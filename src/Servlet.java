@@ -27,14 +27,14 @@ public class Servlet extends HttpServlet
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         resp.setHeader("x-content-options", "nosniff");
-        String relativeWebPath = "/resources" + req.getRequestURI();
-        String absoluteDiskPath = getServletContext().getRealPath(relativeWebPath);
-        File file = new File(absoluteDiskPath);
+            String relativeWebPath = "/resources" + req.getRequestURI();
+            String absoluteDiskPath = getServletContext().getRealPath(relativeWebPath);
+            File file = new File(absoluteDiskPath);
 
-        //System.out.println(req.getRequestURI());
-        //System.out.println(req.getHeader("Accept"));
+            //System.out.println(req.getRequestURI());
+            //System.out.println(req.getHeader("Accept"));
 
-        if (("ajax").equals(req.getHeader("mode")))
+        if("POST".equalsIgnoreCase(req.getMethod()))
         {
             resp.setStatus(200);
             resp.getWriter().println("{\"type\": \"profile\", \"data\": {}}");
