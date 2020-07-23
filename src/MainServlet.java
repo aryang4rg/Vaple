@@ -43,6 +43,8 @@ public class MainServlet extends HttpServlet
         File file = new File(absoluteDiskPath);
         String[] uriSplit = req.getRequestURI().split("[/]+");
 
+		System.out.println("ABSOLUTE_DISK_PATH: " + absoluteDiskPath);
+
 
         if(uriSplit.length > 0 && "POST".equalsIgnoreCase(req.getMethod()))
         {
