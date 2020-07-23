@@ -132,6 +132,10 @@ public class Activity
 		this.attending = attending;
 	}
 
+	public void addAttending(ObjectId id) { attending.add(id);}
+
+	public void removeAttending(ObjectId id) { attending.remove(id); }
+
 	public long getTime()
 	{
 		return time;
@@ -149,7 +153,7 @@ public class Activity
 
 	public static Activity findActivity(DBObject obj)
 	{
-		DBObject object = DatabaseConnectivity.findObject(obj, DatabaseConnectivity.ACTIVITYCOLLECTION);
+		DBObject object = DatabaseConnectivity.findOneObject(obj, DatabaseConnectivity.ACTIVITYCOLLECTION);
 		if(object != null)
 			return new Activity(object);
 		return null;
