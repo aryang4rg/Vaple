@@ -12,17 +12,6 @@ import java.util.Base64;
 
 public class SignUpServlet implements AjaxHandler
 {
-	public String toValidString(String k){
-		if(k == null || k.length() == 0)
-			return null;
-		/* removes all special characters */
-		k = k.replace("[^a-zA-Z0-9_-]", "");
-
-		if(k.length() == 0)
-			return null;
-		return k;
-	}
-
 	public boolean isValidEmail(String email){
 		if(email.indexOf(' ') != -1)
 			return false;
@@ -52,7 +41,9 @@ public class SignUpServlet implements AjaxHandler
 	}
 
 	@Override
-	public void service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response) throws ServletException, IOException {
+	public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User u) throws ServletException, IOException {
+		if(uriSplit.length > 0 || u != null)
+			return 400;
 		String email = Util.nullIfSpecialCharacters(request.get("email").asText());
 		String name = Util.removeTrimAndNonAlphanumeric(request.get("name").asText());
 		String password = Util.nullIfSpecialCharacters(request.get("password").asText());
@@ -65,27 +56,27 @@ public class SignUpServlet implements AjaxHandler
 				response.put("token", null);
 				response.put("error", "Invalid field(s)");
 
-				return;
+				return 200;
 			}
 		if(!isValidEmail(email)){
 			response.put("token", null);
 			response.put("error", "Invalid email");
 
-			return;
+			return 200;
 		}
 
 		if(!isValidPassword(password)){
 			response.put("token", null);
 			response.put("error", "Password must be less than 32 characters");
 
-			return;
+			return 200;
 		}
 
 		if(DatabaseConnectivity.emailAlreadyExists(email)){
 			response.put("token", null);
 			response.put("error", "Email already in use");
 
-			return;
+			return 200;
 		}
 
 		/* here is where you'd encrypt the password */
@@ -101,11 +92,13 @@ public class SignUpServlet implements AjaxHandler
 				response.put("account", user.toAccountNode());
 				response.put("token", user.getToken());
 
-				return;
+				return 200;
 			}
 		}
 
 		response.put("token", null);
 		response.put("error", "Server is busy, try again later");
+
+		return 200;
 	}
 }

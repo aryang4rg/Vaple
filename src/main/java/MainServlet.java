@@ -67,7 +67,18 @@ public class MainServlet extends HttpServlet
 				JsonNode request = Json.parse(req.getReader());
 				ObjectNode response = Util.createObjectNode();
 
-				handler.service(req, resp, request, response);
+				User user = null;
+				String token = resp.getHeader("Authentication");
+
+				if(token != null)
+					user = DatabaseConnectivity.getUserByToken(token);
+				int statusCode = handler.service(req, resp, request, response, Arrays.copyOfRange(uriSplit, 2, uriSplit.length), user);
+
+				if(statusCode != 200){
+					resp.setStatus(statusCode);
+
+					return;
+				}
 
 				boolean retrieveAccount = false;
 
@@ -76,11 +87,6 @@ public class MainServlet extends HttpServlet
 				if(request.get("retrieveAccount").isBoolean() && request.get("retrieveAccount").booleanValue())
 					retrieveAccount = true;
 				if(handler.isPage() && retrieveAccount){
-					User user = null;
-					String token = resp.getHeader("Authentication");
-
-					if(token != null)
-						user = DatabaseConnectivity.getUserByToken(token);
 					if(user != null)
 						/* found the user for that token */
 						response.put("account", user.toAccountNode());

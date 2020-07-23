@@ -15,8 +15,10 @@ public class LoginServlet implements AjaxHandler
 		return false;
 	}
 
-	public void service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response) throws ServletException, IOException
+	public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit) throws ServletException, IOException
 	{
+		if(uriSplit.length > 0)
+			return 400;
 		String email = Util.nullIfSpecialCharacters(request.get("email").asText());
 		String password = Util.nullIfSpecialCharacters(request.get("password").asText());
 		//TODO add encryption to password
@@ -24,7 +26,7 @@ public class LoginServlet implements AjaxHandler
 		{
 			response.put("token", null);
 
-			return;
+			return 200;
 		}
 
 		User user = DatabaseConnectivity.getUserByEmail(email);
@@ -37,5 +39,7 @@ public class LoginServlet implements AjaxHandler
 			response.put("account", user.toObjectNode());
 			response.put("token", user.getToken());
 		}
+
+		return 200;
 	}
 }
