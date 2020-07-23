@@ -13,6 +13,11 @@ public class User implements DatabaseStructureObject
 
 
 
+	private static User databaseConnectivityObject = new User();
+	public static User databaseConnectivity()
+	{
+		return databaseConnectivityObject;
+	}
 	public User() {}
 
 	public User(String name, String email, String password, String location_country,

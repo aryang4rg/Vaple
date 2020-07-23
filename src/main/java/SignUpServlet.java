@@ -84,7 +84,7 @@ public class SignUpServlet implements AjaxHandler
 			return 200;
 		}
 
-		if(User.emailAlreadyExists(email)){
+		if(User.databaseConnectivity().(email)){
 			response.put("token", (Short)null);
 			response.put("error", "Email already in use");
 
