@@ -71,17 +71,17 @@ public class Activity
         this.name = name;
     }
 
-    public String getLocation_country()
+    public String getCountry()
     {
         return location_country;
     }
 
-    public void setLocation_country(String location_country)
+    public void setCountry(String location_country)
     {
         this.location_country = location_country;
     }
 
-    public String getLocation_state()
+    public String getState()
     {
         return location_state;
     }
@@ -97,17 +97,17 @@ public class Activity
     }
 
 
-    public void setLocation_state(String location_state)
+    public void setState(String location_state)
     {
         this.location_state = location_state;
     }
 
-    public String getLocation_city()
+    public String getCity()
     {
         return location_city;
     }
 
-    public void setLocation_city(String location_city)
+    public void setCity(String location_city)
     {
         this.location_city = location_city;
     }
