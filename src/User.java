@@ -1,11 +1,70 @@
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
 import java.util.ArrayList;
 
 public class User
 {
     String name, email, id, password, location_country, location_state, location_city, description, token;
     ArrayList<String> followers, following, activities;
+    BasicDBObject form;
 
-    
+    public User(String name, String email, String id, String password, String location_country, String location_state, String location_city, String description, String token, ArrayList<String> followers, ArrayList<String> following, ArrayList<String> activities)
+    {
+        this.name = name;
+        this.email = email;
+        this.id = id;
+        this.password = password;
+        this.location_country = location_country;
+        this.location_state = location_state;
+        this.location_city = location_city;
+        this.description = description;
+        this.token = token;
+        this.followers = followers;
+        this.following = following;
+        this.activities = activities;
+    }
+
+    public User(DBObject object)
+    {
+        name = (String)object.get("name");
+        email = (String)object.get("email");
+        id = (String)object.get("_id");
+        password = (String)object.get("password");
+        location_country = (String)object.get("location_country");
+        location_city = (String)object.get("location_city");
+        location_state = (String)object.get("location_state");
+        description = (String)object.get("description");
+    }
+
+    public User(BasicDBObject object)
+    {
+        name = (String)object.get("name");
+        email = (String)object.get("email");
+        id = (String)object.get("_id");
+        password = (String)object.get("password");
+        location_country = (String)object.get("location_country");
+        location_city = (String)object.get("location_city");
+        location_state = (String)object.get("location_state");
+        description = (String)object.get("description");
+    }
+
+    public BasicDBObject getDBForm()
+    {
+        form = new BasicDBObject();
+        form.append("name",getName());
+        form.append("email",getEmail());
+        form.append("password",getPassword());
+        form.append("_id",getId());
+        form.append("location_county",getLocation_country());
+        form.append("location_state",getLocation_state());
+        form.append("location_city",getLocation_city());
+        form.append("description",getDescription());
+
+        return form;
+    }
+
+
 
     public String getName() {
         return name;
