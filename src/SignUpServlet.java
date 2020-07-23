@@ -57,5 +57,7 @@ public class SignUpServlet implements AjaxHandler
 			resp.getWriter().println("{\"token\": null, \"error\": \"Password must be less than 32 characters\"}");
 			return;
 		}
+
+		/* here is where you'd encrypt the password */
     }
 }
