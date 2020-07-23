@@ -74,6 +74,7 @@ public class User
         form.append("following",getFollowing());
         form.append("followers",getFollowers());
         form.append("activities",getActivities());
+		form.append("token",getToken());
 
         return form;
     }
