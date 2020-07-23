@@ -51,7 +51,7 @@ public class Activity
     {
         form = new BasicDBObject();
         form.append("name",getName());
-        form.append("location_county",getCountry());
+        form.append("location_county", getCountry());
         form.append("location_state",getState());
         form.append("location_city",getCity());
         form.append("description",getDescription());

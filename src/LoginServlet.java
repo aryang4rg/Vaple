@@ -5,12 +5,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 
 public class LoginServlet implements AjaxHandler
 {
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
-        JsonNode creds = Json.parse(req.getReader());
+
+
+        JsonNode creds = Json.parse(req.getInputStream());
         String email = creds.get("email").asText();
         String password = creds.get("password").asText();
         //TODO add encryption to password
@@ -24,7 +28,7 @@ public class LoginServlet implements AjaxHandler
         {
             resp.getWriter().print("{\"token\": null}\n");
         }
-        else if (/* here is where you'd encrypt the password */ !user.getPassword().equals(password))
+        else if (!user.getPassword().equals(password))
         {
             resp.getWriter().print("{\"token\": null}\n");
         }

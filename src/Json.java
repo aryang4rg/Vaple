@@ -2,6 +2,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 
 public class Json
@@ -32,6 +33,11 @@ public class Json
     }
 
     public static JsonNode parse(Reader src) throws IOException
+    {
+        return  objectMapper.readTree(src);
+    }
+
+    public static JsonNode parse(InputStream src) throws IOException
     {
         return  objectMapper.readTree(src);
     }

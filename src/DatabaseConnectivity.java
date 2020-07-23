@@ -54,6 +54,11 @@ public class DatabaseConnectivity
         return new User(object);
     }
 
+    public static boolean userInfoExist(String varName, String data )
+    {
+        return true;
+    }
+
     public static boolean emailAlreadyExists(String email)
     {
         return getUserByEmail(email) != null;
