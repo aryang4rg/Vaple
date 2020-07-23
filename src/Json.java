@@ -25,7 +25,6 @@ public class Json
 
     private static ObjectMapper objectMapper = getDefaultObjectMapper();
 
-
     public static JsonNode parse(String src) throws IOException
     {
         return  objectMapper.readTree(src);

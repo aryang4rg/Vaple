@@ -7,10 +7,15 @@ import java.io.IOException;
 
 public class SignUpServlet implements AjaxHandler
 {
-	public boolean isValid(String k){
+	public String toValidString(String k){
 		if(k == null || k.length() == 0)
-			return false;
-		return true;
+			return null;
+		/* removes all special characters */
+		k = k.replace("[^a-zA-Z0-9_-]", "");
+
+		if(k.length() == 0)
+			return null;
+		return k;
 	}
 
 	public boolean isValidEmail(String email){
@@ -19,8 +24,6 @@ public class SignUpServlet implements AjaxHandler
 
 		if(ai < 1 || pi <= ai + 1 || pi + 1 >= email.length())
 			return false;
-		//check if email doesnt already exist
-
 		return false;
 	}
 
@@ -31,18 +34,18 @@ public class SignUpServlet implements AjaxHandler
     @Override
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         JsonNode node = Json.parse(req.getReader());
-        String email = node.get("email").asText();
-        String name = node.get("name").asText();
-        String password = node.get("password").asText();
-        String location_country = node.get("location_country").asText();
-        String location_state = node.get("location_state").asText();
-        String location_city = node.get("location_city").asText();
+        String email = toValidString(node.get("email").asText());
+        String name = toValidString(node.get("name").asText());
+        String password = toValidString(node.get("password").asText());
+        String location_country = toValidString(node.get("location_country").asText());
+        String location_state = toValidString(node.get("location_state").asText());
+        String location_city = toValidString(node.get("location_city").asText());
 
         //TODO make token, verify fields exist
        // User user = new User(name,email,password, location_country, location_state, location_city, "", );
 
-		if(!isValid(email) || !isValid(name) || !isValid(password) || !isValid(location_country) ||
-			!isValid(location_state) || !isValid(location_city)){
+		if(email == null || name == null || password == null || location_country == null ||
+			location_state == null || location_city == null){
 				resp.getWriter().println("{\"token\": null}");
 
 				return;
@@ -55,6 +58,13 @@ public class SignUpServlet implements AjaxHandler
 
 		if(!isValidPassword(password)){
 			resp.getWriter().println("{\"token\": null, \"error\": \"Password must be less than 32 characters\"}");
+
+			return;
+		}
+
+		if(DatabaseConnectivity.emailAlreadyExists(email)){
+			resp.getWriter().println("{\"token\": null, \"error\": \"Email already in use\"}");
+
 			return;
 		}
 

@@ -8,13 +8,24 @@ import java.io.IOException;
 
 public class LoginServlet implements AjaxHandler
 {
+	public String toValidString(String k){
+		if(k == null || k.length() == 0)
+			return null;
+		/* removes all special characters */
+		k = k.replace("[^a-zA-Z0-9_-]", "");
+
+		if(k.length() == 0)
+			return null;
+		return k;
+	}
+
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
         JsonNode creds = Json.parse(req.getReader());
-        String email = creds.get("email").asText();
-        String password = creds.get("password").asText();
+        String email = toValidString(creds.get("email").asText());
+        String password = toValidString(creds.get("password").asText());
         //TODO add encryption to password
-        if (email == null || password == null || email.length() == 0 || password.length() == 0)
+        if (email == null || password == null)
         {
             resp.getWriter().print("{\"token\": null}\n");
         }
@@ -30,8 +41,7 @@ public class LoginServlet implements AjaxHandler
         }
         else
         {
-            JsonNode account = Json.toJson(user);
-            resp.getWriter().print(Json.stringify(account));
+            resp.getWriter().print(user.toJsonString());
         }
     }
 }

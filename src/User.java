@@ -169,4 +169,17 @@ public class User
     {
         return objectID;
     }
+
+	public String toJsonString(){
+		ObjectNode node = JsonNodeFactory.instance.objectNode();
+
+		node.put("name",getName());
+        node.put("location_county",getLocation_country());
+        node.put("location_state",getLocation_state());
+        node.put("location_city",getLocation_city());
+        node.put("description",getDescription());
+		node.put("id",getObjectID().toHexString());
+
+		return Json.stringify(node);
+	}
 }
