@@ -481,19 +481,27 @@ class LoginPage extends Page{
 	}
 
 	load(){
-		history.pushState(null, 'Login', '/login');
+		document.title = 'Login';
+		history.pushState(null, document.title, '/login');
 	}
 
-	finish(error){
+	finish(token, reason){
 		this.button.classList.remove('disabled');
 
-		if(error){
+		if(reason || !token){
 			this.actionError.style.display = '';
 
-			if(this.mode == 'login')
-				this.actionError.setText('There was an error logging in, try again later');
-			else
-				this.actionError.setText('There was an error signing up, try again later');
+			if(!reason){
+				if(this.mode == 'login'){
+					if(token === null)
+						reason = 'Invalid credentials';
+					else
+						reason = 'There was an error logging in, try again later';
+				}else
+					reason = 'There was an error creating your account, try again later';
+			}
+
+			this.actionError.setText(reason);
 		}else{
 			this.form.style.width = '';
 
@@ -526,13 +534,29 @@ class ProfilePage extends Page{
 		this.table.appendChild(createElement('div', {className: 'profile-container expander'}));
 		this.table.appendChild(this.right);
 		this.element.appendChild(this.table);
+
+		this.profileAboutContainer = createElement('div', {className: 'profile-about-container shadow-heavy'});
+		this.profileImage = createElement('div', {className: 'profile-photo shadow-heavy'});
+		this.profileAboutContainer.appendChild(createElement('div', {className: 'profile-photo-container'}, [this.profileImage]));
+		this.details = createElement('div', {className: 'profile-details'});
+		this.profileAboutContainer.appendChild(this.details);
+		this.name = createElement('span', {className: 'profile-name text'});
+		this.details.appendChild(this.name);
+		this.followcount = createElement('div', {className: 'profile-follow-counter number'});
+		this.followercount = createElement('div', {className: 'profile-follow-counter number'});
+		this.details.appendChild(createElement('div', {className: 'profile-follow-counter'}, [
+			createElement('div', {className: 'profile-follow-count'})
+		]));
+
+		this.left.appendChild(this.profileAboutContainer);
 	}
 
 	load(data){
-		console.log(data);
+		document.title = data.name + "'s profile";
+		history.pushState(null, document.title, '/profiles/' + data.id);
 
-		/* todo */
-		history.pushState(null, "garg's profile", '/profiles/' + data.id);
+		this.profileImage.style['background-image'] = 'url("/cdn/profile/' + data.id + '.png")';
+		this.name.setText(data.name);
 	}
 }
 
@@ -540,28 +564,35 @@ class FeedPage extends Page{
 	load(data){
 		/* todo */
 
-		history.pushState(null, 'Your feed', '/');
+		document.title = 'Your feed';
+		history.pushState(null, document.title, '/');
 	}
 }
 
 class AccountPage extends Page{
 	load(data){
 		/* todo */
-		history.pushState(null, 'Account', '/account');
+
+		document.title = 'Account';
+		history.pushState(null, document.title, '/account');
 	}
 }
 
 class ExplorePage extends Page{
 	load(data){
 		/* todo */
-		history.pushState(null, 'Explore', '/explore');
+
+		document.title = 'Explore';
+		history.pushState(null, document.title, '/explore');
 	}
 }
 
 class DashboardPage extends Page{
 	load(data){
 		/* todo */
-		history.pushState(null, 'Dashboard', '/dashboard');
+
+		document.title = 'Account';
+		history.pushState(null, document.title, '/dashboard');
 	}
 }
 
@@ -748,6 +779,7 @@ const pageLoader = new (class{
 					if(!accountManager.hasAccount){
 						pageManager.load({type: 'login', data: null});
 
+						this.stopLoading();
 						this.loadingToast.hide();
 					}
 
@@ -810,6 +842,7 @@ const pageLoader = new (class{
 		if(this.loading && this.loading.readyState < 4){
 			this.loading.abort();
 			this.loading = null;
+			this.loadingToast.hideAfter(200);
 		}
 	}
 });
@@ -853,16 +886,18 @@ const accountManager = new (class{
 			pageManager.showErrorPage();
 	}
 
-	complete(error){
+	complete(data){
 		this.loggingIn = false;
 
-		pageManager.pages.login.finish(error);
+		pageManager.pages.login.finish(data.token, data.error);
 
-		if(!error){
-			this.updateButtons();
+		if(data.error || !data.token)
+			return false;
+		if(data.account)
+			return true;
+		pageManager.showErrorPage();
 
-			pageLoader.load('/');
-		}
+		return false;
 	}
 
 	updateButtons(){
@@ -884,26 +919,28 @@ const accountManager = new (class{
 		l.send(JSON.stringify(content));
 		l.addEventListener('load', () => {
 			if(l.status != 200)
-				return this.complete(true);
+				return this.complete({});
 			var data;
 
 			try{
 				data = JSON.parse(l.response);
 			}catch(e){
-				return this.complete(true);
+				return this.complete({});
 			}
 
-			if(!data.token || !data.account)
-				return this.complete(true);
-			localStorage.token = data.token;
+			if(this.complete(data)){
+				localStorage.token = data.token;
 
-			this.load(data.account);
-			this.token = data.token;
-			this.complete(false);
+				this.load(data.account);
+				this.token = data.token;
+				this.updateButtons();
+
+				pageLoader.load('/');
+			}
 		});
 
 		l.addEventListener('error', () => {
-			this.complete(true);
+			this.complete({});
 		});
 	}
 

@@ -11,7 +11,7 @@
 
 body{
 	margin: 0;
-	background-color: #fff;
+	background-color: #eee;
 	height: 100vh;
 }
 
@@ -159,6 +159,7 @@ a{
 
 .top-bar .quick-nav{
 	padding: 16px;
+	cursor: pointer;
 }
 
 .top-bar .quick-nav:hover{
@@ -267,7 +268,9 @@ a{
 
 .profile-container.left{
 	width: 400px;
-	position: fixed;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .profile-container.right{
@@ -276,10 +279,78 @@ a{
 
 .profile-container.middle{
 	flex-grow: 1;
+	overflow: auto;
 }
 
 .profile-container.expander{
 	width: 12px;
+}
+
+.profile-about-container{
+	width: 320px;
+	border-radius: 8px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	position: relative;
+	background-color: #fff;
+}
+
+.profile-photo-container{
+	transform: translateY(-50%);
+	background-color: #eee;
+	width: 190px;
+	height: 190px;
+	border-radius: 50%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.profile-photo{
+	width: 180px;
+	height: 180px;
+	border-radius: 50%;
+	background-position: center;
+	background-size: cover;
+}
+
+.profile-details{
+	width: 280px;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	top: -80px;
+}
+
+.profile-name{
+	display: flex;
+	flex-direction: row;
+	flex: 1;
+	justify-content: center;
+	font-size: 32px;
+}
+
+.profile-follow-count{
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	justify-content: space-evenly;
+}
+
+.profile-follow-counter{
+	display: flex;
+	flex-direction: column;
+}
+
+.profile-follow-counter .title{
+	font-size: 12px;
+	color: #555;
+	margin-bottom: 8px;
+}
+
+.profile-follow-counter .number{
+	font-size: 18px;
 }
 
 .login-background{
@@ -394,6 +465,7 @@ a{
 	color: #fff;
 	height: 40px;
 	cursor: pointer;
+	user-select: none;
 }
 
 @keyframes cycle{
