@@ -208,7 +208,7 @@ class LoadingToast extends Toast{
 	}
 
 	progress(){
-
+		/* todo */
 	}
 }
 
@@ -234,18 +234,11 @@ class Page{
 		this.element = createElement('div', {className: 'page'});
 	}
 
-	showing(){
+	showing(){}
 
-	}
+	hidden(){}
 
-	hidden(){
-
-
-	}
-
-	load(data){
-
-	}
+	load(data){}
 }
 
 class ErrorPage extends Page{
@@ -258,11 +251,22 @@ class ErrorPage extends Page{
 	}
 }
 
+class NotFoundPage extends Page{
+	constructor(){
+		super();
+
+		this.element.appendChild(createElement('div', {className: 'center'}, [
+			createElement('span', {className: 'text', innerText: "We could not find the page you're looking for :("})
+		]));
+	}
+}
+
 class LoginPage extends Page{
 	constructor(){
 		super();
 
 		this.mode = 'login';
+		this.showingsuccess = false;
 		this.emailIcon = createElement('svg', {className: 'login-form-entry-icon'}, [
 			createElement('path', {attributes: {fill: 'none', d: 'M0 0h24v24H0z'}}),
 			createElement('path', {attributes: {d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10h5v-2h-5c-4.34 0-8-3.66-8-8s3.66-8 8-8 8 3.66 8 8v1.43c0 .79-.71 1.57-1.5 1.57s-1.5-.78-1.5-1.57V12c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5c1.38 0 2.64-.56 3.54-1.47.65.89 1.77 1.47 2.96 1.47 1.97 0 3.5-1.6 3.5-3.57V12c0-5.52-4.48-10-10-10zm0 13c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z'}})
@@ -281,6 +285,7 @@ class LoginPage extends Page{
 		this.form = createElement('div', {className: 'login-form shadow-heavy'});
 		this.title = createElement('span', {className: 'login-form-title text metro', innerText: 'Login'});
 		this.form.appendChild(this.title);
+		this.formContainer = createElement('div', {className: 'login-form-container'});
 		this.entries = createElement('div', {className: 'login-form-entries'});
 		this.name = this.createEntry('Name', 'text', this.nameIcon);
 		this.entries.appendChild(this.name.entry);
@@ -295,15 +300,19 @@ class LoginPage extends Page{
 		this.entries.appendChild(this.state.entry);
 		this.city = this.createEntry('City', 'text');
 		this.entries.appendChild(this.city.entry);
-		this.form.appendChild(this.entries);
+		this.formContainer.appendChild(this.entries);
 		this.button = createElement('div', {className: 'login-button login-background text metro', innerText: 'login'});
-		this.form.appendChild(this.button);
+		this.formContainer.appendChild(this.button);
+		this.actionError = createElement('span', {className: 'login-form-entry-error text metro'});
+		this.formContainer.appendChild(this.actionError);
 		this.textcontainer = createElement('div', {className: 'login-change-container'});
 		this.text = createElement('span', {className: 'text metro'});
 		this.textbutton = createElement('span', {className: 'login-change-button text metro'});
 		this.textcontainer.appendChild(this.text);
 		this.textcontainer.appendChild(this.textbutton);
-		this.form.appendChild(this.textcontainer);
+		this.formContainer.appendChild(this.textcontainer);
+		this.successText = createElement('span', {className: 'text metro', css: {'font-size': '12px', 'margin-top': '40px'}});
+		this.form.appendChild(this.formContainer);
 		this.element.appendChild(createElement('div', {className: 'center'}, [this.form]));
 		this.element.classList.add('login-background');
 
@@ -311,9 +320,10 @@ class LoginPage extends Page{
 		this.country.entry.style.display = 'none';
 		this.state.entry.style.display = 'none';
 		this.city.entry.style.display = 'none';
+		this.actionError.style.display = 'none';
 
 		this.textbutton.on('click', () => {
-			if(accountManager.loggingIn)
+			if(!accountManager.needLogin())
 				return;
 			if(this.mode == 'login')
 				this.signupMode();
@@ -322,13 +332,17 @@ class LoginPage extends Page{
 		});
 
 		this.button.on('click', () => {
-			if(accountManager.loggingIn)
+			if(!accountManager.needLogin())
 				return;
+			this.actionError.style.display = 'none';
+
 			var error = false;
+
 			if(this.email.field.value)
 				this.email.error.setText('');
 			else{
 				this.email.error.setText('Enter your email');
+
 				error = true;
 			}
 
@@ -341,6 +355,7 @@ class LoginPage extends Page{
 					this.password.error.setText('');
 			}else{
 				this.password.error.setText('Enter your password');
+
 				error = true;
 			}
 
@@ -429,6 +444,7 @@ class LoginPage extends Page{
 		this.state.entry.style.display = 'none';
 		this.city.entry.style.display = 'none';
 		this.form.style.width = '';
+		this.actionError.style.display = 'none';
 		this.mode = 'login';
 	}
 
@@ -443,17 +459,55 @@ class LoginPage extends Page{
 		this.state.entry.style.display = '';
 		this.city.entry.style.display = '';
 		this.form.style.width = '640px';
+		this.actionError.style.display = 'none';
 		this.mode = 'signup';
 	}
 
 	showing(){
-		if(accountManager.loggingIn)
-			return;
+		this.email.field.value = '';
+		this.password.field.value = '';
+		this.name.field.value = '';
+		this.country.field.value = '';
+		this.state.field.value = '';
+		this.city.field.value = '';
+
 		this.loginMode();
+
+		if(this.showingsuccess){
+			this.showingsuccess = false;
+			this.form.appendChild(this.formContainer);
+			this.form.removeChild(this.successText);
+		}
 	}
 
 	load(){
 		history.pushState(null, 'Login', '/login');
+	}
+
+	finish(error){
+		this.button.classList.remove('disabled');
+
+		if(error){
+			this.actionError.style.display = '';
+
+			if(this.mode == 'login')
+				this.actionError.setText('There was an error logging in, try again later');
+			else
+				this.actionError.setText('There was an error signing up, try again later');
+		}else{
+			this.form.style.width = '';
+
+			if(!this.showingsuccess){
+				this.showingsuccess = true;
+				this.form.removeChild(this.formContainer);
+				this.form.appendChild(this.successText);
+			}
+
+			if(this.mode == 'login')
+				this.successText.setText('Login successful. You will be shortly redirected');
+			else
+				this.successText.setText('Signup successful. You will be shortly redirected');
+		}
 	}
 }
 
@@ -492,18 +546,21 @@ class FeedPage extends Page{
 
 class AccountPage extends Page{
 	load(data){
+		/* todo */
 		history.pushState(null, 'Account', '/account');
 	}
 }
 
 class ExplorePage extends Page{
 	load(data){
+		/* todo */
 		history.pushState(null, 'Explore', '/explore');
 	}
 }
 
 class DashboardPage extends Page{
 	load(data){
+		/* todo */
 		history.pushState(null, 'Dashboard', '/dashboard');
 	}
 }
@@ -529,7 +586,8 @@ const pageManager = new (class{
 			feed: new FeedPage(),
 			account: new AccountPage(),
 			explore: new ExplorePage(),
-			dashboard: new DashboardPage()
+			dashboard: new DashboardPage(),
+			notfound: new NotFoundPage()
 		};
 
 		this.showingPage = null;
@@ -569,12 +627,19 @@ const pageManager = new (class{
 				this.right = createElement('div', {className: 'right'});
 				this.element.appendChild(this.right);
 				this.login = this.createItem('Login', '/login');
+				this.logout = createElement('a', {className: 'quick-nav text metro', innerText: 'Logout'});
+				this.logout.on('click', () => {
+					accountManager.logout();
+					location = location.href;
+				});
+
+				this.logoutShowing = false;
+				this.loginShowing = false;
 			}
 
 			createItem(text, path){
-				const el = createElement('a', {className: 'quick-nav text metro', innerText: text});
+				const el = createElement('a', {className: 'quick-nav text metro', innerText: text, attributes: {href: path}});
 
-				el.setAttribute('href', path);
 				el.on('click', (e) => {
 					e.preventDefault();
 					pageLoader.load(path);
@@ -583,6 +648,28 @@ const pageManager = new (class{
 				});
 
 				return el;
+			}
+
+			showLogin(show){
+				if(show != this.loginShowing){
+					this.loginShowing = show;
+
+					if(show)
+						this.right.appendChild(this.login);
+					else
+						this.right.removeChild(this.login);
+				}
+			}
+
+			showLogout(show){
+				if(show != this.logoutShowing){
+					this.logoutShowing = show;
+
+					if(show)
+						this.right.appendChild(this.logout);
+					else
+						this.right.removeChild(this.logout);
+				}
 			}
 		});
 
@@ -609,6 +696,10 @@ const pageManager = new (class{
 		this.showPage(this.pages.error);
 	}
 
+	showNotFoundPage(){
+		this.showPage(this.pages.notfound);
+	}
+
 	load(data){
 		if(!data.type)
 			return this.showErrorPage();
@@ -627,8 +718,10 @@ const pageLoader = new (class{
 		this.loading = null;
 		this.loadingToast = new LoadingToast('Navigating page');
 		this.loadingToast.indeterminate();
+		this.waitforlogin = new Toast('Please wait for login/signup');
 
 		toastManager.addToast(this.loadingToast);
+		toastManager.addToast(this.waitforlogin);
 
 		window.addEventListener('popstate', (e) => {
 			this.load(location.href);
@@ -636,11 +729,7 @@ const pageLoader = new (class{
 	}
 
 	load(url){
-		if(this.loading && this.loading.readyState < 4)
-			this.loading.abort();
-		if(accountManager.loggingIn)
-			return;
-		if(!accountManager.needAccount && !accountManager.hasAccount)
+		if(accountManager.hasAccount || !accountManager.needAccount){
 			do{
 				if(!url.startsWith('/')){
 					var u;
@@ -656,13 +745,26 @@ const pageLoader = new (class{
 				const spl = url.split(/[/]+/);
 
 				if(spl[1] == 'login'){
-					pageManager.load({type: 'login', data: null});
+					if(!accountManager.hasAccount){
+						pageManager.load({type: 'login', data: null});
 
-					this.loadingToast.hide();
+						this.loadingToast.hide();
+					}
 
 					return;
 				}
 			}while(false);
+		}
+
+		this.stopLoading();
+
+		if(accountManager.loggingIn){
+			this.waitforlogin.show();
+			this.waitforlogin.hideAfter(5000);
+
+			return;
+		}
+
 		const l = new XMLHttpRequest();
 
 		l.open('POST', url);
@@ -676,6 +778,8 @@ const pageLoader = new (class{
 		l.addEventListener('load', () => {
 			this.loadingToast.hideAfter(200);
 
+			if(l.status == 404)
+				return pageManager.showNotFoundPage();
 			if(l.status != 200)
 				return pageManager.showErrorPage();
 			var data;
@@ -701,6 +805,13 @@ const pageLoader = new (class{
 		this.loading = l;
 		this.loadingToast.show();
 	}
+
+	stopLoading(){
+		if(this.loading && this.loading.readyState < 4){
+			this.loading.abort();
+			this.loading = null;
+		}
+	}
 });
 
 const accountManager = new (class{
@@ -712,13 +823,14 @@ const accountManager = new (class{
 
 		if(this.token)
 			this.needAccount = true;
-		else
-			pageManager.topBar.right.appendChild(pageManager.topBar.login);
-		this.loadFailed = new Toast('Failed to load your account');
+		this.updateButtons();
 		this.expired = new Toast('Account credentials expired');
 
-		toastManager.addToast(this.loadFailed);
 		toastManager.addToast(this.expired);
+	}
+
+	needLogin(){
+		return !this.loggingIn && !this.token;
 	}
 
 	load(account){
@@ -728,28 +840,91 @@ const accountManager = new (class{
 			if(account.expired){
 				this.expired.show();
 				this.expired.hideAfter(5000);
+				this.token = null;
 
-				pageManager.topBar.right.appendChild(pageManager.topBar.login);
-				localStorage.token = null;
+				this.updateButtons();
 
+				delete localStorage.token;
 				return;
 			}
 
 			this.hasAccount = true;
-		}else{
-			this.loadFailed.show();
-			this.loadFailed.hideAfter(5000);
+		}else
+			pageManager.showErrorPage();
+	}
 
-			pageManager.topBar.right.appendChild(pageManager.topBar.login);
+	complete(error){
+		this.loggingIn = false;
+
+		pageManager.pages.login.finish(error);
+
+		if(!error){
+			this.updateButtons();
+
+			pageLoader.load('/');
 		}
 	}
 
+	updateButtons(){
+		if(this.token){
+			pageManager.topBar.showLogout(true);
+			pageManager.topBar.showLogin(false);
+		}else{
+			pageManager.topBar.showLogout(false);
+			pageManager.topBar.showLogin(true);
+		}
+	}
+
+	send(path, content){
+		pageLoader.stopLoading();
+
+		const l = new XMLHttpRequest();
+
+		l.open('POST', path);
+		l.send(JSON.stringify(content));
+		l.addEventListener('load', () => {
+			if(l.status != 200)
+				return this.complete(true);
+			var data;
+
+			try{
+				data = JSON.parse(l.response);
+			}catch(e){
+				return this.complete(true);
+			}
+
+			if(!data.token || !data.account)
+				return this.complete(true);
+			localStorage.token = data.token;
+
+			this.load(data.account);
+			this.token = data.token;
+			this.complete(false);
+		});
+
+		l.addEventListener('error', () => {
+			this.complete(true);
+		});
+	}
+
 	login(email, password){
+		if(!this.needLogin())
+			return;
 		this.loggingIn = true;
+		this.send('/account_login', {email, password});
 	}
 
 	signup(name, email, password, country, state, city){
+		if(!this.needLogin())
+			return;
 		this.loggingIn = true;
+		this.send('/account_create', {email, password, name, location_country: country, location_state: state, location_city: city});
+	}
+
+	logout(){
+		this.token = null;
+
+		delete localStorage.token;
 	}
 });
 
