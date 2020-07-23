@@ -29,14 +29,13 @@ public class MainServlet extends HttpServlet
 
 	private Hashtable<String, AjaxHandler> pathToHandler = ajaxRequestToHandler();
 	private Hashtable<String, String> extensionToMime = extensionToMimeHM();
-	public LoginServlet loginServlet =  LoginServlet.getSingletonServlet();
-	public SignUpServlet signUpServlet = SignUpServlet.getSingletonServlet();
+
 
 	private Hashtable<String, AjaxHandler> ajaxRequestToHandler()
 	{
 		Hashtable<String, AjaxHandler> hashtable = new Hashtable<String, AjaxHandler>();
-		hashtable.put("account_login", loginServlet);
-		hashtable.put("account_create", signUpServlet);
+		hashtable.put("account_login", LoginServlet.getSingletonServlet());
+		hashtable.put("account_create", SignUpServlet.getSingletonServlet());
 		return hashtable;
 	}
 
@@ -85,7 +84,7 @@ public class MainServlet extends HttpServlet
 
 				/* on a first page load, the client will ask for account id to verify the token */
 
-				if(request.get("retrieveAccount").isBoolean() && request.get("retrieveAccount").booleanValue())
+				if( request.get("retrieveAccount") != null && request.get("retrieveAccount").isBoolean() && request.get("retrieveAccount").booleanValue())
 					retrieveAccount = true;
 				if(handler.isPage() && retrieveAccount){
 					if(user != null)

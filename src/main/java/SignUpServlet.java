@@ -16,7 +16,10 @@ public class SignUpServlet implements AjaxHandler
 	private static SignUpServlet singletonServlet = new SignUpServlet();
 	public static SignUpServlet getSingletonServlet()
 	{
+		if (singletonServlet == null)
+			singletonServlet = new SignUpServlet();
 		return singletonServlet;
+
 	}
 
 	private SignUpServlet(){}
@@ -90,7 +93,7 @@ public class SignUpServlet implements AjaxHandler
 			return 200;
 		}
 
-		/* here is where you'd encrypt the password */
+		password = PasswordHasher.getSingletonObject().createHash(password);
 
 		for(int i = 0; i < 100; i++){
 			String token = generateSafeToken();

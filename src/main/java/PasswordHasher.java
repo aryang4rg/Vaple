@@ -8,8 +8,9 @@ public class PasswordHasher
     private static PasswordHasher singletonObject = new PasswordHasher();
 
     public static PasswordHasher getSingletonObject() {
-        return singletonObject;
-    }
+        if (singletonObject == null)
+            singletonObject = new PasswordHasher();
+        return singletonObject;    }
 
     public String getPepper() {
         return pepper;

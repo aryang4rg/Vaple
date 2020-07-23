@@ -15,6 +15,9 @@ public class LoginServlet implements AjaxHandler
 	private static LoginServlet singletonServlet = new LoginServlet();
 
 	public static LoginServlet getSingletonServlet() {
+		if (singletonServlet == null)
+			singletonServlet = new LoginServlet();
+
 		return singletonServlet;
 	}
 
@@ -50,7 +53,6 @@ public class LoginServlet implements AjaxHandler
 
 		password = PasswordHasher.getSingletonObject().createHash(password);
 
-		//password = PasswordHasher.getSingletonObject().createHash()
 		User user = DatabaseConnectivity.getUserByEmail(email);
 		if (user == null || !user.getPassword().equals(password))
 		{
