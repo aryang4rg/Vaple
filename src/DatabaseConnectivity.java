@@ -67,7 +67,7 @@ public class DatabaseConnectivity
 
     public static User getUser(ObjectId id)
     {
-        BasicDBObject user = accountCollection.findOne(new BasicDBObject("_id", id));
+        BasicDBObject user = (BasicDBObject)accountCollection.findOne(new BasicDBObject("_id", id));
 
 		if(user == null)
 			return null;
