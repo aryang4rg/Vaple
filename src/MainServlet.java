@@ -56,11 +56,13 @@ public class MainServlet extends HttpServlet
             }
             else
             {
-                resp.setStatus(404);
+                resp.setHeader("Content-Type", "text/html");
+                sendFile(resp.getOutputStream(), new File(getServletContext().getRealPath("/resources/page.html")));
             }
         }
         else if (file.exists() && file.isFile())
         {
+
             sendFile(resp.getOutputStream(), file);
         }
         else
