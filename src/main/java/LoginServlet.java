@@ -1,4 +1,6 @@
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -47,7 +49,7 @@ public class LoginServlet implements AjaxHandler
 
 			node.put("account", node);
 			node.put("token", user.getToken());
-            resp.getWriter().print(JSON.stringify(node));
+            resp.getWriter().print(Json.stringify(node));
         }
     }
 }
