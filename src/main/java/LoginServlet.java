@@ -45,7 +45,7 @@ public class LoginServlet implements AjaxHandler
         {
 			ObjectNode node = JsonNodeFactory.instance.objectNode();
 
-			node.put("account", node);
+			node.put("account", user.toObjectNode());
 			node.put("token", user.getToken());
             resp.getWriter().print(JSON.stringify(node));
         }
