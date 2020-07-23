@@ -46,10 +46,10 @@ public class MainServlet extends HttpServlet
 		System.out.println("ABSOLUTE_DISK_PATH: " + absoluteDiskPath);
 
 
-        if(uriSplit.length > 0 && "POST".equalsIgnoreCase(req.getMethod()))
+        if(uriSplit.length > 1 && "POST".equalsIgnoreCase(req.getMethod()))
         {
 
-            AjaxHandler handler = pathToHandler.get(uriSplit[0]);
+            AjaxHandler handler = pathToHandler.get(uriSplit[1]);
             if (handler != null)
             {
                 handler.service(req,resp);
