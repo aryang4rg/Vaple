@@ -17,10 +17,11 @@ public class SignUpServlet implements AjaxHandler
 		int pi = email.lastIndexOf('.');
 		int ai = email.indexOf('@');
 
-		if(ai < 1 || pi <= ai + 1 || pi + 1 >= email.length)
+		if(ai < 1 || pi <= ai + 1 || pi + 1 >= email.length())
 			return false;
-		else
-			return true;
+		//check if email doesnt already exist
+
+		return false;
 	}
 
 	public boolean isValidPassword(String k){
@@ -38,7 +39,7 @@ public class SignUpServlet implements AjaxHandler
         String location_city = node.get("location_city").asText();
 
         //TODO make token, verify fields exist
-       // User user = new User(name,email,password, location_country, location_state, location_city, );
+       // User user = new User(name,email,password, location_country, location_state, location_city, "", );
 
 		if(!isValid(email) || !isValid(name) || !isValid(password) || !isValid(location_country) ||
 			!isValid(location_state) || !isValid(location_city)){
@@ -54,7 +55,6 @@ public class SignUpServlet implements AjaxHandler
 
 		if(!isValidPassword(password)){
 			resp.getWriter().println("{\"token\": null, \"error\": \"Password must be less than 32 characters\"}");
-
 			return;
 		}
     }

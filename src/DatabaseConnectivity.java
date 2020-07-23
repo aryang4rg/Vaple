@@ -1,7 +1,6 @@
 import com.mongodb.*;
 import org.bson.types.ObjectId;
 
-import java.lang.reflect.Array;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
