@@ -68,7 +68,7 @@ public class DatabaseConnectivity
 
 	public static boolean doesObjectExist(DBObject object, DBCollection collection)
 	{
-		return findObject(object, collection) != null;
+		return findOneObject(object, collection) != null;
 	}
 
 

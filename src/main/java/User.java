@@ -178,7 +178,7 @@ public class User implements DatabaseStructureObject
 
 
 	public DatabaseStructureObject findInDatabase(DBObject obj){
-		DBObject object = DatabaseConnectivity.findObject(obj, DatabaseConnectivity.ACCOUNTCOLLECTION);
+		DBObject object = DatabaseConnectivity.findOneObject(obj, DatabaseConnectivity.ACCOUNTCOLLECTION);
 		if(object != null)
 			return new User(object);
 		return null;
@@ -208,7 +208,7 @@ public class User implements DatabaseStructureObject
 	public void addInDatabase(DatabaseStructureObject user)
 	{
 		String email = ((User)(user)).getEmail();
-		if (DatabaseConnectivity.findObject(  new BasicDBObject("email", email),DatabaseConnectivity.ACCOUNTCOLLECTION) == null)
+		if (DatabaseConnectivity.findOneObject(  new BasicDBObject("email", email),DatabaseConnectivity.ACCOUNTCOLLECTION) == null)
 		{
 			DatabaseConnectivity.addObject(user.getDBForm(), DatabaseConnectivity.ACCOUNTCOLLECTION);
 		}
