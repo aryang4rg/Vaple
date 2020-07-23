@@ -172,7 +172,7 @@ public class User
         return objectID;
     }
 
-	public ObjectNode getObjectNode(){
+	public ObjectNode toObjectNode(){
 		ObjectNode node = JsonNodeFactory.instance.objectNode();
 
 		node.put("name",getName());
