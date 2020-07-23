@@ -1,6 +1,5 @@
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -12,44 +11,31 @@ import java.io.Reader;
 
 public class LoginServlet implements AjaxHandler
 {
-	public String toValidString(String k){
-		if(k == null || k.length() == 0)
-			return null;
-		/* removes all special characters */
-		k = k.replace("[^a-zA-Z0-9_-]", "");
-
-		if(k.length() == 0)
-			return null;
-		return k;
+	public boolean isPage(){
+		return false;
 	}
 
-    public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-    {
-        JsonNode creds = Json.parse(req.getInputStream());
-        String email = toValidString(creds.get("email").asText());
-        String password = toValidString(creds.get("password").asText());
-        //TODO add encryption to password
-        if (email == null || password == null)
-        {
-            resp.getWriter().print("{\"token\": null}\n");
-        }
+	public void service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response) throws ServletException, IOException
+	{
+		String email = Util.nullIfSpecialCharacters(request.get("email").asText());
+		String password = Util.nullIfSpecialCharacters(request.get("password").asText());
+		//TODO add encryption to password
+		if (email == null || password == null)
+		{
+			response.put("token", null);
 
-        User user = DatabaseConnectivity.getUserByEmail(email);
-        if (user == null)
-        {
-            resp.getWriter().print("{\"token\": null}\n");
-        }
-        else if (!user.getPassword().equals(password))
-        {
-            resp.getWriter().print("{\"token\": null}\n");
-        }
-        else
-        {
-			ObjectNode node = JsonNodeFactory.instance.objectNode();
+			return;
+		}
 
-			node.put("account", user.toObjectNode());
-			node.put("token", user.getToken());
-            resp.getWriter().print(Json.stringify(node));
-        }
-    }
+		User user = DatabaseConnectivity.getUserByEmail(email);
+		if (user == null || !user.getPassword().equals(password))
+		{
+			response.put("token", null);
+		}
+		else
+		{
+			response.put("account", user.toObjectNode());
+			response.put("token", user.getToken());
+		}
+	}
 }

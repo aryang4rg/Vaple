@@ -1,6 +1,5 @@
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.bson.types.ObjectId;
 
 import javax.servlet.ServletException;
@@ -25,6 +24,8 @@ public class SignUpServlet implements AjaxHandler
 	}
 
 	public boolean isValidEmail(String email){
+		if(email.indexOf(' ') != -1)
+			return false;
 		int pi = email.lastIndexOf('.');
 		int ai = email.indexOf('@');
 
@@ -46,39 +47,43 @@ public class SignUpServlet implements AjaxHandler
 		return token;
 	}
 
-    @Override
-    public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        JsonNode node = Json.parse(req.getReader());
-        String email = toValidString(node.get("email").asText());
-        String name = toValidString(node.get("name").asText());
-        String password = toValidString(node.get("password").asText());
-        String location_country = toValidString(node.get("location_country").asText());
-        String location_state = toValidString(node.get("location_state").asText());
-        String location_city = toValidString(node.get("location_city").asText());
+	public boolean isPage(){
+		return false;
+	}
 
-        //TODO make token, verify fields exist
-       // User user = new User(name,email,password, location_country, location_state, location_city, "", );
+	@Override
+	public void service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response) throws ServletException, IOException {
+		String email = Util.nullIfSpecialCharacters(request.get("email").asText());
+		String name = Util.removeTrimAndNonAlphanumeric(request.get("name").asText());
+		String password = Util.nullIfSpecialCharacters(request.get("password").asText());
+		String location_country = Util.removeTrimAndNonAlphanumeric(request.get("location_country").asText());
+		String location_state = Util.removeTrimAndNonAlphanumeric(request.get("location_state").asText());
+		String location_city = Util.removeTrimAndNonAlphanumeric(request.get("location_city").asText());
 
 		if(email == null || name == null || password == null || location_country == null ||
 			location_state == null || location_city == null){
-				resp.getWriter().println("{\"token\": null}");
+				response.put("token", null);
+				response.put("error", "Invalid field(s)");
 
 				return;
 			}
 		if(!isValidEmail(email)){
-			resp.getWriter().println("{\"token\": null, \"error\": \"Invalid email\"}");
+			response.put("token", null);
+			response.put("error", "Invalid email");
 
 			return;
 		}
 
 		if(!isValidPassword(password)){
-			resp.getWriter().println("{\"token\": null, \"error\": \"Password must be less than 32 characters\"}");
+			response.put("token", null);
+			response.put("error", "Password must be less than 32 characters");
 
 			return;
 		}
 
 		if(DatabaseConnectivity.emailAlreadyExists(email)){
-			resp.getWriter().println("{\"token\": null, \"error\": \"Email already in use\"}");
+			response.put("token", null);
+			response.put("error", "Email already in use");
 
 			return;
 		}
@@ -89,20 +94,18 @@ public class SignUpServlet implements AjaxHandler
 			String token = generateSafeToken();
 
 			if(DatabaseConnectivity.getUserByToken(token) == null){
-				User user = new User(name, email, password, location_country, location_state, location_city, "", token, new ArrayList<ObjectId>(),  new ArrayList<ObjectId>(),  new ArrayList<ObjectId>() );
+				User user = new User(name, email, password, location_country, location_state, location_city, "", token);
 
 				DatabaseConnectivity.addNewUser(user);
-				user = DatabaseConnectivity.getUserByToken(token);
-				ObjectNode response = JsonNodeFactory.instance.objectNode();
 
-				response.put("account", user.toObjectNode());
+				response.put("account", user.toAccountNode());
 				response.put("token", user.getToken());
-				resp.getWriter().print(Json.stringify(response));
 
 				return;
 			}
 		}
 
-		resp.getWriter().println("{\"token\": null, \"error\": \"Try again later\"}");
-    }
+		response.put("token", null);
+		response.put("error", "Server is busy, try again later");
+	}
 }

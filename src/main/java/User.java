@@ -1,187 +1,167 @@
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
-import java.util.Objects;
-
 public class User
 {
-    String name, email, password, location_country, location_state, location_city, description, token;
-    ArrayList<ObjectId> followers, following, activities;
-    BasicDBObject form;
-    ObjectId objectID;
+	private DBObject object;
 
-    public User(String name, String email, String password, String location_country, String location_state, String location_city, String description, String token, ArrayList<ObjectId> followers, ArrayList<ObjectId> following, ArrayList<ObjectId> activities)
-    {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.location_country = location_country;
-        this.location_state = location_state;
-        this.location_city = location_city;
-        this.description = description;
-        this.token = token;
-        this.followers = followers;
-        this.following = following;
-        this.activities = activities;
-    }
+	public User(String name, String email, String password, String location_country,
+		String location_state, String location_city, String description, String token)
+	{
+		DBObject object = new BasicDBObject();
 
-    public User(DBObject object)
-    {
-        name = (String)object.get("name");
-        email = (String)object.get("email");
-        password = (String)object.get("password");
-        location_country = (String)object.get("location_country");
-        location_city = (String)object.get("location_city");
-        location_state = (String)object.get("location_state");
-        description = (String)object.get("description");
-        objectID = (ObjectId) object.get("_id");
-        following = (ArrayList<ObjectId>) object.get("following");
-        followers = (ArrayList<ObjectId>) object.get("followers");
-        activities = (ArrayList<ObjectId>) object.get("activties");
-        token = (String)object.get("token");
-    }
+		object.put("name", name);
+		object.put("email", email);
+		object.put("password", password);
+		object.put("location_state", location_state);
+		object.put("location_city", location_city);
+		object.put("description", description);
+		object.put("token", token);
+		object.put("following", new BasicDBObject());
+		object.put("followers", new BasicDBObject());
+		object.put("activities", new BasicDBObject());
 
-    public User(BasicDBObject object)
-    {
-        name = (String)object.get("name");
-        email = (String)object.get("email");
-        password = (String)object.get("password");
-        location_country = (String)object.get("location_country");
-        location_city = (String)object.get("location_city");
-        location_state = (String)object.get("location_state");
-        description = (String)object.get("description");
-        objectID = (ObjectId)object.get("_id");
-        following = (ArrayList<ObjectId>) object.get("following");
-        followers = (ArrayList<ObjectId>) object.get("followers");
-        activities = (ArrayList<ObjectId>) object.get("activties");
-        token = (String)object.get("token");
-    }
+		this.object = object;
+	}
 
-    public BasicDBObject getDBForm()
-    {
-        form = new BasicDBObject();
-        form.append("name",getName());
-        form.append("email",getEmail());
-        form.append("password",getPassword());
-        form.append("location_county",getCountry());
-        form.append("location_state",getState());
-        form.append("location_city",getCity());
-        form.append("description",getDescription());
-        form.append("following",getFollowing());
-        form.append("followers",getFollowers());
-        form.append("activities",getActivities());
-		form.append("token",getToken());
+	public User(DBObject object)
+	{
+		this.object = object;
+	}
 
-        return form;
-    }
+	public DBObject getDBForm()
+	{
+		return object;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return (String)object.get("name");
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		object.put("name", name);
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public String getEmail() {
+		return (String)object.get("email");
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public void setEmail(String email) {
+		object.put("email", email);
+	}
 
+	public String getPassword() {
+		return (String)object.get("password");
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public void setPassword(String password) {
+		object.put("password", password);
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public String getCountry() {
+		return (String)object.get("location_country");
+	}
 
-    public String getCountry() {
-        return location_country;
-    }
+	public void setCountry(String location_country) {
+		object.put("location_country", location_country);
+	}
 
-    public void setLocation_country(String location_country) {
-        this.location_country = location_country;
-    }
+	public String getState() {
+		return (String)object.get("location_state");
+	}
 
-    public String getState() {
-        return location_state;
-    }
+	public void setState(String location_state) {
+		object.put("location_state", location_state);
+	}
 
-    public void setLocation_state(String location_state) {
-        this.location_state = location_state;
-    }
+	public String getCity() {
+		return (String)object.get("location_city");
+	}
 
-    public String getCity() {
-        return location_city;
-    }
+	public void setCity(String location_city) {
+		object.put("location_city", location_city);
+	}
 
-    public void setLocation_city(String location_city) {
-        this.location_city = location_city;
-    }
+	public String getDescription() {
+		return (String)object.get("description");
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public void setDescription(String description) {
+		object.put("description", description);
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public String getToken() {
+		return (String)object.get("token");
+	}
 
-    public String getToken() {
-        return token;
-    }
+	public void setToken(String token) {
+		object.put("token", token);
+	}
 
-    public void setToken(String token) {
-        this.token = token;
-    }
+	public ObjectId getObjectID()
+	{
+		return (ObjectId)object.get("_id");
+	}
 
-    public ArrayList<ObjectId> getFollowers() {
-        return followers;
-    }
+	public void setFollower(ObjectId follower, boolean following){
+		if(following)
+			((DBObject)object.get("followers")).put(follower.toHexString(), true);
+		else
+			((DBObject)object.get("followers")).removeField(follower.toHexString());
+	}
 
-    public void setFollowers(ArrayList<ObjectId> followers) {
-        this.followers = followers;
-    }
+	public void setFollowing(ObjectId following, boolean bfollowing){
+		if(bfollowing)
+			((DBObject)object.get("following")).put(following.toHexString(), true);
+		else
+			((DBObject)object.get("following")).removeField(following.toHexString());
+	}
 
-    public ArrayList<ObjectId> getFollowing() {
-        return following;
-    }
+	public boolean isFollowing(ObjectId user){
+		return ((DBObject)object.get("following")).get(user.toHexString()) != null;
+	}
 
-    public void setFollowing(ArrayList<ObjectId> following) {
-        this.following = following;
-    }
+	public boolean isFollowedBy(ObjectId user){
+		return ((DBObject)object.get("followers")).get(user.toHexString()) != null;
+	}
 
-    public ArrayList<ObjectId> getActivities() {
-        return activities;
-    }
+	public int countObjectEntries(DBObject object){
+		int size = object.keySet().size();
 
-    public void setActivities(ArrayList<ObjectId> activities) {
-        this.activities = activities;
-    }
+		if(object.get("_id") != null)
+			size--;
+		return size;
+	}
 
-    public ObjectId getObjectID()
-    {
-        return objectID;
-    }
+	public int countFollowers(){
+		return countObjectEntries((DBObject)object.get("followers"));
+	}
 
-	public ObjectNode toObjectNode(){
+	public int countFollowing(){
+		return countObjectEntries((DBObject)object.get("following"));
+	}
+
+	public ObjectNode toAccountNode(){
 		ObjectNode node = JsonNodeFactory.instance.objectNode();
 
-		node.put("name",getName());
-        node.put("location_county",getCountry());
-        node.put("location_state",getState());
-        node.put("location_city",getCity());
-        node.put("description",getDescription());
-		node.put("id",getObjectID().toHexString());
+		node.put("name", getName());
+		node.put("id", getObjectID().toHexString());
+
+		return node;
+	}
+
+	public ObjectNode toProfileNode(){
+		ObjectNode node = JsonNodeFactory.instance.objectNode();
+
+		node.put("name", getName());
+		node.put("id", getObjectID().toHexString());
+		node.put("location_country", getCountry());
+		node.put("location_state", getState());
+		node.put("location_city", getCity());
+		node.put("description", getDescription());
+		node.put("followers_count", countFollowers());
+		node.put("following_count", countFollowing());
 
 		return node;
 	}
