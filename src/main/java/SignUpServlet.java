@@ -1,5 +1,6 @@
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mongodb.BasicDBObject;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -96,10 +97,10 @@ public class SignUpServlet implements AjaxHandler
 		for(int i = 0; i < 100; i++){
 			String token = generateSafeToken();
 
-			if(DatabaseConnectivity.getUserByToken(token) == null){
+			if(DatabaseConnectivity.findOneObject(new BasicDBObject("token",token),DatabaseConnectivity.ACCOUNTCOLLECTION) == null){
 				User user = new User(name, email, password, location_country, location_state, location_city, "", token);
 
-				DatabaseConnectivity.addNewUser(user);
+				User.databaseConnectivity().addInDatabase(user);
 
 				response.put("account", user.toAccountNode());
 				response.put("token", user.getToken());

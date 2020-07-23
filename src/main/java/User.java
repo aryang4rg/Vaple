@@ -4,6 +4,10 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 
+/**
+ * <PRE>The user class describes a user object, which stores the user's name, location, description, password, email, a list of followers and
+ * following, a list of the activities they have done, and a unique token.</PRE>
+ */
 public class User implements DatabaseStructureObject
 {
 	private DBObject object;
@@ -45,80 +49,157 @@ public class User implements DatabaseStructureObject
 		this.object = object;
 	}
 
+	/**
+	 *
+	 * @return A DBObject version of the User.
+	 */
 	public DBObject getDBForm()
 	{
 		return object;
 	}
 
+	/**
+	 *
+	 * @return Returns the name of the user
+	 */
 	public String getName() {
 		return (String)object.get("name");
 	}
 
+	/**
+	 *
+	 * @param name Sets the name of the user
+	 */
 	public void setName(String name) {
 		object.put("name", name);
 	}
 
+	/**
+	 *
+	 * @return Returns the email of the user
+	 */
 	public String getEmail() {
 		return (String)object.get("email");
 	}
 
+	/**
+	 *
+	 * @param email Sets the email of the user
+	 */
 	public void setEmail(String email) {
 		object.put("email", email);
 	}
 
+	/**
+	 *
+	 * @return Returns the password of the user
+	 */
 	public String getPassword() {
 		return (String)object.get("password");
 	}
 
+	/**
+	 *
+	 * @param password Sets the password of the user
+	 */
 	public void setPassword(String password) {
 		object.put("password", password);
 	}
 
+	/**
+	 *
+	 * @return Returns the country of the user
+	 */
 	public String getCountry() {
 		return (String)object.get("location_country");
 	}
 
+	/**
+	 *
+	 * @param location_country Sets the country of the user
+ 	 */
 	public void setCountry(String location_country) {
 		object.put("location_country", location_country);
 	}
 
+	/**
+	 *
+	 * @return Returns the state(location) of the user
+	 */
 	public String getState() {
 		return (String)object.get("location_state");
 	}
 
+	/**
+	 *
+	 * @param location_state Sets the state of the user
+	 */
 	public void setState(String location_state) {
 		object.put("location_state", location_state);
 	}
 
+	/**
+	 *
+	 * @return Returns the city of the user
+	 */
 	public String getCity() {
 		return (String)object.get("location_city");
 	}
 
+	/**
+	 *
+	 * @param location_city Sets the city of the user
+	 */
 	public void setCity(String location_city) {
 		object.put("location_city", location_city);
 	}
 
+	/**
+	 *
+	 * @return Returns the description of the user
+	 */
 	public String getDescription() {
 		return (String)object.get("description");
 	}
 
+	/**
+	 *
+	 * @param description Sets the description of the user
+	 */
 	public void setDescription(String description) {
 		object.put("description", description);
 	}
 
+	/**
+	 *
+	 * @return Returns the unique token of the user
+	 */
 	public String getToken() {
 		return (String)object.get("token");
 	}
 
+	/**
+	 *
+	 * @param token Sets the token of the user
+	 */
 	public void setToken(String token) {
 		object.put("token", token);
 	}
 
+	/**
+	 *
+	 * @return Returns the ObjectId of the user
+	 */
 	public ObjectId getObjectID()
 	{
 		return (ObjectId)object.get("_id");
 	}
 
+	/**
+	 * Sets another object as a follower of this user
+	 * @param follower The other user
+	 * @param following True if they are following this user, false otherwise
+	 */
 	public void setFollower(ObjectId follower, boolean following){
 		if(following)
 			((DBObject)object.get("followers")).put(follower.toHexString(), true);
@@ -126,6 +207,11 @@ public class User implements DatabaseStructureObject
 			((DBObject)object.get("followers")).removeField(follower.toHexString());
 	}
 
+	/**
+	 * Sets if this user is following another user
+	 * @param following The other user being followed
+	 * @param bfollowing True if this user is following the other, false otherwise
+	 */
 	public void setFollowing(ObjectId following, boolean bfollowing){
 		if(bfollowing)
 			((DBObject)object.get("following")).put(following.toHexString(), true);
@@ -133,10 +219,20 @@ public class User implements DatabaseStructureObject
 			((DBObject)object.get("following")).removeField(following.toHexString());
 	}
 
+	/**
+	 * Returns whether this user is following another user
+	 * @param user The other user
+	 * @return Returns true if they are following the other user, false otherwise
+	 */
 	public boolean isFollowing(ObjectId user){
 		return ((DBObject)object.get("following")).get(user.toHexString()) != null;
 	}
 
+	/**
+	 * Returns if this user is followed by another specified user
+	 * @param user The other user
+	 * @return Returns true if this user is being followed by the other user, false otherwise
+	 */
 	public boolean isFollowedBy(ObjectId user){
 		return ((DBObject)object.get("followers")).get(user.toHexString()) != null;
 	}
@@ -149,10 +245,18 @@ public class User implements DatabaseStructureObject
 		return size;
 	}
 
+	/**
+	 *
+	 * @return Returns the total number of followers
+	 */
 	public int countFollowers(){
 		return countObjectEntries((DBObject)object.get("followers"));
 	}
 
+	/**
+	 *
+	 * @return Returns the total number of users followed
+	 */
 	public int countFollowing(){
 		return countObjectEntries((DBObject)object.get("following"));
 	}

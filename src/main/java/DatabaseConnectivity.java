@@ -4,6 +4,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * <PRE> This class implements methods to allow for modification of the database</PRE>
+ */
 public class DatabaseConnectivity
 {
 	private static MongoClient mongoClient;
@@ -66,6 +69,12 @@ public class DatabaseConnectivity
 		collection.update(new BasicDBObject("_id", object.get("id")), object);
 	}
 
+	/**
+	 *
+	 * @param object The object to be searched for
+	 * @param collection The collection to search in
+	 * @return Returns true if the object exists in the specified collection, false otherwise
+	 */
 	public static boolean doesObjectExist(DBObject object, DBCollection collection)
 	{
 		return findOneObject(object, collection) != null;
