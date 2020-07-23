@@ -41,14 +41,16 @@ public class LoginServlet implements AjaxHandler
 			return 400;
 		String email = Util.nullIfSpecialCharacters(request.get("email").asText());
 		String password = Util.nullIfSpecialCharacters(request.get("password").asText());
-		//TODO add encryption to password
-		if (email == null || password == null)
+		if (email == null || password == null || email.length() == 0 || password.length() == 0)
 		{
 			response.put("token", (Short)null);
 
 			return 200;
 		}
 
+		password = PasswordHasher.getSingletonObject().createHash(password);
+
+		//password = PasswordHasher.getSingletonObject().createHash()
 		User user = DatabaseConnectivity.getUserByEmail(email);
 		if (user == null || !user.getPassword().equals(password))
 		{

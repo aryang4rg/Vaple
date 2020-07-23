@@ -24,37 +24,65 @@ public class PasswordHasher
 
     public static void main(String... args)
     {
+        /*
+        for (int i = 48; i < 58; i++)
+        {
+            System.out.print("'" + ((char)(i)) + "', " );
+        }
+        */
         PasswordHasher hasher = PasswordHasher.getSingletonObject();
-        String user1 = "slayer";
         String pass1 = "password123";
 
-        String user2 = "destame";
         String pass2 = "xbobomb";
 
-        String pass1Hash = hasher.createHash(pass1, user1);
+        String pass1Hash = hasher.createHash(pass1);
         System.out.println("Hash for user1 + pass1: " + pass1Hash);
-        if (hasher.createHash(pass1,user1).equals(pass1Hash))
+        if (hasher.createHash(pass1).equals(pass1Hash))
         {
             System.out.println("hashes match!");
         }
 
-        System.out.println("Hash for user2 + pass1: " + hasher.createHash(pass1,user2) );
-        System.out.println("Hash for user2 + pass2: " + hasher.createHash(pass2,user2) );
-        System.out.println("Hash for user1 + pass12 " + hasher.createHash(pass2,user1) );
-
-
+        System.out.println("Hash for user2 + pass1: " + hasher.createHash(pass1) );
+        System.out.println("Hash for user2 + pass2: " + hasher.createHash(pass2) );
+        System.out.println("Hash for user1 + pass12 " + hasher.createHash(pass2) );
     }
 
-    /**
-     *
-     * @param message password you would want to hash
-     * @param salt some type of other unique identifier, such as mongodb _id
-     * @return Returns a unique hash version of your message
-     */
-    public String createHash(String message, String salt)
+    private char[] intToChar =
+            {
+                    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+            };
+    public String createSalt(String message)
+    {
+        Random r = new Random(stringToLong(message));
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < 10; i++)
+        {
+            stringBuilder.append(intToChar[r.nextInt(intToChar.length) ] );
+        }
+        return stringBuilder.toString();
+    }
+
+    public Long stringToLong(String message)
+    {
+        if (message.length() > 5) //12345
+        {
+            message = message.substring(0,5);
+        }
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < message.length(); i++)
+        {
+            int charToInt = (int)message.charAt(i);
+            builder.append(charToInt);
+        }
+        return Long.parseLong(builder.toString());
+    }
+
+    public String createHash(String message)
     {
         try {
-            return hashingAlgorithm(combineSaltPepperAndPass(salt, message));
+            return hashingAlgorithm(combineSaltPepperAndPass(createSalt(message), message));
         }
         catch (NoSuchAlgorithmException e)
         {

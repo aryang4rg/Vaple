@@ -61,7 +61,9 @@ public class SignUpServlet implements AjaxHandler
 		String location_city = Util.removeTrimAndNonAlphanumeric(request.get("location_city").asText());
 
 		if(email == null || name == null || password == null || location_country == null ||
-			location_state == null || location_city == null){
+			location_state == null || location_city == null
+				|| email.length() == 0 || name.length() == 0 ||password.length() == 0
+				||location_country.length() == 0 ||location_state.length() == 0 || location_city.length() == 0){
 				response.put("token", (Short)null);
 				response.put("error", "Invalid field(s)");
 
