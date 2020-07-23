@@ -22,7 +22,7 @@ public class ProfileHandler implements AjaxHandler
 			return 404;
 		ObjectId id = new ObjectId(uriSplit[0]);
 
-		//TODO fix this, idk what david is trying to do
+		//TODO fix this
 		/*
 		if(!id.isValid())
 			return 404;
@@ -31,6 +31,8 @@ public class ProfileHandler implements AjaxHandler
 
 		if(user == null)
 			return 404;
+
+
 		response.put("profile", user.toProfileNode());
 
 		return 200;

@@ -16,6 +16,7 @@ public class User
 		object.put("name", name);
 		object.put("email", email);
 		object.put("password", password);
+		object.put("location_country", location_country);
 		object.put("location_state", location_state);
 		object.put("location_city", location_city);
 		object.put("description", description);
@@ -163,8 +164,44 @@ public class User
 		node.put("location_city", getCity());
 		node.put("description", getDescription());
 		node.put("followers_count", countFollowers());
-		node.put("following_count", countFollowing());
 
 		return node;
 	}
+
+	private static User findUser(BasicDBObject obj){
+		DBObject object = DatabaseConnectivity.findObject(obj, DatabaseConnectivity.ACCOUNTCOLLECTION);
+		if(object != null)
+			return new User(object);
+		return null;
+	}
+
+	public static User getUserByInfo(String varName, String data)
+	{
+		return findUser(new BasicDBObject(varName,data));
+	}
+
+	public static boolean userInfoExist(String varName, String data )
+	{
+		return getUserByInfo(varName, data) != null;
+	}
+
+
+	public static void updateUser(User user)
+	{
+		DatabaseConnectivity.updateObject( user.getDBForm(), DatabaseConnectivity.ACCOUNTCOLLECTION);
+	}
+
+	public static void addNewUser(User user)
+	{
+		String email = user.getEmail();
+		if (DatabaseConnectivity.findObject(  new BasicDBObject("email", email),DatabaseConnectivity.ACCOUNTCOLLECTION) == null)
+		{
+			DatabaseConnectivity.addObject(user.getDBForm(), DatabaseConnectivity.ACCOUNTCOLLECTION);
+		}
+		else
+		{
+			assert false;
+		}
+	}
+
 }

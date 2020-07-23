@@ -2,7 +2,6 @@ import com.mongodb.*;
 import org.bson.types.ObjectId;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 
 public class DatabaseConnectivity
 {
@@ -20,62 +19,30 @@ public class DatabaseConnectivity
 	}
 
 	private static DB database = mongoClient.getDB("vaple");
-	private static DBCollection accountCollection = database.getCollection("account");
-	private static DBCollection activityCollection = database.getCollection("activity");
+	public static final DBCollection ACCOUNTCOLLECTION = database.getCollection("account");
+	public static final DBCollection ACTIVITYCOLLECTION = database.getCollection("activity");
 
-	public static void addNewUser(User user)
+	public static void addObject(DBObject object, DBCollection collection)
 	{
-		String email = user.getEmail();
-		if (accountCollection.findOne(new BasicDBObject("email",email)) == null)
-		{
-			accountCollection.insert(user.getDBForm());
-		}
-		else
-		{
-			assert false;
-		}
+		collection.insert(object);
 	}
 
-	public static User findUser(BasicDBObject obj){
-		DBObject object = accountCollection.findOne(obj);
-
-		if(object != null)
-			return new User(object);
-		return null;
-	}
-
-	public static User getUserByEmail(String email)
+	public static DBObject findObject(DBObject object, DBCollection collection)
 	{
-		return findUser(new BasicDBObject("email",email));
+		return collection.findOne(object);
+
 	}
 
-	public static User getUserByToken(String token)
+
+	public static void updateObject(DBObject object, DBCollection collection)
 	{
-		return findUser(new BasicDBObject("token",token));
+		collection.update(new BasicDBObject("_id", object.get("id")), object);
 	}
 
-	public static boolean userInfoExist(String varName, String data )
-	{
-		return true;
-	}
 
-	public static boolean emailAlreadyExists(String email)
-	{
-		return getUserByEmail(email) != null;
-	}
 
-	public static void updateUser(User user)
-	{
-		accountCollection.update(new BasicDBObject("_id",user.getObjectID()),user.getDBForm());
-	}
-
-	public static User getUser(ObjectId id)
-	{
-		return findUser(new BasicDBObject("_id", id));
-	}
-
-	public static Activity findActivity(BasicDBObject obj){
-		DBObject object = activityCollection.findOne(obj);
+	public static Activity findActivity(DBObject obj){
+		DBObject object = ACTIVITYCOLLECTION.findOne(obj);
 
 		if(object != null)
 			return new Activity(object);
@@ -89,11 +56,11 @@ public class DatabaseConnectivity
 
 	public static void addNewActivity(Activity activity)
 	{
-		activityCollection.insert(activity.getDBform());
+		ACTIVITYCOLLECTION.insert(activity.getDBform());
 	}
 
 	public static void updateActivity(Activity activity)
 	{
-		activityCollection.update(new BasicDBObject("_id",activity.getObjectID()),activity.getDBform());
+		ACTIVITYCOLLECTION.update(new BasicDBObject("_id",activity.getObjectID()),activity.getDBform());
 	}
 }
