@@ -43,7 +43,11 @@ public class LoginServlet implements AjaxHandler
         }
         else
         {
-            resp.getWriter().print(user.toJsonString());
+			ObjectNode node = JsonNodeFactory.instance.objectNode();
+
+			node.put("account", node);
+			node.put("token", user.getToken());
+            resp.getWriter().print(JSON.stringify(node));
         }
     }
 }
