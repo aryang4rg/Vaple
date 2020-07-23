@@ -1,6 +1,6 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
-
+import com.fasterxml.jackson.core.TreeNode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -11,7 +11,8 @@ public class Json
     {
         String jsonSource = "{\"email\":\"agarg.usa@gmail.com\",\"password\":\"agargusa6969\"}\n";
         JsonNode node =  Json.parse(jsonSource);
-
+        System.out.println(node.get("email").toString());
+        TreeNode treeNode;
         JsonTest test = new JsonTest("this is my name", "pass123", "hexadec", "token", 69);
         JsonNode nodeTest = toJson(test);
         System.out.println(stringify(nodeTest));

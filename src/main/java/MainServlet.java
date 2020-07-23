@@ -28,7 +28,7 @@ public class MainServlet extends HttpServlet
 
     public  Hashtable<String, AjaxHandler> ajaxResponseToHandler()
     {
-        Hashtable<String, AjaxHandler> hashtable = new Hashtable<>();
+        Hashtable<String, AjaxHandler> hashtable = new Hashtable<String, AjaxHandler>();
         hashtable.put("account_login", loginServlet );
         hashtable.put("account_create", signUpServlet);
         return hashtable;

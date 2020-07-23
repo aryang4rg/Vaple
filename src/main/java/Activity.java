@@ -32,7 +32,7 @@ public class Activity
         description = (String)object.get("description");
         objectID = (ObjectId)object.get("_id");
         attending = (ArrayList<ObjectId>)object.get("attending");
-        time = (long)object.get("time");
+        time = (Long)object.get("time");
     }
 
     public Activity(BasicDBObject object)
@@ -44,7 +44,7 @@ public class Activity
         description = (String)object.get("description");
         objectID = (ObjectId)object.get("_id");
         attending = (ArrayList<ObjectId>)object.get("attending");
-        time = (long)object.get("time");
+        time = (Long)object.get("time");
     }
 
     public BasicDBObject getDBform()
