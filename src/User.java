@@ -3,16 +3,17 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class User
 {
     String name, email, password, location_country, location_state, location_city, description, token;
-    ArrayList<String> followers, following, activities;
+    ArrayList<ObjectId> followers, following, activities;
     BasicDBObject form;
 
     ObjectId objectID;
 
-    public User(String name, String email, String password, String location_country, String location_state, String location_city, String description, String token, ArrayList<String> followers, ArrayList<String> following, ArrayList<String> activities)
+    public User(String name, String email, String password, String location_country, String location_state, String location_city, String description, String token, ArrayList<ObjectId> followers, ArrayList<ObjectId> following, ArrayList<ObjectId> activities)
     {
         this.name = name;
         this.email = email;
@@ -139,27 +140,27 @@ public class User
         this.token = token;
     }
 
-    public ArrayList<String> getFollowers() {
+    public ArrayList<ObjectId> getFollowers() {
         return followers;
     }
 
-    public void setFollowers(ArrayList<String> followers) {
+    public void setFollowers(ArrayList<ObjectId> followers) {
         this.followers = followers;
     }
 
-    public ArrayList<String> getFollowing() {
+    public ArrayList<ObjectId> getFollowing() {
         return following;
     }
 
-    public void setFollowing(ArrayList<String> following) {
+    public void setFollowing(ArrayList<ObjectId> following) {
         this.following = following;
     }
 
-    public ArrayList<String> getActivities() {
+    public ArrayList<ObjectId> getActivities() {
         return activities;
     }
 
-    public void setActivities(ArrayList<String> activities) {
+    public void setActivities(ArrayList<ObjectId> activities) {
         this.activities = activities;
     }
 

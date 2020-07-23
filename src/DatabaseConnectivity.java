@@ -25,12 +25,7 @@ public class DatabaseConnectivity
 
     public static void main(String[] args)
     {
-        User user = new User("David Garg","agargusa@gmail.com","","","","","","",new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>());
-        updateUser(user);
 
-        User user2 = new User(accountCollection.findOne(new BasicDBObject("email","agargusa@gmail.com")));
-        user2.setName("Loser");
-        updateUser(user2);
     }
 
     public static void addNewUser(User user)
