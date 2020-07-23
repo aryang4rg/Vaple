@@ -37,9 +37,9 @@ public class User
         location_state = (String)object.get("location_state");
         description = (String)object.get("description");
         objectID = (ObjectId) object.get("_id");
-        ArrayList<String> following = (ArrayList<String>) object.get("following");
-        ArrayList<String> followers = (ArrayList<String>) object.get("followers");
-        ArrayList<String> activities = (ArrayList<String>) object.get("activties");
+        following = (ArrayList<ObjectId>) object.get("following");
+        followers = (ArrayList<ObjectId>) object.get("followers");
+        activities = (ArrayList<ObjectId>) object.get("activties");
     }
 
     public User(BasicDBObject object)
@@ -52,9 +52,9 @@ public class User
         location_state = (String)object.get("location_state");
         description = (String)object.get("description");
         objectID = (ObjectId)object.get("_id");
-        ArrayList<String> following = (ArrayList<String>) object.get("following");
-        ArrayList<String> followers = (ArrayList<String>) object.get("followers");
-        ArrayList<String> activities = (ArrayList<String>) object.get("activties");
+        following = (ArrayList<ObjectId>) object.get("following");
+        followers = (ArrayList<ObjectId>) object.get("followers");
+        activities = (ArrayList<ObjectId>) object.get("activties");
     }
 
     public BasicDBObject getDBForm()

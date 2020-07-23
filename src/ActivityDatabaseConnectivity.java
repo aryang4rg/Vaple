@@ -24,10 +24,7 @@ public class ActivityDatabaseConnectivity
 
     public static void main(String[] args)
     {
-        BasicDBObject ob = (BasicDBObject)activityCollection.findOne(new BasicDBObject("name","Garg Pickup"));
-        ObjectId hell = (ObjectId) ob.get("_id");
-        Activity act = getActivity(hell);
-        System.out.println(act.getName());
+
     }
 
     public static Activity getActivity(ObjectId ID)
