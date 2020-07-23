@@ -2,15 +2,24 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 
-public class Activity
+public class Activity implements DatabaseStructureObject
 {
 	String name, location_country, location_state, location_city, description;
 	ArrayList<ObjectId> attending;
 	long time;
 	BasicDBObject form;
 	ObjectId objectID;
+
+	private static Activity databaseConnectivityObject = new Activity();
+	public static Activity databaseConnectivity()
+	{
+		return databaseConnectivityObject;
+	}
+
+	public Activity() {}
 
 	public Activity(String name, String location_country, String location_state, String location_city, String description, ArrayList<ObjectId> attending, long time)
 	{
@@ -45,6 +54,40 @@ public class Activity
 		objectID = (ObjectId)object.get("_id");
 		attending = (ArrayList<ObjectId>)object.get("attending");
 		time = (Long)object.get("time");
+	}
+
+	@Override
+	public DatabaseStructureObject findInDatabase(DBObject obj)
+	{
+		DBObject object = DatabaseConnectivity.findOneObject(obj, DatabaseConnectivity.ACTIVITYCOLLECTION);
+		if(object != null)
+			return new Activity(object);
+		return null;
+	}
+
+	@Override
+	public DatabaseStructureObject getByInfoInDataBase(String varName, String data)
+	{
+		return findInDatabase(new BasicDBObject(varName,data));
+
+	}
+
+	@Override
+	public boolean infoExistsInDatabase(String varName, String data)
+	{
+		return getByInfoInDataBase(varName, data) != null;
+	}
+
+	@Override
+	public void updateInDatabase(DatabaseStructureObject object)
+	{
+		DatabaseConnectivity.updateObject(object.getDBForm(), DatabaseConnectivity.ACTIVITYCOLLECTION);
+	}
+
+	@Override
+	public void addInDatabase(DatabaseStructureObject object)
+	{
+		DatabaseConnectivity.addObject(object.getDBForm(), DatabaseConnectivity.ACTIVITYCOLLECTION);
 	}
 
 	public BasicDBObject getDBForm()
@@ -144,24 +187,6 @@ public class Activity
 	public void setTime(long time)
 	{
 		this.time = time;
-	}
-
-	public static Activity getActivityByInfo(String varName, String data)
-	{
-		return findActivity(new BasicDBObject(varName,data));
-	}
-
-	public static Activity findActivity(DBObject obj)
-	{
-		DBObject object = DatabaseConnectivity.findOneObject(obj, DatabaseConnectivity.ACTIVITYCOLLECTION);
-		if(object != null)
-			return new Activity(object);
-		return null;
-	}
-
-	public static void updateActivity(Activity activity)
-	{
-		DatabaseConnectivity.updateObject(activity.getDBForm(), DatabaseConnectivity.ACTIVITYCOLLECTION);
 	}
 
 }
