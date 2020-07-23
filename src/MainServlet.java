@@ -9,9 +9,8 @@ import java.net.FileNameMap;
 import java.net.URLConnection;
 
 @WebServlet("/")
-public class Servlet extends HttpServlet
+public class MainServlet extends HttpServlet
 {
-
     public static void sendFile(OutputStream out, File file) throws FileNotFoundException, IOException {
         FileInputStream in = new FileInputStream(file);
         byte[] buffer = new byte[16384];
@@ -27,12 +26,10 @@ public class Servlet extends HttpServlet
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         resp.setHeader("x-content-options", "nosniff");
-            String relativeWebPath = "/resources" + req.getRequestURI();
-            String absoluteDiskPath = getServletContext().getRealPath(relativeWebPath);
-            File file = new File(absoluteDiskPath);
+        String relativeWebPath = "/resources" + req.getRequestURI();
+        String absoluteDiskPath = getServletContext().getRealPath(relativeWebPath);
+        File file = new File(absoluteDiskPath);
 
-            //System.out.println(req.getRequestURI());
-            //System.out.println(req.getHeader("Accept"));
 
         if("POST".equalsIgnoreCase(req.getMethod()))
         {
@@ -41,7 +38,6 @@ public class Servlet extends HttpServlet
         }
         else if (file.exists() && file.isFile())
         {
-
             sendFile(resp.getOutputStream(), file);
         }
         else
@@ -49,8 +45,6 @@ public class Servlet extends HttpServlet
             resp.setHeader("Content-Type", "text/html");
             sendFile(resp.getOutputStream(), new File(getServletContext().getRealPath("/resources/page.html")));
         }
-
     }
-
-
 }
+

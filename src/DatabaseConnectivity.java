@@ -8,6 +8,7 @@ public class DatabaseConnectivity
 {
     public static void main(String[] args) throws UnknownHostException
     {
+
         MongoClient mongoClient = new MongoClient();
         DB database = mongoClient.getDB("test");
         DBCollection collection = database.getCollection("epic");
