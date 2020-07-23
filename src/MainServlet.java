@@ -7,10 +7,14 @@ import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.net.FileNameMap;
 import java.net.URLConnection;
+import java.util.Hashtable;
 
 @WebServlet("/")
 public class MainServlet extends HttpServlet
 {
+    private LoginServlet loginServlet = new LoginServlet();
+    private SignUpServlet signUpServlet = new SignUpServlet();
+    private Hashtable<String, AjaxHandler> pathToHandler = ajaxResponseToHandler();
     public static void sendFile(OutputStream out, File file) throws FileNotFoundException, IOException {
         FileInputStream in = new FileInputStream(file);
         byte[] buffer = new byte[16384];
@@ -22,6 +26,14 @@ public class MainServlet extends HttpServlet
         out.flush();
     }
 
+    public  Hashtable<String, AjaxHandler> ajaxResponseToHandler()
+    {
+        Hashtable<String, AjaxHandler> hashtable = new Hashtable<>();
+        hashtable.put("account_login", loginServlet );
+        hashtable.put("account_create", signUpServlet);
+        return hashtable;
+    }
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -29,12 +41,21 @@ public class MainServlet extends HttpServlet
         String relativeWebPath = "/resources" + req.getRequestURI();
         String absoluteDiskPath = getServletContext().getRealPath(relativeWebPath);
         File file = new File(absoluteDiskPath);
+        String[] uriSplit = req.getRequestURI().split("[/]+");
 
 
         if("POST".equalsIgnoreCase(req.getMethod()))
         {
-            resp.setStatus(200);
-            resp.getWriter().println("{\"type\": \"profile\", \"data\": {}}");
+
+            AjaxHandler handler = pathToHandler.get(uriSplit[0]);
+            if (handler != null)
+            {
+                handler.service(req,resp);
+            }
+            else
+            {
+                resp.setStatus(404);
+            }
         }
         else if (file.exists() && file.isFile())
         {
