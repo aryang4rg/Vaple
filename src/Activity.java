@@ -51,9 +51,9 @@ public class Activity
     {
         form = new BasicDBObject();
         form.append("name",getName());
-        form.append("location_county",getLocation_country());
-        form.append("location_state",getLocation_state());
-        form.append("location_city",getLocation_city());
+        form.append("location_county",getCountry());
+        form.append("location_state",getState());
+        form.append("location_city",getCity());
         form.append("description",getDescription());
         form.append("attending",getAttending());
         form.append("time",getTime());
