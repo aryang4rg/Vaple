@@ -12,6 +12,15 @@ import java.util.Base64;
 
 public class SignUpServlet implements AjaxHandler
 {
+
+	private static SignUpServlet singletonServlet = new SignUpServlet();
+	public static SignUpServlet getSingletonServlet()
+	{
+		return singletonServlet;
+	}
+
+	private SignUpServlet(){}
+
 	public boolean isValidEmail(String email){
 		if(email.indexOf(' ') != -1)
 			return false;
@@ -53,27 +62,27 @@ public class SignUpServlet implements AjaxHandler
 
 		if(email == null || name == null || password == null || location_country == null ||
 			location_state == null || location_city == null){
-				response.put("token", null);
+				response.put("token", (Short)null);
 				response.put("error", "Invalid field(s)");
 
 				return 200;
 			}
 		if(!isValidEmail(email)){
-			response.put("token", null);
+			response.put("token", (Short)null);
 			response.put("error", "Invalid email");
 
 			return 200;
 		}
 
 		if(!isValidPassword(password)){
-			response.put("token", null);
+			response.put("token", (Short)null);
 			response.put("error", "Password must be less than 32 characters");
 
 			return 200;
 		}
 
 		if(DatabaseConnectivity.emailAlreadyExists(email)){
-			response.put("token", null);
+			response.put("token", (Short)null);
 			response.put("error", "Email already in use");
 
 			return 200;
@@ -96,7 +105,7 @@ public class SignUpServlet implements AjaxHandler
 			}
 		}
 
-		response.put("token", null);
+		response.put("token", (Short)null);
 		response.put("error", "Server is busy, try again later");
 
 		return 200;

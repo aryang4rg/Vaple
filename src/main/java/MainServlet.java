@@ -7,6 +7,7 @@ import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.net.FileNameMap;
 import java.net.URLConnection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,9 +28,9 @@ public class MainServlet extends HttpServlet
 	}
 
 	private Hashtable<String, AjaxHandler> pathToHandler = ajaxRequestToHandler();
-	private HashMap<String, String> extensionToMime = extensionToMimeHM();
-	public LoginServlet loginServlet = new LoginServlet(this);
-	public SignUpServlet signUpServlet = new SignUpServlet(this);
+	private Hashtable<String, String> extensionToMime = extensionToMimeHM();
+	public LoginServlet loginServlet =  LoginServlet.getSingletonServlet();
+	public SignUpServlet signUpServlet = SignUpServlet.getSingletonServlet();
 
 	private Hashtable<String, AjaxHandler> ajaxRequestToHandler()
 	{
@@ -39,8 +40,8 @@ public class MainServlet extends HttpServlet
 		return hashtable;
 	}
 
-	private HashMap<String, String> extensionToMimeHM(){
-		HashMap<String, String> map = new HashMap<>();
+	private Hashtable<String, String> extensionToMimeHM(){
+		Hashtable<String, String> map = new Hashtable<>();
 
 		map.put("js", "application/javascript");
 		map.put("css", "text/css");
@@ -113,7 +114,7 @@ public class MainServlet extends HttpServlet
 		}
 		else
 		{
-			File requestedFile = new File(getServletContext().getRealPath("/resources" + req.getRequestURI()));
+			File file = new File(getServletContext().getRealPath("/resources" + req.getRequestURI()));
 
 			if (file.exists() && file.isFile())
 			{
@@ -122,7 +123,7 @@ public class MainServlet extends HttpServlet
 				/* since aryan wouldn't do it */
 				if(index != -1){
 					String extension = file.getName().substring(index + 1);
-					String mimeType = extensionMimeMap.get(extension);
+					String mimeType = extensionToMime.get(extension);
 
 					if(mimeType != null)
 						resp.setHeader("Content-Type", mimeType);
@@ -140,7 +141,7 @@ public class MainServlet extends HttpServlet
 			+ "</head><body><script src=\"/js/base.js\"></script><script src=\"/js/loader.js\"></script></body></html>";
 		/* send a minimized version of page.html since it never changes anyway */
 		resp.setHeader("Content-Type", "text/html");
-		resp.setHeader("Content-Length", page.length());
+		resp.setHeader("Content-Length", "" + page.length());
 		resp.getWriter().print(page);
 	}
 }

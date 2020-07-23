@@ -11,11 +11,31 @@ import java.io.Reader;
 
 public class LoginServlet implements AjaxHandler
 {
-	public boolean isPage(){
-		return false;
+
+	private static LoginServlet singletonServlet = new LoginServlet();
+
+	public static LoginServlet getSingletonServlet() {
+		return singletonServlet;
 	}
 
-	public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit) throws ServletException, IOException
+	private LoginServlet()
+	{}
+
+	public boolean isPage() {
+		return false;
+	}
+	public String toValidString(String k){
+		if(k == null || k.length() == 0)
+			return null;
+		// removes all special characters
+		k = k.replace("[^a-zA-Z0-9_-]", "");
+
+		if(k.length() == 0)
+			return null;
+		return k;
+	}
+
+	public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User nullUser) throws ServletException, IOException
 	{
 		if(uriSplit.length > 0)
 			return 400;
@@ -24,7 +44,7 @@ public class LoginServlet implements AjaxHandler
 		//TODO add encryption to password
 		if (email == null || password == null)
 		{
-			response.put("token", null);
+			response.put("token", (Short)null);
 
 			return 200;
 		}
@@ -32,11 +52,11 @@ public class LoginServlet implements AjaxHandler
 		User user = DatabaseConnectivity.getUserByEmail(email);
 		if (user == null || !user.getPassword().equals(password))
 		{
-			response.put("token", null);
+			response.put("token", (Short)null);
 		}
 		else
 		{
-			response.put("account", user.toObjectNode());
+			response.put("account", user.toProfileNode());
 			response.put("token", user.getToken());
 		}
 
