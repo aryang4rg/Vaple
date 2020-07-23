@@ -1,11 +1,9 @@
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bson.types.ObjectId;
-import java.util.ArrayList;
 
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class User
 {
@@ -167,12 +165,12 @@ public class User
         this.activities = activities;
     }
 
-    public ObjectId getObjectID()
+    public Object getObjectID()
     {
         return objectID;
     }
 
-	public String toJsonString() throws JsonProcessingException {
+	public ObjectNode getObjectNode(){
 		ObjectNode node = JsonNodeFactory.instance.objectNode();
 
 		node.put("name",getName());
@@ -182,6 +180,6 @@ public class User
         node.put("description",getDescription());
 		node.put("id",getObjectID().toHexString());
 
-		return Json.stringify(node);
+		return node;
 	}
 }
