@@ -40,6 +40,7 @@ public class User
         following = (ArrayList<ObjectId>) object.get("following");
         followers = (ArrayList<ObjectId>) object.get("followers");
         activities = (ArrayList<ObjectId>) object.get("activties");
+        token = (String)object.get("token");
     }
 
     public User(BasicDBObject object)
@@ -55,6 +56,7 @@ public class User
         following = (ArrayList<ObjectId>) object.get("following");
         followers = (ArrayList<ObjectId>) object.get("followers");
         activities = (ArrayList<ObjectId>) object.get("activties");
+        token = (String)object.get("token");
     }
 
     public BasicDBObject getDBForm()
