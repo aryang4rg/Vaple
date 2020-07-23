@@ -31,6 +31,15 @@ public class SignUpServlet implements AjaxHandler
 		return k.length() <= 32;
 	}
 
+	private String generateSafeToken() {
+		SecureRandom random = new SecureRandom();
+		byte bytes[] = new byte[64];
+		random.nextBytes(bytes);
+		Encoder encoder = Base64.getUrlEncoder().withoutPadding();
+		String token = encoder.encodeToString(bytes);
+		return token;
+	}
+
     @Override
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         JsonNode node = Json.parse(req.getReader());
@@ -69,5 +78,25 @@ public class SignUpServlet implements AjaxHandler
 		}
 
 		/* here is where you'd encrypt the password */
+
+		for(int i = 0; i < 100; i++){
+			String token = generateSafeToken();
+
+			if(DatabaseConnectivity.getUserByToken(token) == null){
+				User user = new User(name, email, password, location_country, location_state, location_city, "", token);
+
+				DatabaseConnectivity.addNewUser(user);
+
+				ObjectNode node = JsonNodeFactory.instance.objectNode();
+
+				node.put("account", user.toObjectNode());
+				node.put("token", user.getToken());
+				resp.getWriter().print(Json.stringify(node));
+
+				return;
+			}
+		}
+
+		resp.getWriter().println("{\"token\": null, \"error\": \"Try again later\"}");
     }
 }

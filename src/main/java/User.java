@@ -67,9 +67,9 @@ public class User
         form.append("name",getName());
         form.append("email",getEmail());
         form.append("password",getPassword());
-        form.append("location_county",getLocation_country());
-        form.append("location_state",getLocation_state());
-        form.append("location_city",getLocation_city());
+        form.append("location_county",getCountry());
+        form.append("location_state",getState());
+        form.append("location_city",getCity());
         form.append("description",getDescription());
         form.append("following",getFollowing());
         form.append("followers",getFollowers());
@@ -103,7 +103,7 @@ public class User
         this.password = password;
     }
 
-    public String getLocation_country() {
+    public String getCountry() {
         return location_country;
     }
 
@@ -111,7 +111,7 @@ public class User
         this.location_country = location_country;
     }
 
-    public String getLocation_state() {
+    public String getState() {
         return location_state;
     }
 
@@ -119,7 +119,7 @@ public class User
         this.location_state = location_state;
     }
 
-    public String getLocation_city() {
+    public String getCity() {
         return location_city;
     }
 
@@ -176,9 +176,9 @@ public class User
 		ObjectNode node = JsonNodeFactory.instance.objectNode();
 
 		node.put("name",getName());
-        node.put("location_county",getLocation_country());
-        node.put("location_state",getLocation_state());
-        node.put("location_city",getLocation_city());
+        node.put("location_county",getCountry());
+        node.put("location_state",getState());
+        node.put("location_city",getCity());
         node.put("description",getDescription());
 		node.put("id",getObjectID().toHexString());
 
