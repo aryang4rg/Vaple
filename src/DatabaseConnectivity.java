@@ -47,7 +47,7 @@ public class DatabaseConnectivity
         return accountCollection.findOne(new BasicDBObject("email",email)) != null;
     }
 
-    public User getUserByEmail(String email)
+    public static User getUserByEmail(String email)
     {
         BasicDBObject object = (BasicDBObject)accountCollection.findOne(new BasicDBObject("email",email));
         User user = new User(object);

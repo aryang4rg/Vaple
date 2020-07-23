@@ -10,7 +10,6 @@ public class User
     String name, email, password, location_country, location_state, location_city, description, token;
     ArrayList<ObjectId> followers, following, activities;
     BasicDBObject form;
-
     ObjectId objectID;
 
     public User(String name, String email, String password, String location_country, String location_state, String location_city, String description, String token, ArrayList<ObjectId> followers, ArrayList<ObjectId> following, ArrayList<ObjectId> activities)
