@@ -1,5 +1,4 @@
 import com.mongodb.*;
-import org.bson.types.ObjectId;
 
 import java.net.UnknownHostException;
 
@@ -33,34 +32,10 @@ public class DatabaseConnectivity
 
 	}
 
-
 	public static void updateObject(DBObject object, DBCollection collection)
 	{
 		collection.update(new BasicDBObject("_id", object.get("id")), object);
 	}
 
 
-
-	public static Activity findActivity(DBObject obj){
-		DBObject object = ACTIVITYCOLLECTION.findOne(obj);
-
-		if(object != null)
-			return new Activity(object);
-		return null;
-	}
-
-	public static Activity getActivity(ObjectId ID)
-	{
-		return findActivity(new BasicDBObject("_id",ID));
-	}
-
-	public static void addNewActivity(Activity activity)
-	{
-		ACTIVITYCOLLECTION.insert(activity.getDBform());
-	}
-
-	public static void updateActivity(Activity activity)
-	{
-		ACTIVITYCOLLECTION.update(new BasicDBObject("_id",activity.getObjectID()),activity.getDBform());
-	}
 }

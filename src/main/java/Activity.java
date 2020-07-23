@@ -47,7 +47,7 @@ public class Activity
 		time = (Long)object.get("time");
 	}
 
-	public BasicDBObject getDBform()
+	public BasicDBObject getDBForm()
 	{
 		form = new BasicDBObject();
 		form.append("name",getName());
@@ -141,4 +141,23 @@ public class Activity
 	{
 		this.time = time;
 	}
+
+	public static Activity getActivityByInfo(String varName, String data)
+	{
+		return findActivity(new BasicDBObject(varName,data));
+	}
+
+	public static Activity findActivity(DBObject obj)
+	{
+		DBObject object = DatabaseConnectivity.findObject(obj, DatabaseConnectivity.ACTIVITYCOLLECTION);
+		if(object != null)
+			return new Activity(object);
+		return null;
+	}
+
+	public static void updateActivity(Activity activity)
+	{
+		DatabaseConnectivity.updateObject(activity.getDBForm(), DatabaseConnectivity.ACTIVITYCOLLECTION);
+	}
+
 }
