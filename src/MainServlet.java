@@ -44,7 +44,7 @@ public class MainServlet extends HttpServlet
         String[] uriSplit = req.getRequestURI().split("[/]+");
 
 
-        if("POST".equalsIgnoreCase(req.getMethod()))
+        if(uriSplit.length > 0 && "POST".equalsIgnoreCase(req.getMethod()))
         {
 
             AjaxHandler handler = pathToHandler.get(uriSplit[0]);

@@ -29,7 +29,7 @@ public class LoginServlet implements AjaxHandler
         }
         else
         {
-            JsonNode account = Json.toJson(creds);
+            JsonNode account = Json.toJson(user);
             resp.getWriter().print(Json.stringify(account));
         }
     }
