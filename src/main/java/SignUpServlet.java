@@ -1,20 +1,18 @@
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.bson.types.ObjectId;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Base64;
 
 public class SignUpServlet implements AjaxHandler
 {
 
 	private static SignUpServlet singletonServlet = new SignUpServlet();
-	public static SignUpServlet getSingletonServlet()
+	public static SignUpServlet getInstance()
 	{
 		if (singletonServlet == null)
 			singletonServlet = new SignUpServlet();
@@ -86,14 +84,14 @@ public class SignUpServlet implements AjaxHandler
 			return 200;
 		}
 
-		if(DatabaseConnectivity.emailAlreadyExists(email)){
+		if(User.emailAlreadyExists(email)){
 			response.put("token", (Short)null);
 			response.put("error", "Email already in use");
 
 			return 200;
 		}
 
-		password = PasswordHasher.getSingletonObject().createHash(password);
+		password = PasswordHasher.getInstance().createHash(password);
 
 		for(int i = 0; i < 100; i++){
 			String token = generateSafeToken();

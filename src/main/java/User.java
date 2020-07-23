@@ -4,9 +4,16 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 
-public class User
+public class User implements DatabaseStructureObject
 {
 	private DBObject object;
+
+	public static final String NAME = "name", EMAIL = "email", PASSWORD = "password", LOCATION_COUNTRY = "location_country", LOCATION_STATE = "location_state",
+	LOCATION_CITY = "location_city", DESCRIPTION = "description", TOKEN = "token", FOLLOWING = "following", FOLLWERS = "followers", ACTIVITIES = "activities";
+
+
+
+	public User() {}
 
 	public User(String name, String email, String password, String location_country,
 		String location_state, String location_city, String description, String token)
@@ -168,39 +175,46 @@ public class User
 		return node;
 	}
 
-	private static User findUser(BasicDBObject obj){
+
+
+	public DatabaseStructureObject findInDatabase(DBObject obj){
 		DBObject object = DatabaseConnectivity.findObject(obj, DatabaseConnectivity.ACCOUNTCOLLECTION);
 		if(object != null)
 			return new User(object);
 		return null;
 	}
 
-	public static User getUserByInfo(String varName, String data)
+	public DatabaseStructureObject getByInfoInDataBase(String varName, String data)
 	{
-		return findUser(new BasicDBObject(varName,data));
+		return findInDatabase(new BasicDBObject(varName,data));
 	}
 
-	public static boolean userInfoExist(String varName, String data )
+	public boolean infoExistsInDatabase(String varName, String data)
 	{
-		return getUserByInfo(varName, data) != null;
+		return getByInfoInDataBase(varName, data) != null;
 	}
 
 
-	public static void updateUser(User user)
+	/**
+	 *
+	 * @param user given a user, goes into database find the previous version of that user by its id and updates it
+	 */
+	public void updateInDatabase(DatabaseStructureObject user)
 	{
 		DatabaseConnectivity.updateObject( user.getDBForm(), DatabaseConnectivity.ACCOUNTCOLLECTION);
 	}
 
-	public static void addNewUser(User user)
+
+	public void addInDatabase(DatabaseStructureObject user)
 	{
-		String email = user.getEmail();
+		String email = ((User)(user)).getEmail();
 		if (DatabaseConnectivity.findObject(  new BasicDBObject("email", email),DatabaseConnectivity.ACCOUNTCOLLECTION) == null)
 		{
 			DatabaseConnectivity.addObject(user.getDBForm(), DatabaseConnectivity.ACCOUNTCOLLECTION);
 		}
 		else
 		{
-			assert false;
+			throw new RuntimeException("Account with email " + email + " has already been created!");
 		}
 	}
 

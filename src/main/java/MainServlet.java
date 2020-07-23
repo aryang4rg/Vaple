@@ -3,12 +3,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
-import java.net.FileNameMap;
-import java.net.URLConnection;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Hashtable;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,8 +30,8 @@ public class MainServlet extends HttpServlet
 	private Hashtable<String, AjaxHandler> ajaxRequestToHandler()
 	{
 		Hashtable<String, AjaxHandler> hashtable = new Hashtable<String, AjaxHandler>();
-		hashtable.put("account_login", LoginServlet.getSingletonServlet());
-		hashtable.put("account_create", SignUpServlet.getSingletonServlet());
+		hashtable.put("account_login", LoginServlet.getInstance());
+		hashtable.put("account_create", SignUpServlet.getInstance());
 		return hashtable;
 	}
 

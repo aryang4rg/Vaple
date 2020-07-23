@@ -37,5 +37,10 @@ public class DatabaseConnectivity
 		collection.update(new BasicDBObject("_id", object.get("id")), object);
 	}
 
+	public static boolean doesObjectExist(DBObject object, DBCollection collection)
+	{
+		return findObject(object, collection) != null;
+	}
+
 
 }

@@ -2,19 +2,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
 
 public class LoginServlet implements AjaxHandler
 {
 
 	private static LoginServlet singletonServlet = new LoginServlet();
 
-	public static LoginServlet getSingletonServlet() {
+	public static LoginServlet getInstance() {
 		if (singletonServlet == null)
 			singletonServlet = new LoginServlet();
 
@@ -51,9 +48,9 @@ public class LoginServlet implements AjaxHandler
 			return 200;
 		}
 
-		password = PasswordHasher.getSingletonObject().createHash(password);
+		password = PasswordHasher.getInstance().createHash(password);
 
-		User user = DatabaseConnectivity.getUserByEmail(email);
+		User user = User.getUserByInfo(User.EMAIL, email);
 		if (user == null || !user.getPassword().equals(password))
 		{
 			response.put("token", (Short)null);

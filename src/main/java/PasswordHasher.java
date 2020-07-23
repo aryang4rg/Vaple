@@ -7,7 +7,7 @@ public class PasswordHasher
 {
     private static PasswordHasher singletonObject = new PasswordHasher();
 
-    public static PasswordHasher getSingletonObject() {
+    public static PasswordHasher getInstance() {
         if (singletonObject == null)
             singletonObject = new PasswordHasher();
         return singletonObject;    }
@@ -31,7 +31,7 @@ public class PasswordHasher
             System.out.print("'" + ((char)(i)) + "', " );
         }
         */
-        PasswordHasher hasher = PasswordHasher.getSingletonObject();
+        PasswordHasher hasher = PasswordHasher.getInstance();
         String pass1 = "password123";
 
         String pass2 = "xbobomb";
