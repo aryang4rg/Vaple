@@ -12,18 +12,18 @@ import java.util.Base64;
 
 public class FeedHandler implements AjaxHandler
 {
-	public boolean isPage(){
-		return true;
-	}
+    public boolean isPage(){
+        return true;
+    }
 
-	@Override
-	public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User u) throws ServletException, IOException {
-		response.put("type", "feed");
+    @Override
+    public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User u) throws ServletException, IOException {
+        response.put("type", "feed");
 
-		ObjectNode node = Util.createObjectNode();
+        ObjectNode node = Util.createObjectNode();
 
-		response.put("data", node);
+        response.put("data", node);
 
-		return 200;
-	}
+        return 200;
+    }
 }

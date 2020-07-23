@@ -22,8 +22,11 @@ public class ProfileHandler implements AjaxHandler
 			return 404;
 		ObjectId id = new ObjectId(uriSplit[0]);
 
+		//TODO fix this, idk what david is trying to do
+		/*
 		if(!id.isValid())
 			return 404;
+		 */
 		User user = DatabaseConnectivity.getUser(id);
 
 		if(user == null)
