@@ -133,7 +133,8 @@ a{
 
 .top-bar .right{
 	display: flex;
-	flex-direction: row-reverse;
+	flex-direction: row;
+	justify-content: flex-end;
 	align-items: center;
 	height: 100%;
 	flex: 1;
@@ -164,6 +165,14 @@ a{
 
 .top-bar .quick-nav:hover{
 	text-decoration: underline;
+}
+
+.top-bar-profile-photo{
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background-position: center;
+	background-size: cover;
 }
 
 .page{
@@ -323,12 +332,21 @@ a{
 	top: -80px;
 }
 
+.profile-details .divider{
+	display: inline-block;
+	width: 100%;
+	height: 1px;
+	background-color: #bbb;
+	margin: 12px 0;
+}
+
 .profile-name{
 	display: flex;
 	flex-direction: row;
 	flex: 1;
 	justify-content: center;
 	font-size: 32px;
+	padding: 0 0 40px 0;
 }
 
 .profile-follow-count{
@@ -336,21 +354,39 @@ a{
 	flex-direction: row;
 	width: 100%;
 	justify-content: space-evenly;
+	align-items: center;
+}
+
+.profile-follow-count .divider{
+	display: inline-block;
+	width: 1px;
+	height: 36px;
+	background-color: #ccc;
 }
 
 .profile-follow-counter{
 	display: flex;
 	flex-direction: column;
+	align-items: center;
 }
 
 .profile-follow-counter .title{
 	font-size: 12px;
 	color: #555;
 	margin-bottom: 8px;
+	font-size: 16px;
 }
 
 .profile-follow-counter .number{
-	font-size: 18px;
+	font-size: 24px;
+	font-weight: 500;
+}
+
+.profile-bio{
+	margin-top: 20px;
+	font-size: 16px;
+	width: 100%;
+	font-weight: 500;
 }
 
 .login-background{
@@ -466,6 +502,7 @@ a{
 	height: 40px;
 	cursor: pointer;
 	user-select: none;
+	background-color: #000;
 }
 
 @keyframes cycle{
