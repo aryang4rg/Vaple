@@ -43,6 +43,7 @@ public class FollowPersonHandler implements AjaxHandler
 						continue;
 					user.setFollowing(other.getObjectID(), true);
 					other.setFollower(user.getObjectID(), true);
+					User.databaseConnectivity().updateInDatabase(other);
 				}
             }
         }
@@ -61,9 +62,13 @@ public class FollowPersonHandler implements AjaxHandler
 						continue;
 					user.setFollowing(other.getObjectID(), false);
 					other.setFollower(user.getObjectID(), false);
-				}
+                    User.databaseConnectivity().updateInDatabase(other);
+                }
             }
         }
+
+        User.databaseConnectivity().updateInDatabase(user);
+
         return 200;
     }
 

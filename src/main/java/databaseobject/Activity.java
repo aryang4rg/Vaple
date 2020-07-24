@@ -1,5 +1,7 @@
 package databaseobject;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import main.*;
 
 import com.mongodb.BasicDBObject;
@@ -14,6 +16,11 @@ import java.util.ArrayList;
  */
 public class Activity implements DatabaseStructureObject
 {
+
+	public static final String NAME = "name", DESCRIPTION = "description", LATITUDE = "latitude", LONGITUDE = "longitude",
+			ATTENDING = "attending", TIME_START = "time_start", TIME_END = "time_end", FORM = "form", OBJECTID = "objectID",
+			ASSOCIATED_CLUB = "associated_club", CREATOR = "creator", TYPE = "type";
+
 	String name, description;
 	double latitude, longitude;
 	ArrayList<ObjectId> attending;
@@ -22,8 +29,7 @@ public class Activity implements DatabaseStructureObject
 	ObjectId objectID;
 	ObjectId associated_club;
 	ObjectId creator;
-
-
+	String type;
 
 	private static Activity databaseConnectivityObject = new Activity();
 	public static Activity databaseConnectivity()
@@ -33,9 +39,10 @@ public class Activity implements DatabaseStructureObject
 
 	public Activity() {}
 
-	public Activity(String name, String description, ObjectId creator, ArrayList<ObjectId> attending, long time_start, long time_end, double latitude, double longitude, Club associated_club)
+	public Activity(String name, String description, String type, ObjectId creator, ArrayList<ObjectId> attending, long time_start, long time_end, double latitude, double longitude, Club associated_club)
 	{
 		this.name = name;
+		this.type = type;
 		this.description = description;
 		this.attending = attending;
 		this.creator = creator;
@@ -47,11 +54,31 @@ public class Activity implements DatabaseStructureObject
 			this.associated_club = associated_club.getObjectID();
 		}
 
+		ObjectNode node = JsonNodeFactory.instance.objectNode();
 	}
+
+	/*
+	public ObjectNode toFeedNode(){
+
+		node.put("name", getName());
+		node.put("id", getObjectID().toHexString());
+		node.put("description", getDescription())
+		//node.put("type", gett());
+		node.put("location_state", ());
+		node.put("location_city", ());
+		node.put("description", getDescription());
+		node.put("followers_count", ());
+		node.put("following_count", ());
+
+		return node;
+	}
+	*/
+
 
 	public Activity(DBObject object)
 	{
 		name = (String)object.get("name");
+		type = (String)object.get("type");
 		description = (String)object.get("description");
 		objectID = (ObjectId)object.get("_id");
 		attending = (ArrayList<ObjectId>)object.get("attending");
@@ -142,6 +169,14 @@ public class Activity implements DatabaseStructureObject
 		this.longitude = longitude;
 	}
 
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	public BasicDBObject getDBForm()
 	{
 		form = new BasicDBObject();
@@ -151,7 +186,7 @@ public class Activity implements DatabaseStructureObject
 		form.append("creator", getCreator());
 		form.append("time_start",getTime_start());
 		form.append("time_end",getTime_end());
-
+		form.append("type", getType());
 		form.append("latitude",getLatitude());
 		form.append("longitude",getLongitude());
 

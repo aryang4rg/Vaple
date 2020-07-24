@@ -80,7 +80,8 @@ public class ActivityFeedHandler implements AjaxHandler
         {
             if (index+numToFetch < activities.size())
             {
-                response.put("activities", Json.toJson(activities.subList(index, index+numToFetch)));
+                //response.put("activites", )
+                //response.put("activities", Json.toJson(activities.subList(index, index+numToFetch)));
             }
             else
             {
