@@ -6,6 +6,7 @@ import util.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import util.JavaMailUtil.JavaMail;
 import util.PasswordHasher;
 
 import javax.servlet.ServletException;
@@ -107,6 +108,13 @@ public class SignUpServlet implements AjaxHandler
 				User user = new User(name, email, password, location_country, location_state, location_city, "", token);
 
 				User.databaseConnectivity().addInDatabase(user);
+				String verificationLink = "";
+				try {
+					JavaMail.sendMessage(user.getEmail(),"Verify Email",verificationLink);
+				} catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 
 				response.put("account", user.toAccountNode());
 				response.put("token", user.getToken());

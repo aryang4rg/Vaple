@@ -21,7 +21,7 @@ public class User implements DatabaseStructureObject
 	public static final String NAME = "name", EMAIL = "email", PASSWORD = "password", LOCATION_COUNTRY = "location_country", LOCATION_STATE = "location_state",
 	LOCATION_CITY = "location_city", DESCRIPTION = "description", TOKEN = "token", FOLLOWING = "following", FOLLOWERS = "followers", ACTIVITIES = "activities";
 
-
+	private boolean verifiedUser = false;
 
 	private static User databaseConnectivityObject = new User();
 	public static User databaseConnectivity()
@@ -47,6 +47,7 @@ public class User implements DatabaseStructureObject
 		object.put("followers", new BasicDBObject());
 		object.put("activities", new BasicDBObject());
 		object.put("clubs",new BasicDBObject());
+		object.put("verified",verifiedUser);
 
 		this.object = object;
 	}
@@ -378,4 +379,13 @@ public class User implements DatabaseStructureObject
 		}
 	}
 
+	public boolean isVerifiedUser()
+	{
+		return verifiedUser;
+	}
+
+	public void setVerifiedUser(boolean verifiedUser)
+	{
+		this.verifiedUser = verifiedUser;
+	}
 }
