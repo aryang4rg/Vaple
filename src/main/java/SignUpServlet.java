@@ -52,7 +52,9 @@ public class SignUpServlet implements AjaxHandler
 
 	@Override
 	public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User u) throws ServletException, IOException {
-		if(uriSplit.length > 0 || u != null)
+		if(uriSplit.length > 0)
+			return 404;
+		if(u != null)
 			return 400;
 		String email = Util.nullIfSpecialCharacters(request.get("email").asText());
 		String name = Util.removeTrimAndNonAlphanumeric(request.get("name").asText());

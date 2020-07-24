@@ -24,7 +24,7 @@ public class ProfileHandler implements AjaxHandler
 			return 404;
 		ObjectId id = new ObjectId(uriSplit[0]);
 
-		User user = (User)User.databaseConnectivity().getByInfoInDataBase(ID, id.toHexString());
+		User user = (User)User.databaseConnectivity().getByInfoInDataBase(ID, id);
 
 		if(user == null)
 			return 404;

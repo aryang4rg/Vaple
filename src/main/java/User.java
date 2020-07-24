@@ -293,12 +293,12 @@ public class User implements DatabaseStructureObject
 		return null;
 	}
 
-	public DatabaseStructureObject getByInfoInDataBase(String varName, String data)
+	public DatabaseStructureObject getByInfoInDataBase(String varName, Object data)
 	{
 		return findInDatabase(new BasicDBObject(varName,data));
 	}
 
-	public boolean infoExistsInDatabase(String varName, String data)
+	public boolean infoExistsInDatabase(String varName, Object data)
 	{
 		return getByInfoInDataBase(varName, data) != null;
 	}
