@@ -1,4 +1,4 @@
-package ajaxhandler.addupdate;
+package ajaxhandler.addupdate.add;
 
 import ajaxhandler.AjaxHandler;
 import databaseobject.*;

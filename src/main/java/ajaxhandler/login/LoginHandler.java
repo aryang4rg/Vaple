@@ -1,7 +1,7 @@
 package ajaxhandler.login;
 
 import ajaxhandler.AjaxHandler;
-import ajaxhandler.fulfiller.FeedHandler;
+import ajaxhandler.fulfiller.ActivityFeedHandler;
 import databaseobject.*;
 
 
@@ -25,7 +25,7 @@ public class LoginHandler implements AjaxHandler
 		return instance;
 	}
 
-	private FeedHandler handler = new FeedHandler();
+	private ActivityFeedHandler handler = new ActivityFeedHandler();
 	public boolean isPage(){
 		return true;
 	}

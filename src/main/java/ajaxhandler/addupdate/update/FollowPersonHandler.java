@@ -1,4 +1,4 @@
-package ajaxhandler.addupdate;
+package ajaxhandler.addupdate.update;
 
 import ajaxhandler.AjaxHandler;
 import databaseobject.*;
@@ -40,7 +40,7 @@ public class FollowPersonHandler implements AjaxHandler
 				if(id != null && !user.getObjectID().toHexString().equals(id)){
 					User other = (User) User.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(id));
 
-					if(other != null)
+					if(other == null)
 						continue;
 					user.setFollowing(other.getObjectID(), true);
 					other.setFollower(user.getObjectID(), true);
@@ -69,7 +69,7 @@ public class FollowPersonHandler implements AjaxHandler
 				if(id != null && !user.getObjectID().toHexString().equals(id)){
 					User other = (User) User.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(id));
 
-					if(other != null)
+					if(other == null)
 						continue;
 					user.setFollowing(other.getObjectID(), false);
 					other.setFollower(user.getObjectID(), false);

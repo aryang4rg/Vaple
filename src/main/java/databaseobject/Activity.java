@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * <PRE> The activity class describes an activity object, which stores data about the activity's name, location, time, description and
  * a list of attendees. The activity class also constructs a corresponding DBObject to store in the database.</PRE>
  */
-public class Activity implements DatabaseStructureObject
+public class Activity implements DatabaseStructureObject, Comparable<Activity>
 {
 
 	public static final String NAME = "name", DESCRIPTION = "description", LATITUDE = "latitude", LONGITUDE = "longitude",
@@ -32,6 +32,19 @@ public class Activity implements DatabaseStructureObject
 	ObjectId associated_club;
 	ObjectId creator;
 	String type;
+
+	@Override
+	public int compareTo(Activity o) {
+		if (time_start - o.time_start > 0)
+		{
+			return -1;
+		}
+		else if (time_start == o.time_start)
+		{
+			return 0;
+		}
+		return 1;
+	}
 
 	private static Activity databaseConnectivityObject = new Activity();
 	public static Activity databaseConnectivity()

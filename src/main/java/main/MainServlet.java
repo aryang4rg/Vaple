@@ -10,9 +10,12 @@ import java.util.Arrays;
 import java.util.Hashtable;
 
 import ajaxhandler.*;
-import ajaxhandler.addupdate.*;
+import ajaxhandler.addupdate.add.ActivityCreatorHandler;
+import ajaxhandler.addupdate.add.SignUpServlet;
+import ajaxhandler.addupdate.update.AccountChangeHandler;
+import ajaxhandler.addupdate.update.ClubFollowHandler;
+import ajaxhandler.addupdate.update.FollowPersonHandler;
 import ajaxhandler.fulfiller.ActivityFeedHandler;
-import ajaxhandler.fulfiller.FeedHandler;
 import ajaxhandler.fulfiller.ProfileHandler;
 import ajaxhandler.login.LoginHandler;
 import ajaxhandler.login.LoginServlet;
@@ -53,13 +56,13 @@ public class MainServlet extends HttpServlet
 		hashtable.put("account_login", LoginServlet.getInstance());
 		hashtable.put("account_create", SignUpServlet.getInstance());
 		hashtable.put("login", LoginHandler.getInstance());
-		hashtable.put("home", FeedHandler.getInstance());
 		hashtable.put("profile", ProfileHandler.getInstance());
-		hashtable.put("activity_create", ActivityCreatorHandler.getInstance());
+		hashtable.put("activity_create", ActivityCreatorHandler.getInstance(this));
 		hashtable.put("account_change", AccountChangeHandler.getInstance(this));
 		hashtable.put("join_leave_club", ClubFollowHandler.getInstance());
 		hashtable.put("follow_change", FollowPersonHandler.getInstance());
 		hashtable.put("activity_feed", ActivityFeedHandler.getInstance());
+		hashtable.put("activities", ActivityFeedHandler.getInstance());
 		return hashtable;
 	}
 

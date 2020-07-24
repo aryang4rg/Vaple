@@ -1,6 +1,7 @@
-package ajaxhandler.addupdate;
+package ajaxhandler.addupdate.update;
 
 import ajaxhandler.AjaxHandler;
+import ajaxhandler.addupdate.add.SignUpServlet;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
 
