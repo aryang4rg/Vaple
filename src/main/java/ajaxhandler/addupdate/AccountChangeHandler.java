@@ -29,6 +29,7 @@ public class AccountChangeHandler implements AjaxHandler
 		String email = Util.asText(request.get("email"));
 		String name = Util.asText(request.get("name"));
 		String password = Util.asText(request.get("password"));
+		String old_password = Util.asText(request.get("password"));
 		String location_country = Util.asText(request.get("location_country"));
 		String location_state = Util.asText(request.get("location_state"));
 		String location_city = Util.asText(request.get("location_city"));
@@ -49,6 +50,22 @@ public class AccountChangeHandler implements AjaxHandler
 			}
 
 			if(password != null){
+				old_password = Util.trimAndnullIfSpecialCharacters(old_password);
+
+				if(old_password == null){
+					error = "Incorrect password";
+
+					break;
+				}
+
+				old_password = PasswordHasher.getInstance().createHash(old_password);
+
+				if(!u.getPassword().equals(old_password)){
+					error = "Incorrect password";
+
+					break;
+				}
+
 				password = Util.trimString(password);
 
 				if(password == null){
