@@ -67,7 +67,7 @@ public class DatabaseConnectivity
 	 */
 	public static void updateObject(DBObject object, DBCollection collection)
 	{
-		collection.update(new BasicDBObject("_id", object.get("id")), object);
+		collection.update(new BasicDBObject("_id", object.get("_id")), object);
 	}
 
 	/**
