@@ -25,6 +25,16 @@ public class ProfileHandler implements AjaxHandler
 			return 404;
 		if(!ObjectId.isValid(uriSplit[0]))
 			return 404;
+		if(u.getObjectID().toHexString().equals(uriSplit[0])){
+			ObjectNode node = u.toProfileNode();
+
+			node.put("self", true);
+			response.put("data", node);
+			response.put("type", "profile");
+
+			return 200;
+		}
+
 		ObjectId id = new ObjectId(uriSplit[0]);
 
 		User user = (User) User.databaseConnectivity().getByInfoInDataBase(ID, id);
