@@ -96,7 +96,7 @@ public class SignUpServlet implements AjaxHandler
 		for(int i = 0; i < 100; i++){
 			String token = generateSafeToken();
 
-			if(User.databaseConnectivity().infoExistsInDatabase(User.TOKEN, token)){
+			if(!User.databaseConnectivity().infoExistsInDatabase(User.TOKEN, token)){
 				User user = new User(name, email, password, location_country, location_state, location_city, "", token);
 
 				User.databaseConnectivity().addInDatabase(user);
