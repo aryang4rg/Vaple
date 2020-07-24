@@ -20,13 +20,10 @@ public class ProfileHandler implements AjaxHandler
 	public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User u) throws ServletException, IOException {
 		if(uriSplit.length == 0)
 			return 404;
+		if(!ObjectId.isValid(uriSplit[0]))
+			return 404;
 		ObjectId id = new ObjectId(uriSplit[0]);
 
-		//TODO fix this
-		/*
-		if(!id.isValid())
-			return 404;
-		 */
 		User user = (User)User.databaseConnectivity().getByInfoInDataBase(ID, id.toHexString());
 
 		if(user == null)
