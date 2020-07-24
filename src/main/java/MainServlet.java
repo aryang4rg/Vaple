@@ -63,12 +63,16 @@ public class MainServlet extends HttpServlet
 		{
 			AjaxHandler handler = null;
 
-			if(uriSplit.length <= 1)
+			if(uriSplit.length == 0)
 			{
 				handler = pathToHandler.get("home");
+				uriSplit = new String[]{};
 			}
-			else if(uriSplit.length >= 2)
+			else if(uriSplit.length >= 2){
 				handler = pathToHandler.get(uriSplit[1]);
+				uriSplit = Arrays.copyOfRange(uriSplit, 2, uriSplit.length);
+			}
+
 			if (handler != null)
 			{
 				JsonNode request = Json.parse(req.getReader());
@@ -79,7 +83,7 @@ public class MainServlet extends HttpServlet
 
 				if(token != null)
 					user = (User)User.databaseConnectivity().getByInfoInDataBase(User.TOKEN, token);
-				int statusCode = handler.service(req, resp, request, response, Arrays.copyOfRange(uriSplit, 2, uriSplit.length), user);
+				int statusCode = handler.service(req, resp, request, response, uriSplit, user);
 
 				if(statusCode != 200){
 					resp.setStatus(statusCode);
