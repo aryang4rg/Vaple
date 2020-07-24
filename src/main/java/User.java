@@ -48,8 +48,9 @@ public class User implements DatabaseStructureObject
 
 	public ArrayList<DBObject> getActivities(int limit)
 	{
-		ArrayList<DBObject> activities = (ArrayList<DBObject>) object.get("activities");
-		activities.addAll((ArrayList<DBObject>)DatabaseConnectivity.ACTIVITYCOLLECTION.find().sort(new BasicDBObject("time",1)).limit(limit - activities.size()).toArray());
+		ArrayList<DBObject> activities =
+		(ArrayList<DBObject>)DatabaseConnectivity.ACTIVITYCOLLECTION.find()
+		.sort(new BasicDBObject("time",1)).limit(limit).toArray();
 		return activities;
 	}
 
