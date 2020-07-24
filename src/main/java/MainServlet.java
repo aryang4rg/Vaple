@@ -67,7 +67,7 @@ public class MainServlet extends HttpServlet
 				String token = resp.getHeader("Authentication");
 
 				if(token != null)
-					user = DatabaseConnectivity.getUserByToken(token);
+					user = (User)User.databaseConnectivity().getByInfoInDataBase(User.TOKEN, token);
 				int statusCode = handler.service(req, resp, request, response, Arrays.copyOfRange(uriSplit, 2, uriSplit.length), user);
 
 				if(statusCode != 200){

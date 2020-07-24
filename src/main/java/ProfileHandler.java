@@ -27,7 +27,7 @@ public class ProfileHandler implements AjaxHandler
 		if(!id.isValid())
 			return 404;
 		 */
-		User user = DatabaseConnectivity.getUser(id);
+		User user = (User)User.databaseConnectivity().getByInfoInDataBase(ID, id.toHexString());
 
 		if(user == null)
 			return 404;

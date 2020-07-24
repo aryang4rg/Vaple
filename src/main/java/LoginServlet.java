@@ -50,7 +50,7 @@ public class LoginServlet implements AjaxHandler
 
 		password = PasswordHasher.getInstance().createHash(password);
 
-		User user = User.getUserByInfo(User.EMAIL, email);
+		User user = (User) User.databaseConnectivity().getByInfoInDataBase(User.EMAIL, email);
 		if (user == null || !user.getPassword().equals(password))
 		{
 			response.put("token", (Short)null);

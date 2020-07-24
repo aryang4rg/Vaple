@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public interface AjaxHandler
 {
+	String ID = "_id";
 	int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException;
 	boolean isPage();
 }
