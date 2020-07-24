@@ -301,7 +301,7 @@ class LoginPage extends Page{
 		this.city = this.createEntry('City', 'text');
 		this.entries.appendChild(this.city.entry);
 		this.formContainer.appendChild(this.entries);
-		this.button = createElement('div', {className: 'login-button login-background text metro', innerText: 'login'});
+		this.button = createElement('div', {className: 'login-button text metro', innerText: 'login'});
 		this.formContainer.appendChild(this.button);
 		this.actionError = createElement('span', {className: 'login-form-entry-error text metro'});
 		this.formContainer.appendChild(this.actionError);
@@ -405,8 +405,8 @@ class LoginPage extends Page{
 					error = true;
 				}
 
-				if(error)
-					return;
+				// if(error)
+				// 	return;
 				this.button.classList.add('disabled');
 
 				accountManager.signup(this.name.field.value, this.email.field.value, this.password.field.value,
@@ -542,11 +542,23 @@ class ProfilePage extends Page{
 		this.profileAboutContainer.appendChild(this.details);
 		this.name = createElement('span', {className: 'profile-name text'});
 		this.details.appendChild(this.name);
-		this.followcount = createElement('div', {className: 'profile-follow-counter number'});
-		this.followercount = createElement('div', {className: 'profile-follow-counter number'});
-		this.details.appendChild(createElement('div', {className: 'profile-follow-counter'}, [
-			createElement('div', {className: 'profile-follow-count'})
+		this.followcount = createElement('div', {className: 'number text'});
+		this.followercount = createElement('div', {className: 'number text'});
+		this.details.appendChild(createElement('div', {className: 'profile-follow-count'}, [
+			createElement('div', {className: 'profile-follow-counter'}, [
+				createElement('div', {className: 'title text', innerText: 'Followers'}),
+				this.followercount
+			]),
+			createElement('div', {className: 'divider'}),
+			createElement('div', {className: 'profile-follow-counter'}, [
+				createElement('div', {className: 'title text', innerText: 'Following'}),
+				this.followcount
+			]),
 		]));
+
+		this.details.appendChild(createElement('div', {className: 'divider'}));
+		this.bio = createElement('span', {className: 'profile-bio text metro'});
+		this.details.appendChild(this.bio);
 
 		this.left.appendChild(this.profileAboutContainer);
 	}
@@ -557,6 +569,9 @@ class ProfilePage extends Page{
 
 		this.profileImage.style['background-image'] = 'url("/cdn/profile/' + data.id + '.png")';
 		this.name.setText(data.name);
+		this.followcount.setText(data.following_count);
+		this.followercount.setText(data.followers_count);
+		this.bio.setText(data.description);
 	}
 }
 
@@ -666,6 +681,15 @@ const pageManager = new (class{
 
 				this.logoutShowing = false;
 				this.loginShowing = false;
+				this.profileImage = createElement('a', {className: 'top-bar-profile-photo', attributes: {href: '/account'}});
+				this.right.appendChild(this.profileImage);
+
+				this.profileImage.on('click', (e) => {
+					e.preventDefault();
+					pageLoader.load('/account');
+
+					return false;
+				});
 			}
 
 			createItem(text, path){
@@ -679,6 +703,10 @@ const pageManager = new (class{
 				});
 
 				return el;
+			}
+
+			showProfilePhoto(url){
+				this.profileImage.style['background-image'] = 'url("' + url + '")';
 			}
 
 			showLogin(show){
@@ -882,6 +910,8 @@ const accountManager = new (class{
 			}
 
 			this.hasAccount = true;
+
+			pageManager.topBar.showProfilePhoto('/cdn/profile/' + account.id + '.png');
 		}else
 			pageManager.showErrorPage();
 	}
