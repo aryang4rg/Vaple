@@ -1,4 +1,3 @@
-import com.fasterxml.jackson.databind.introspect.TypeResolutionContext;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
@@ -18,7 +17,7 @@ public class Club implements DatabaseStructureObject
     }
     public Club() {}
 
-    public Club(String name, String description, String location_country, String location_state, String location_city, String club_type, DBObject owner)
+    public Club(String name, String description, String location_country, String location_state, String location_city, String club_type, ObjectId owner)
     {
         DBObject object = new BasicDBObject();
 
@@ -63,7 +62,7 @@ public class Club implements DatabaseStructureObject
     {
         DBObject object = DatabaseConnectivity.findOneObject(obj, DatabaseConnectivity.CLUBCOLLECTION);
         if(object != null)
-            return new User(object);
+            return new Club(object);
         return null;
     }
 

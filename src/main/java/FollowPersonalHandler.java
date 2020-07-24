@@ -25,7 +25,7 @@ public class FollowPersonalHandler implements AjaxHandler
 				String id = Util.removeNonAlphanumeric(Util.asText(idToFollow));
 
 				if(id != null){
-					User other = (User)User.databaseConnectivity().getByInfoInDataBase(ID, new ObjectId(id));
+					User other = (User) User.databaseConnectivity().getByInfoInDataBase(ID, new ObjectId(id));
 
 					if(other != null)
 						continue;
@@ -43,7 +43,7 @@ public class FollowPersonalHandler implements AjaxHandler
 				String id = Util.removeNonAlphanumeric(Util.asText(idToFollow));
 
 				if(id != null){
-					User other = (User)User.databaseConnectivity().getByInfoInDataBase(ID, new ObjectId(id));
+					User other = (User) User.databaseConnectivity().getByInfoInDataBase(ID, new ObjectId(id));
 
 					if(other != null)
 						continue;

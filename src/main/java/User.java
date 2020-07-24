@@ -1,4 +1,3 @@
-
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.BasicDBObject;
@@ -43,19 +42,30 @@ public class User implements DatabaseStructureObject
 		object.put("following", new BasicDBObject());
 		object.put("followers", new BasicDBObject());
 		object.put("activities", new BasicDBObject());
+		object.put("clubs",new BasicDBObject());
 
 		this.object = object;
 	}
 
 	public ArrayList<DBObject> getActivities(int limit)
 	{
-		return (ArrayList<DBObject>)DatabaseConnectivity.ACTIVITYCOLLECTION.find()
+		return (ArrayList<DBObject>) DatabaseConnectivity.ACTIVITYCOLLECTION.find()
 		.sort(new BasicDBObject("time",1)).limit(limit).toArray();
 	}
 
-	public ArrayList<DBObject> getActivities()
+	public ArrayList<DBObject> getClubs()
 	{
-		return (ArrayList<DBObject>)DatabaseConnectivity.ACTIVITYCOLLECTION.find().toArray();
+		return (ArrayList<DBObject>) object.get("clubs");
+	}
+
+	public void addClubToUser(Club club)
+	{
+		((DBObject)object.get("clubs")).put(club.getObjectID().toHexString(), true);
+	}
+
+	public void addActivityToUser(Activity activity)
+	{
+		((DBObject)object.get("activities")).put(activity.getObjectID().toHexString(),true);
 	}
 
 	public User(DBObject object)
