@@ -10,13 +10,13 @@ import java.util.Arrays;
 import java.util.Hashtable;
 
 import ajaxhandler.*;
-import ajaxhandler.addupdate.AccountChangeHandler;
-import ajaxhandler.addupdate.ActivityCreatorHandler;
-import ajaxhandler.addupdate.SignUpServlet;
+import ajaxhandler.addupdate.*;
+import ajaxhandler.fulfiller.ActivityFeedHandler;
 import ajaxhandler.fulfiller.FeedHandler;
 import ajaxhandler.fulfiller.ProfileHandler;
 import ajaxhandler.login.LoginHandler;
 import ajaxhandler.login.LoginServlet;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import databaseobject.*;
 import util.*;
 
@@ -57,6 +57,9 @@ public class MainServlet extends HttpServlet
 		hashtable.put("profile", ProfileHandler.getInstance());
 		hashtable.put("activity_create", ActivityCreatorHandler.getInstance());
 		hashtable.put("account_change", AccountChangeHandler.getInstance(this));
+		hashtable.put("join_leave_club", ClubFollowHandler.getInstance());
+		hashtable.put("follow_change", FollowPersonHandler.getInstance());
+		hashtable.put("activity_feed", ActivityFeedHandler.getInstance());
 		return hashtable;
 	}
 
@@ -91,8 +94,16 @@ public class MainServlet extends HttpServlet
 
 			if (handler != null)
 			{
-				JsonNode request = Json.parse(req.getInputStream());
-				ObjectNode response = Util.createObjectNode();
+				JsonNode request = null;
+				try {
+					request = Json.parse(req.getInputStream());
+				}
+				catch (JsonMappingException e)
+				{
+					e.printStackTrace();
+				}
+
+					ObjectNode response = Util.createObjectNode();
 
 				User user = null;
 				String token = req.getHeader("Authentication");

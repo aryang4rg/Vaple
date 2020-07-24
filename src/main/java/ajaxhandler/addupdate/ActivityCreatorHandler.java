@@ -58,7 +58,9 @@ public class ActivityCreatorHandler implements AjaxHandler
                     Long.parseLong(time_end), Double.parseDouble(latitude), Double.parseDouble(longitude), club);
             Activity.databaseConnectivity().addInDatabase(activity);
 
-            ((User) User.databaseConnectivity().getFromInfoInDataBase(ID, user.getObjectID())).setActivities(activity.getObjectID(), true);
+            user.setActivities(activity.getObjectID(), true);
+            User.databaseConnectivity().addInDatabase(user);
+
             return 200;
         }
         catch (NumberFormatException e)

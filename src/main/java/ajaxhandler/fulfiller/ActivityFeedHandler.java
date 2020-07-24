@@ -19,6 +19,12 @@ import java.util.Comparator;
 
 public class ActivityFeedHandler implements AjaxHandler
 {
+    private static ActivityFeedHandler instance = new ActivityFeedHandler();
+
+    public static ActivityFeedHandler getInstance() {
+        return instance;
+    }
+
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException {
         if (user == null)
@@ -31,6 +37,10 @@ public class ActivityFeedHandler implements AjaxHandler
         for (String idString : following)
         {
             User followingUser = (User) User.databaseConnectivity().getFromInfoInDataBase(AjaxHandler.ID, new ObjectId(idString) );
+            if (followingUser == null)
+            {
+                continue;
+            }
             ArrayList<DBObject> dbObjArr = followingUser.getActivities(50);
 
             for (DBObject obj : dbObjArr)
@@ -51,6 +61,7 @@ public class ActivityFeedHandler implements AjaxHandler
             numToFetch = 50;
         }
 
+        numToFetch = Math.abs(numToFetch);
         String afterKeyword = req.getParameter("after");
         afterKeyword = Util.trimAndnullIfSpecialCharacters(afterKeyword);
         int index = 0;

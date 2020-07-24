@@ -16,6 +16,12 @@ import java.io.IOException;
 
 public class ClubFollowHandler implements AjaxHandler
 {
+    private static ClubFollowHandler instance = new ClubFollowHandler();
+
+    public static ClubFollowHandler getInstance() {
+        return instance;
+    }
+
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException {
         String club_id = Util.asText(request.get("club_id"));
