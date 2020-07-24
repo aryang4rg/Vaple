@@ -13,9 +13,15 @@ public class Activity implements DatabaseStructureObject
 	String name, description;
 	double latitude, longitude;
 	ArrayList<ObjectId> attending;
-	long time;
+	long time_start, time_end;
 	BasicDBObject form;
+<<<<<<< Updated upstream
 	ObjectId objectID, owner;
+=======
+	ObjectId objectID;
+	ObjectId associated_club;
+	ObjectId creator;
+>>>>>>> Stashed changes
 
 	private static Activity databaseConnectivityObject = new Activity();
 	public static Activity databaseConnectivity()
@@ -25,14 +31,21 @@ public class Activity implements DatabaseStructureObject
 
 	public Activity() {}
 
+<<<<<<< Updated upstream
 	public Activity(String name, String description, ArrayList<ObjectId> attending, long time, double latitude, double longitude, ObjectId owner)
+=======
+	public Activity(String name, String description, ObjectId creator, ArrayList<ObjectId> attending, long time_start, long time_end, double latitude, double longitude, Club associated_club)
+>>>>>>> Stashed changes
 	{
 		this.name = name;
 		this.description = description;
 		this.attending = attending;
-		this.time = time;
+		this.creator = creator;
+		this.time_start = time_start;
+		this.time_end = time_end;
 		this.latitude = latitude;
 		this.longitude = longitude;
+<<<<<<< Updated upstream
 		this.owner = owner;
 	}
 
@@ -46,19 +59,30 @@ public class Activity implements DatabaseStructureObject
 		latitude = (double)object.get("latitude");
 		longitude = (double)object.get("longitude");
 		owner = (ObjectId)object.get("owner");
+=======
+		if (associated_club != null) {
+			this.associated_club = associated_club.getObjectID();
+		}
+
+>>>>>>> Stashed changes
 	}
 
-
-	public Activity(BasicDBObject object)
+	public Activity(DBObject object)
 	{
 		name = (String)object.get("name");
 		description = (String)object.get("description");
 		objectID = (ObjectId)object.get("_id");
 		attending = (ArrayList<ObjectId>)object.get("attending");
-		time = (Long)object.get("time");
+		time_start = (Long)object.get("time_start");
+		time_end = (Long)object.get("time_end");
 		latitude = (double)object.get("latitude");
 		longitude = (double)object.get("longitude");
+<<<<<<< Updated upstream
 		owner = (ObjectId)object.get("owner");
+=======
+		creator = (ObjectId)object.get("creator");
+		associated_club = (ObjectId)object.get("associated_club");
+>>>>>>> Stashed changes
 	}
 
 	/**
@@ -146,10 +170,14 @@ public class Activity implements DatabaseStructureObject
 		form.append("name",getName());
 		form.append("description",getDescription());
 		form.append("attending",getAttending());
-		form.append("time",getTime());
+		form.append("creator", getCreator());
+		form.append("time_start",getTime_start());
+		form.append("time_end",getTime_end());
+
 		form.append("latitude",getLatitude());
 		form.append("longitude",getLongitude());
 
+		form.append("associated_club", getAssociated_club());
 		return form;
 	}
 
@@ -251,9 +279,9 @@ public class Activity implements DatabaseStructureObject
 	 *
 	 * @return Returns the time the activity takes place
 	 */
-	public long getTime()
+	public long getStartTime()
 	{
-		return time;
+		return time_start;
 	}
 
 	/**
@@ -262,7 +290,46 @@ public class Activity implements DatabaseStructureObject
 	 */
 	public void setTime(long time)
 	{
-		this.time = time;
+		this.time_start = time;
 	}
 
+	public long getTime_start() {
+		return time_start;
+	}
+
+	public void setTime_start(long time_start) {
+		this.time_start = time_start;
+	}
+
+	public long getTime_end() {
+		return time_end;
+	}
+
+	public void setTime_end(long time_end) {
+		this.time_end = time_end;
+	}
+
+	public BasicDBObject getForm() {
+		return form;
+	}
+
+	public void setForm(BasicDBObject form) {
+		this.form = form;
+	}
+
+	public ObjectId getAssociated_club() {
+		return associated_club;
+	}
+
+	public void setAssociated_club(ObjectId associated_club) {
+		this.associated_club = associated_club;
+	}
+
+	public ObjectId getCreator() {
+		return creator;
+	}
+
+	public void setCreator(ObjectId creator) {
+		this.creator = creator;
+	}
 }

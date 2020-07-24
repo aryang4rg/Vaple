@@ -60,6 +60,18 @@ public class Util{
 		return string;
 	}
 
+	public static boolean checkIfStringsAreValid(String... stringArr)
+	{
+		for (String str : stringArr)
+		{
+			if (trimAndnullIfSpecialCharacters(str) == null)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public static String asText(JsonNode textNode){
 		if(textNode == null)
 			return null;

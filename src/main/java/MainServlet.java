@@ -3,7 +3,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -41,6 +40,7 @@ public class MainServlet extends HttpServlet
 		hashtable.put("login", LoginHandler.getInstance());
 		hashtable.put("home", FeedHandler.getInstance());
 		hashtable.put("profile", ProfileHandler.getInstance());
+		hashtable.put("activity_create", ActivityCreatorHandler.getInstance());
 		hashtable.put("account_change", AccountChangeHandler.getInstance(this));
 		return hashtable;
 	}

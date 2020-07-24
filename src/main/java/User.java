@@ -243,6 +243,13 @@ public class User implements DatabaseStructureObject
 			((DBObject)object.get("following")).removeField(following.toHexString());
 	}
 
+	public void setActivities(ObjectId activityId, boolean isAdding){
+		if(isAdding)
+			((DBObject)object.get(ACTIVITIES)).put(activityId.toHexString(), true);
+		else
+			((DBObject)object.get(ACTIVITIES)).removeField(activityId.toHexString());
+	}
+
 	/**
 	 * Returns whether this user is following another user
 	 * @param user The other user
