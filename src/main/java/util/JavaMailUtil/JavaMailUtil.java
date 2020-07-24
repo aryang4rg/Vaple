@@ -47,7 +47,6 @@ public class JavaMailUtil
         Message message = prepareMessage(session,myAccountEmail,recipient,messageText,subject);
 
         Transport.send(message);
-        System.out.println("Sent email");
 
     }
 
@@ -59,7 +58,7 @@ public class JavaMailUtil
             message.setFrom(new InternetAddress(myAccountEmail));
             message.setRecipient(Message.RecipientType.TO,new InternetAddress(recipient));
             message.setSubject(subject);
-            message.setText(messageText);
+            message.setContent(messageText,"text/html");
             return message;
         } catch(Exception e) {
             Logger.getLogger(JavaMailUtil.class.getName()).log(Level.SEVERE,null,e);

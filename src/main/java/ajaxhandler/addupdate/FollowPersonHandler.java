@@ -7,6 +7,7 @@ import util.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bson.types.ObjectId;
+import util.JavaMailUtil.JavaMail;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +45,16 @@ public class FollowPersonHandler implements AjaxHandler
 					user.setFollowing(other.getObjectID(), true);
 					other.setFollower(user.getObjectID(), true);
 					User.databaseConnectivity().updateInDatabase(other);
+					String recipient = other.getEmail();
+					String subject = "New Follower";
+					String messageText = "<h1> You have a new Follower!</h1>";
+					try
+                    {
+                        JavaMail.sendMessage(recipient, subject, messageText);
+                    } catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
 				}
             }
         }
