@@ -1,3 +1,9 @@
+package ajaxhandler.fulfiller;
+
+import ajaxhandler.AjaxHandler;
+import databaseobject.*;
+
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.bson.types.ObjectId;
@@ -7,6 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Gives profile information given id
+ */
 public class ProfileHandler implements AjaxHandler
 {
 	private static ProfileHandler instance = new ProfileHandler();
@@ -37,7 +46,7 @@ public class ProfileHandler implements AjaxHandler
 
 		ObjectId id = new ObjectId(uriSplit[0]);
 
-		User user = (User) User.databaseConnectivity().getByInfoInDataBase(ID, id);
+		User user = (User) User.databaseConnectivity().getFromInfoInDataBase(ID, id);
 
 		if(user == null)
 			return 404;

@@ -1,3 +1,10 @@
+package ajaxhandler.addupdate;
+
+import ajaxhandler.AjaxHandler;
+import databaseobject.*;
+import util.*;
+
+import databaseobject.Activity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bson.types.ObjectId;
@@ -38,7 +45,7 @@ public class ActivityCreatorHandler implements AjaxHandler
 
         Club club = null;
         if (associated_club != null) {
-            club = (Club) Club.databaseConnectivity().getByInfoInDataBase(ID, associated_club);
+            club = (Club) Club.databaseConnectivity().getFromInfoInDataBase(ID, associated_club);
         }
 
         if (user == null)
@@ -51,7 +58,7 @@ public class ActivityCreatorHandler implements AjaxHandler
                     Long.parseLong(time_end), Double.parseDouble(latitude), Double.parseDouble(longitude), club);
             Activity.databaseConnectivity().addInDatabase(activity);
 
-            ((User)User.databaseConnectivity().getByInfoInDataBase(ID, user.getObjectID())).setActivities(activity.objectID, true);
+            ((User) User.databaseConnectivity().getFromInfoInDataBase(ID, user.getObjectID())).setActivities(activity.getObjectID(), true);
             return 200;
         }
         catch (NumberFormatException e)

@@ -1,3 +1,6 @@
+package databaseobject;
+
+import main.*;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -81,7 +84,7 @@ public class Activity implements DatabaseStructureObject
 	 * @return The activity object
 	 */
 	@Override
-	public DatabaseStructureObject getByInfoInDataBase(String varName, Object data)
+	public DatabaseStructureObject getFromInfoInDataBase(String varName, Object data)
 	{
 		return findInDatabase(new BasicDBObject(varName,data));
 
@@ -96,7 +99,7 @@ public class Activity implements DatabaseStructureObject
 	@Override
 	public boolean infoExistsInDatabase(String varName, Object data)
 	{
-		return getByInfoInDataBase(varName, data) != null;
+		return getFromInfoInDataBase(varName, data) != null;
 	}
 
 	/**

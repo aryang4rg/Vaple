@@ -1,3 +1,10 @@
+package ajaxhandler.addupdate;
+
+import ajaxhandler.AjaxHandler;
+import databaseobject.*;
+import util.*;
+
+import databaseobject.Club;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bson.types.ObjectId;
@@ -19,7 +26,7 @@ public class ClubFollowHandler implements AjaxHandler
             return 400;
         }
 
-        Club c = (Club) Club.databaseConnectivity().getByInfoInDataBase(ID, new ObjectId(club_id));
+        Club c = (Club) Club.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(club_id));
         if (c == null)
         {
             return 400;
@@ -27,6 +34,8 @@ public class ClubFollowHandler implements AjaxHandler
 
         user.setClubs(c.getObjectID(), toJoin);
         c.setMember(user.getObjectID(), toJoin);
+        Club.databaseConnectivity().updateInDatabase(c);
+        User.databaseConnectivity().updateInDatabase(user);
         return 200;
     }
 

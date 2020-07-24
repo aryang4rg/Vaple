@@ -1,5 +1,12 @@
+package ajaxhandler.addupdate;
+
+import ajaxhandler.AjaxHandler;
+import databaseobject.*;
+import util.*;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import util.PasswordHasher;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

@@ -1,3 +1,10 @@
+package ajaxhandler.fulfiller;
+
+import ajaxhandler.AjaxHandler;
+import databaseobject.*;
+import util.*;
+
+import databaseobject.Activity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.DBObject;
@@ -23,12 +30,12 @@ public class ActivityFeedHandler implements AjaxHandler
         ArrayList<String> following = user.getFollowing();
         for (String idString : following)
         {
-            User followingUser = (User) User.databaseConnectivity().getByInfoInDataBase(AjaxHandler.ID, new ObjectId(idString) );
+            User followingUser = (User) User.databaseConnectivity().getFromInfoInDataBase(AjaxHandler.ID, new ObjectId(idString) );
             ArrayList<DBObject> dbObjArr = followingUser.getActivities(50);
 
             for (DBObject obj : dbObjArr)
             {
-                Activity activity = (Activity) Activity.databaseConnectivity().getByInfoInDataBase(ID, obj.get(ID));
+                Activity activity = (Activity) Activity.databaseConnectivity().getFromInfoInDataBase(ID, obj.get(ID));
                 if (activity != null)
                 {
                     activities.add(activity);

@@ -1,3 +1,9 @@
+package ajaxhandler.fulfiller;
+
+import ajaxhandler.AjaxHandler;
+import databaseobject.*;
+import util.*;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
 

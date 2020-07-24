@@ -1,3 +1,5 @@
+package main;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -6,6 +8,19 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Hashtable;
+
+import ajaxhandler.*;
+import ajaxhandler.addupdate.AccountChangeHandler;
+import ajaxhandler.addupdate.ActivityCreatorHandler;
+import ajaxhandler.addupdate.SignUpServlet;
+import ajaxhandler.fulfiller.FeedHandler;
+import ajaxhandler.fulfiller.ProfileHandler;
+import ajaxhandler.login.LoginHandler;
+import ajaxhandler.login.LoginServlet;
+import databaseobject.*;
+import util.*;
+
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -83,7 +98,7 @@ public class MainServlet extends HttpServlet
 				String token = req.getHeader("Authentication");
 
 				if(token != null)
-					user = (User)User.databaseConnectivity().getByInfoInDataBase(User.TOKEN, token);
+					user = (User) User.databaseConnectivity().getFromInfoInDataBase(User.TOKEN, token);
 				/* maybe remove later */
 
 				if(user == null && handler.isPage()){

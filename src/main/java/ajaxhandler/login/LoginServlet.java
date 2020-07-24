@@ -1,3 +1,9 @@
+package ajaxhandler.login;
+
+import ajaxhandler.AjaxHandler;
+import databaseobject.*;
+import util.*;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -40,7 +46,7 @@ public class LoginServlet implements AjaxHandler
 
 		password = PasswordHasher.getInstance().createHash(password);
 
-		User user = (User) User.databaseConnectivity().getByInfoInDataBase(User.EMAIL, email);
+		User user = (User) User.databaseConnectivity().getFromInfoInDataBase(User.EMAIL, email);
 		if (user == null || !user.getPassword().equals(password))
 		{
 			response.put("token", (String)null);

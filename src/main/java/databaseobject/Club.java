@@ -1,3 +1,7 @@
+package databaseobject;
+
+import main.*;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
@@ -74,7 +78,7 @@ public class Club implements DatabaseStructureObject
     }
 
     @Override
-    public DatabaseStructureObject getByInfoInDataBase(String varName, Object data)
+    public DatabaseStructureObject getFromInfoInDataBase(String varName, Object data)
     {
         return findInDatabase(new BasicDBObject(varName,data));
     }
@@ -82,7 +86,7 @@ public class Club implements DatabaseStructureObject
     @Override
     public boolean infoExistsInDatabase(String varName, Object data)
     {
-        return getByInfoInDataBase(varName, data) != null;
+        return getFromInfoInDataBase(varName, data) != null;
     }
 
     @Override

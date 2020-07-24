@@ -1,3 +1,7 @@
+package databaseobject;
+
+import main.*;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.BasicDBObject;
@@ -75,7 +79,7 @@ public class User implements DatabaseStructureObject
 
 	/**
 	 *
-	 * @return A DBObject version of the databasestructureobjects.User.
+	 * @return A DBObject version of the databasestructureobjects.databaseobject.User.
 	 */
 	public DBObject getDBForm()
 	{
@@ -340,14 +344,14 @@ public class User implements DatabaseStructureObject
 		return null;
 	}
 
-	public DatabaseStructureObject getByInfoInDataBase(String varName, Object data)
+	public DatabaseStructureObject getFromInfoInDataBase(String varName, Object data)
 	{
 		return findInDatabase(new BasicDBObject(varName,data));
 	}
 
 	public boolean infoExistsInDatabase(String varName, Object data)
 	{
-		return getByInfoInDataBase(varName, data) != null;
+		return getFromInfoInDataBase(varName, data) != null;
 	}
 
 
