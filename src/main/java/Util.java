@@ -45,4 +45,16 @@ public class Util{
 			return null;
 		return string;
 	}
+
+	public static String trimAndnullIfSpecialCharacters(String string){
+		string = trimString(string);
+
+		if(string == null)
+			return null;
+		string = nullIfSpecialCharacters(string);
+
+		if(string.length() == 0)
+			return null;
+		return string;
+	}
 }
