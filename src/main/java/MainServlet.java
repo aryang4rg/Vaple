@@ -86,7 +86,7 @@ public class MainServlet extends HttpServlet
 					user = (User)User.databaseConnectivity().getByInfoInDataBase(User.TOKEN, token);
 				/* maybe remove later */
 
-				if(user == null)
+				if(user == null && handler.isPage())
 					handler = pathToHandler.get("login");
 
 				/* maybe remove later ^*/
