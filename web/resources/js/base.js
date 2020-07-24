@@ -663,12 +663,14 @@ class ProfilePage extends Page{
 			return;
 		if(!data || data.error || !data.profile){
 			const error = (data && data.error) || 'There was an error updating your profile';
+
 			this.error.setText(error);
 			this.submittingToast.text.setText('Could not update profile');
 
 			return;
 		}
 
+		this.submittingToast.text.setText('Profile updated');
 		this.name.setText(data.profile.name);
 		this.bio.setText(data.profile.description);
 		this.country.setText(data.profile.location_country);
