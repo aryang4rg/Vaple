@@ -16,7 +16,7 @@ public class User implements DatabaseStructureObject
 	private DBObject object;
 
 	public static final String NAME = "name", EMAIL = "email", PASSWORD = "password", LOCATION_COUNTRY = "location_country", LOCATION_STATE = "location_state",
-	LOCATION_CITY = "location_city", DESCRIPTION = "description", TOKEN = "token", FOLLOWING = "following", FOLLWERS = "followers", ACTIVITIES = "activities";
+	LOCATION_CITY = "location_city", DESCRIPTION = "description", TOKEN = "token", FOLLOWING = "following", FOLLOWERS = "followers", ACTIVITIES = "activities";
 
 
 

@@ -25,6 +25,7 @@ public class DatabaseConnectivity
 	private static DB database = mongoClient.getDB("vaple");
 	public static final DBCollection ACCOUNTCOLLECTION = database.getCollection("account");
 	public static final DBCollection ACTIVITYCOLLECTION = database.getCollection("activity");
+	public static final DBCollection CLUBCOLLECTION = database.getCollection("club");
 
 	/**
 	 * Adds an object to the database
