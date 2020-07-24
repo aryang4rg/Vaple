@@ -352,6 +352,63 @@ a{
 	top: -80px;
 }
 
+.profile-editable-string-container{
+	display: flex;
+	flex: 1;
+	justify-content: center;
+	position: relative;
+	align-items: center;
+}
+
+.profile-editable-string-container input,
+.profile-editable-string-container textarea{
+	display: none;
+	width: 100%;
+	text-align: center;
+	resize: none;
+}
+
+.profile-editable-string-container textarea{
+	height: 100px;
+}
+
+.profile-editable-string-container.editing input,
+.profile-editable-string-container.editing textarea{
+	display: inline-block;
+	border: 0;
+	outline: 0;
+	padding: 0;
+}
+
+.profile-editable-string-container.editing span{
+	display: none;
+}
+
+.profile-editable-string-svg{
+	fill: #888;
+	opacity: 0;
+	width: 24px;
+	height: 24px;
+	margin-left: 4px;
+	position: absolute;
+	right: 0;
+	background-color: #fff;
+	border-radius: 50%;
+}
+
+.profile-editable-string-container.editable:hover .profile-editable-string-svg{
+	opacity: 1;
+	cursor: pointer;
+}
+
+.profile-editable-string-svg:hover{
+	fill: #444;
+}
+
+.profile-editable-string-container.editing .profile-editable-string-svg{
+	display: none;
+}
+
 .profile-details .divider{
 	display: inline-block;
 	width: 100%;
@@ -361,16 +418,13 @@ a{
 }
 
 .profile-name{
-	display: flex;
-	flex-direction: row;
-	flex: 1;
-	justify-content: center;
 	font-size: 32px;
 	line-height: normal;
-	padding: 0 0 40px 0;
+	word-break: break-all;
 }
 
 .profile-follow-count{
+	padding: 40px 0 0 0;
 	display: flex;
 	flex-direction: row;
 	width: 100%;
@@ -410,6 +464,8 @@ a{
 	line-height: normal;
 	width: 100%;
 	font-weight: 500;
+	text-align: left !important;
+	word-break: break-word;
 }
 
 .profile-location{
@@ -424,8 +480,40 @@ a{
 .profile-location .text{
 	text-overflow: ellipsis;
 	color: #444;
-	max-width: 33%;
 	overflow: hidden;
+}
+
+.profile-submit{
+	border-radius: 1000px;
+	width: 100%;
+	text-transform: uppercase;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	color: #fff;
+	height: 40px;
+	cursor: pointer;
+	user-select: none;
+	background-color: #000;
+	margin-top: 24px;
+}
+
+.profile-submit.disabled{
+	background-image: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
+	background-size: 1800% 1800%;
+	animation: cycle 4s linear infinite;
+	cursor: default;
+}
+
+.profile-submit-error{
+	color: #a00;
+	font-size: 13px;
+	margin-top: 8px;
+	height: 16px;
+	text-align: center;
+	width: 100%;
 }
 
 .profile-clubs{
@@ -528,8 +616,6 @@ a{
 }
 
 .login-form-entry-input{
-	border: 0;
-	outline: 0;
 	background-color: transparent;
 	font-size: .875rem;
 	line-height: .875rem;
@@ -537,7 +623,6 @@ a{
 	display: flex;
 	flex: 1;
 	color: #444;
-	padding: 0;
 }
 
 .login-form-entry-input-focus-visualizer{
