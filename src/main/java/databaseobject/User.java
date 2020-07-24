@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import util.Json;
 
 import java.util.ArrayList;
 
@@ -58,9 +59,36 @@ public class User implements DatabaseStructureObject
 		.sort(new BasicDBObject("time",1)).limit(limit).toArray();
 	}
 
-	public ArrayList<DBObject> getClubs()
+	public ArrayList<DBObject> getActivities()
 	{
-		return (ArrayList<DBObject>) object.get("clubs");
+		return (ArrayList<DBObject>) DatabaseConnectivity.ACTIVITYCOLLECTION.find()
+				.sort(new BasicDBObject("time",1)).toArray();
+	}
+
+	public ObjectNode toProfileNode(){
+		ObjectNode node = JsonNodeFactory.instance.objectNode();
+
+		node.put("name", getName());
+		node.put("id", getObjectID().toHexString());
+		node.put("location_country", getCountry());
+		node.put("location_state", getState());
+		node.put("location_city", getCity());
+		node.put("description", getDescription());
+		node.put("followers_count", countFollowers());
+		node.put("following_count", countFollowing());
+		node.put("clubs", Json.toJson(dbObjectClubListToArrayList(getClubs())));
+
+		return node;
+	}
+
+	public ArrayList<String> dbObjectClubListToArrayList(DBObject clubs)
+	{
+		return new ArrayList<>(clubs.keySet());
+	}
+
+	public DBObject getClubs()
+	{
+		return (DBObject) object.get("clubs");
 	}
 
 	public void addClubToUser(Club club)
@@ -321,20 +349,7 @@ public class User implements DatabaseStructureObject
 		return node;
 	}
 
-	public ObjectNode toProfileNode(){
-		ObjectNode node = JsonNodeFactory.instance.objectNode();
 
-		node.put("name", getName());
-		node.put("id", getObjectID().toHexString());
-		node.put("location_country", getCountry());
-		node.put("location_state", getState());
-		node.put("location_city", getCity());
-		node.put("description", getDescription());
-		node.put("followers_count", countFollowers());
-		node.put("following_count", countFollowing());
-
-		return node;
-	}
 
 
 

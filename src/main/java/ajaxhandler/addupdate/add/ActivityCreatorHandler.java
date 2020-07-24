@@ -1,7 +1,8 @@
-package ajaxhandler.addupdate;
+package ajaxhandler.addupdate.add;
 
 import ajaxhandler.AjaxHandler;
 import databaseobject.*;
+import main.MainServlet;
 import util.*;
 
 import databaseobject.Activity;
@@ -17,9 +18,18 @@ import java.util.ArrayList;
 
 public class ActivityCreatorHandler implements AjaxHandler
 {
-    private static ActivityCreatorHandler instance = new ActivityCreatorHandler();
+    private static ActivityCreatorHandler instance;
+    private MainServlet mainServlet;
+    ActivityCreatorHandler(MainServlet mainServlet)
+    {
+        this.mainServlet = mainServlet;
+    }
 
-    public static ActivityCreatorHandler getInstance() {
+    public static ActivityCreatorHandler getInstance(MainServlet mainServlet) {
+
+        if (instance == null) {
+            instance = new ActivityCreatorHandler(mainServlet);
+        }
         return instance;
     }
 
@@ -33,10 +43,11 @@ public class ActivityCreatorHandler implements AjaxHandler
         String time_start = Util.asText(request.get("time_start"));
         String time_end = Util.asText(request.get("time_end"));
         String associated_club = Util.asText(request.get("associated_club"));
+        String picture = Util.asText(request.get("image"));
 
 
 
-        if (!Util.checkIfStringsAreValid(title,description,type,time_end,time_start, longitude, latitude))
+        if (!Util.checkIfStringsAreValid(title,description,type,time_end,time_start, longitude, latitude, picture))
         {
             return 400;
         }
@@ -60,6 +71,15 @@ public class ActivityCreatorHandler implements AjaxHandler
 
             user.setActivities(activity.getObjectID(), true);
             User.databaseConnectivity().addInDatabase(user);
+
+            if(picture != null){
+                try{
+                     ImageUtil.writeToFile(mainServlet.getFile("/cdn/activity/" + activity.getObjectID().toHexString() + ".png"), picture);
+                }catch(IOException e){
+                    response.put("image", "Error creating image");
+                }
+
+            }
 
             return 200;
         }
