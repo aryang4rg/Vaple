@@ -33,9 +33,11 @@ public class Club implements DatabaseStructureObject
         this.object = object;
     }
 
-    public void addMemberToClub(User user)
-    {
-        ((DBObject)object.get("members")).put(user.getObjectID().toHexString(), true);
+    public void setMember(ObjectId userId, boolean isAdding){
+        if(isAdding)
+            ((DBObject)object.get("clubs")).put(userId.toHexString(), true);
+        else
+            ((DBObject)object.get("clubs")).removeField(userId.toHexString());
     }
 
     public int countObjectEntries(DBObject object){
