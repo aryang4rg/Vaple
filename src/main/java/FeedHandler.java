@@ -13,6 +13,12 @@ public class FeedHandler implements AjaxHandler
         return true;
     }
 
+    private static FeedHandler feedHandler = new FeedHandler();
+    public static FeedHandler getInstance()
+    {
+        return feedHandler;
+    }
+
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User u) throws ServletException, IOException {
         response.put("type", "feed");
