@@ -3,9 +3,12 @@ package util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.core.TreeNode;
+import org.bson.types.ObjectId;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.ArrayList;
 
 public class Json
 {
@@ -51,6 +54,15 @@ public class Json
 
 
 
+	public static JsonNode objectIdListToJsonNode(ArrayList<ObjectId> list)
+	{
+		ArrayList<String> myIds = new ArrayList<String>();
+		for (ObjectId id : list)
+		{
+			myIds.add(id.toHexString());
+		}
+		return toJson(myIds);
+	}
 
 	public static <A> A fromJson(JsonNode node, Class<A> clazz) throws JsonProcessingException {
 		return objectMapper.treeToValue(node, clazz);

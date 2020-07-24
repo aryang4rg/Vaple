@@ -8,6 +8,7 @@ import main.*;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import util.Json;
 
 import java.util.ArrayList;
 
@@ -66,13 +67,13 @@ public class Activity implements DatabaseStructureObject
 		node.put("id", getObjectID().toHexString());
 		node.put("description", getDescription());
 		node.put("type", getType());
-		/*
-		node.put("location_state", ());
-		node.put("location_city", ());
-		node.put("description", getDescription());
-		node.put("followers_count", ());
-		node.put("following_count", ());
-	`	*/
+		node.put("attending", Json.objectIdListToJsonNode(getAttending()));
+		node.put("creator", getCreator().toHexString());
+		node.put("time_start", getTime_start());
+		node.put("time_end", getTime_end());
+		node.put(LATITUDE, getLatitude());
+		node.put(LONGITUDE, getLongitude());
+
 		return node;
 	}
 
@@ -87,10 +88,11 @@ public class Activity implements DatabaseStructureObject
 		attending = (ArrayList<ObjectId>)object.get("attending");
 		time_start = (Long)object.get("time_start");
 		time_end = (Long)object.get("time_end");
-		latitude = (double)object.get("latitude");
-		longitude = (double)object.get("longitude");
+		latitude = (Double)object.get("latitude");
+		longitude = (Double)object.get("longitude");
 		creator = (ObjectId)object.get("creator");
 		associated_club = (ObjectId)object.get("associated_club");
+
 	}
 
 	/**

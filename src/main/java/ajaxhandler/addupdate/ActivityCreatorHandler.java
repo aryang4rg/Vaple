@@ -54,7 +54,7 @@ public class ActivityCreatorHandler implements AjaxHandler
         }
 
         try {
-            Activity activity = new Activity(title, description,user.getObjectID(), new ArrayList<ObjectId>(), Long.parseLong(time_start),
+            Activity activity = new Activity(title, description, type, user.getObjectID(), new ArrayList<ObjectId>(), Long.parseLong(time_start),
                     Long.parseLong(time_end), Double.parseDouble(latitude), Double.parseDouble(longitude), club);
             Activity.databaseConnectivity().addInDatabase(activity);
 
