@@ -86,8 +86,10 @@ public class MainServlet extends HttpServlet
 					user = (User)User.databaseConnectivity().getByInfoInDataBase(User.TOKEN, token);
 				/* maybe remove later */
 
-				if(user == null && handler.isPage())
+				if(user == null && handler.isPage()){
 					handler = pathToHandler.get("login");
+					uriSplit = new String[]{};
+				}
 
 				/* maybe remove later ^*/
 				int statusCode = handler.service(req, resp, request, response, uriSplit, user);
