@@ -540,6 +540,8 @@ class ProfilePage extends Page{
 		toastManager.addToast(this.submittingToast);
 
 		this.submitpfp = null;
+		this.submittedpfp = null;
+
 		this.table = createElement('div', {className: 'profile-table'});
 		this.left = createElement('div', {className: 'profile-container left'});
 		this.middle = createElement('div', {className: 'profile-container middle'});
@@ -622,6 +624,7 @@ class ProfilePage extends Page{
 			this.submittingToast.text.setText('Changing');
 			this.submittingToast.show();
 			this.submittingToast.indeterminate();
+			this.submittedpfp = this.submitpfp;
 
 			accountManager.changeAccount(this.name.input.value, this.bio.input.value, this.country.input.value, this.state.input.value, this.city.input.value, this.submitpfp);
 		});
@@ -704,6 +707,12 @@ class ProfilePage extends Page{
 
 		if(data.profile.image)
 			this.error.setText('Could not update image: ' + data.profile.image);
+		else if(this.submittedpfp){
+			pageManager.topBar.showProfilePhoto('');
+			pageManager.topBar.showProfilePhoto('/cdn/profile/' + accountManager.id + '.png?nocache=' + Date.now());
+
+			this.profileImage.style['background-image'] = 'url("/cdn/profile/' + accountManager.id + '.png?nocache=' + Date.now() + '")';
+		}
 	}
 
 	load(data){
@@ -853,6 +862,10 @@ const pageManager = new (class{
 				this.accountOptions = createElement('div', {className: 'top-bar-profile-options shadow-heavy', css: {display: 'none'}, attributes: {tabindex: 0}});
 				this.right.appendChild(this.accountOptions);
 				this.showProfilePhoto('/cdn/default.png');
+				this.login.style.display = 'none';
+				this.logout.style.display = 'none';
+				this.accountOptions.appendChild(this.login);
+				this.accountOptions.appendChild(this.logout);
 
 				this.profileImage.on('click', () => {
 					this.accountOptions.style.display = '';
@@ -898,9 +911,9 @@ const pageManager = new (class{
 					this.loginShowing = show;
 
 					if(show)
-						this.accountOptions.appendChild(this.login);
+						this.login.style.display = '';
 					else
-						this.accountOptions.removeChild(this.login);
+						this.login.style.display = 'none';
 				}
 			}
 
@@ -909,13 +922,14 @@ const pageManager = new (class{
 					this.logoutShowing = show;
 
 					if(show)
-						this.accountOptions.appendChild(this.logout);
+						this.logout.style.display = '';
 					else
-						this.accountOptions.removeChild(this.logout);
+						this.logout.style.display = 'none';
 				}
 			}
 
 			showManageAccount(id){
+
 				this.accountOptions.appendChild(this.createItem('My Account', '/profile/' + id));
 			}
 		});
@@ -1070,6 +1084,7 @@ const accountManager = new (class{
 		this.loggingIn = false;
 		this.submitting = false;
 		this.token = localStorage.token;
+		this.id = null;
 
 		if(this.token)
 			this.needAccount = true;
@@ -1102,6 +1117,8 @@ const accountManager = new (class{
 
 			pageManager.topBar.showProfilePhoto('/cdn/profile/' + account.id + '.png');
 			pageManager.topBar.showManageAccount(account.id);
+
+			this.id = account.id;
 		}else
 			pageManager.showErrorPage();
 	}

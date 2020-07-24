@@ -357,6 +357,7 @@ a{
 	opacity: 0;
 	transition: opacity 0.2s ease;
 	cursor: pointer;
+	color: #fff;
 }
 
 .profile-photo-container.editable .profile-edit-button{
