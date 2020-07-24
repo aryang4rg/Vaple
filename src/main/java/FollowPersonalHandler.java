@@ -22,10 +22,16 @@ public class FollowPersonalHandler implements AjaxHandler
         if (jsonNode != null) {
             for (Iterator<JsonNode> it = jsonNode.elements(); it.hasNext(); ) {
                 JsonNode idToFollow = it.next();
-                String id = idToFollow.asText();
-                user.setFollower(new ObjectId(id), true);
-                ((User)(User.databaseConnectivity().getByInfoInDataBase(ID, new ObjectId(id)))).setFollower(new ObjectId(id), true);
+				String id = Util.removeNonAlphanumeric(Util.asText(idToFollow));
 
+				if(id != null){
+					User other = (User)User.databaseConnectivity().getByInfoInDataBase(ID, new ObjectId(id));
+
+					if(other != null)
+						continue;
+					user.setFollowing(other.getObjectID(), true);
+					other.setFollower(user.getObjectID(), true);
+				}
             }
         }
 
@@ -34,9 +40,16 @@ public class FollowPersonalHandler implements AjaxHandler
         {
             for (Iterator<JsonNode> it = jsonNode.elements(); it.hasNext(); ) {
                 JsonNode idToFollow = it.next();
-                String id = idToFollow.asText();
-                user.setFollower(new ObjectId(id), false);
-                ((User)(User.databaseConnectivity().getByInfoInDataBase(ID, new ObjectId(id)))).setFollower(new ObjectId(id), false);
+				String id = Util.removeNonAlphanumeric(Util.asText(idToFollow));
+
+				if(id != null){
+					User other = (User)User.databaseConnectivity().getByInfoInDataBase(ID, new ObjectId(id));
+
+					if(other != null)
+						continue;
+					user.setFollowing(other.getObjectID(), false);
+					other.setFollower(user.getObjectID(), false);
+				}
             }
         }
         return 200;

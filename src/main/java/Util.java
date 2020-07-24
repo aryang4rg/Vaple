@@ -58,4 +58,10 @@ public class Util{
 			return null;
 		return string;
 	}
+
+	public static String asText(JsonNode textNode){
+		if(textNode == null)
+			return null;
+		return textNode.asText();
+	}
 }

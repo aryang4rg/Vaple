@@ -38,6 +38,7 @@ public class MainServlet extends HttpServlet
 		hashtable.put("account_login", LoginServlet.getInstance());
 		hashtable.put("account_create", SignUpServlet.getInstance());
 		hashtable.put("login", LoginHandler.getInstance());
+		hashtable.put("home", FeedHandler.getInstance());
 		hashtable.put("profile", ProfileHandler.getInstance());
 		hashtable.put("account_change", AccountChangeHandler.getInstance(this));
 		return hashtable;
@@ -63,7 +64,9 @@ public class MainServlet extends HttpServlet
 			AjaxHandler handler = null;
 
 			if(uriSplit.length == 1)
-				; /*handler = default handler, for home page, aka feed page */
+			{
+				handler = pathToHandler.get("home");
+			}
 			else if(uriSplit.length >= 2)
 				handler = pathToHandler.get(uriSplit[1]);
 			if (handler != null)
@@ -123,7 +126,6 @@ public class MainServlet extends HttpServlet
 			{
 				int index = file.getName().lastIndexOf('.');
 
-				/* since aryan wouldn't do it */
 				if(index != -1){
 					String extension = file.getName().substring(index + 1);
 					String mimeType = extensionToMime.get(extension);

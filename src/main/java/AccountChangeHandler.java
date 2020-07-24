@@ -22,14 +22,14 @@ public class AccountChangeHandler implements AjaxHandler
 			return 404;
 		if(u == null)
 			return 400;
-		String email = request.get("email").asText();
-		String name = request.get("name").asText();
-		String password = request.get("password").asText();
-		String location_country = request.get("location_country").asText();
-		String location_state = request.get("location_state").asText();
-		String location_city = request.get("location_city").asText();
-		String description = request.get("description").asText();
-		String picture = request.get("image").asText();
+		String email = Util.asText(request.get("email"));
+		String name = Util.asText(request.get("name")));
+		String password = Util.asText(request.get("password"));
+		String location_country = Util.asText(request.get("location_country"));
+		String location_state = Util.asText(request.get("location_state"));
+		String location_city = Util.asText(request.get("location_city"));
+		String description = Util.asText(request.get("description"));
+		String picture = Util.asText(request.get("image"));
 
 		String error = null;
 
