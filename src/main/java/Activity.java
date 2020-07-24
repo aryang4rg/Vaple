@@ -11,7 +11,8 @@ import java.util.ArrayList;
  */
 public class Activity implements DatabaseStructureObject
 {
-	String name, location_country, location_state, location_city, description;
+	String name, description;
+	double latitude, longitude;
 	ArrayList<ObjectId> attending;
 	long time;
 	BasicDBObject form;
@@ -25,39 +26,37 @@ public class Activity implements DatabaseStructureObject
 
 	public Activity() {}
 
-	public Activity(String name, String location_country, String location_state, String location_city, String description, ArrayList<ObjectId> attending, long time)
+	public Activity(String name, String description, ArrayList<ObjectId> attending, long time, double latitude, double longitude)
 	{
 		this.name = name;
-		this.location_country = location_country;
-		this.location_state = location_state;
-		this.location_city = location_city;
 		this.description = description;
 		this.attending = attending;
 		this.time = time;
+		this.latitude = latitude;
+		this.longitude = longitude;
 	}
 
 	public Activity(DBObject object)
 	{
 		name = (String)object.get("name");
-		location_country = (String)object.get("location_country");
-		location_city = (String)object.get("location_city");
-		location_state = (String)object.get("location_state");
 		description = (String)object.get("description");
 		objectID = (ObjectId)object.get("_id");
 		attending = (ArrayList<ObjectId>)object.get("attending");
 		time = (Long)object.get("time");
+		latitude = (double)object.get("latitude");
+		longitude = (double)object.get("longitude");
 	}
+
 
 	public Activity(BasicDBObject object)
 	{
 		name = (String)object.get("name");
-		location_country = (String)object.get("location_country");
-		location_city = (String)object.get("location_city");
-		location_state = (String)object.get("location_state");
 		description = (String)object.get("description");
 		objectID = (ObjectId)object.get("_id");
 		attending = (ArrayList<ObjectId>)object.get("attending");
 		time = (Long)object.get("time");
+		latitude = (double)object.get("latitude");
+		longitude = (double)object.get("longitude");
 	}
 
 	/**
@@ -119,16 +118,35 @@ public class Activity implements DatabaseStructureObject
 		DatabaseConnectivity.addObject(object.getDBForm(), DatabaseConnectivity.ACTIVITYCOLLECTION);
 	}
 
+	public double getLatitude()
+	{
+		return latitude;
+	}
+
+	public void setLatitude(double latitude)
+	{
+		this.latitude = latitude;
+	}
+
+	public double getLongitude()
+	{
+		return longitude;
+	}
+
+	public void setLongitude(double longitude)
+	{
+		this.longitude = longitude;
+	}
+
 	public BasicDBObject getDBForm()
 	{
 		form = new BasicDBObject();
 		form.append("name",getName());
-		form.append("location_county", getCountry());
-		form.append("location_state",getState());
-		form.append("location_city",getCity());
 		form.append("description",getDescription());
 		form.append("attending",getAttending());
 		form.append("time",getTime());
+		form.append("latitude",getLatitude());
+		form.append("longitude",getLongitude());
 
 		return form;
 	}
@@ -155,28 +173,6 @@ public class Activity implements DatabaseStructureObject
 	 *
 	 * @return Gets the country the activity takes place in
 	 */
-	public String getCountry()
-	{
-		return location_country;
-	}
-
-	/**
-	 *
-	 * @param location_country Sets the country of the activity
-	 */
-	public void setCountry(String location_country)
-	{
-		this.location_country = location_country;
-	}
-
-	/**
-	 *
-	 * @return Returns the state the activity takes place in
-	 */
-	public String getState()
-	{
-		return location_state;
-	}
 
 	/**
 	 *
@@ -200,28 +196,6 @@ public class Activity implements DatabaseStructureObject
 	 *
 	 * @param location_state Sets the state(location) of the activity
 	 */
-	public void setState(String location_state)
-	{
-		this.location_state = location_state;
-	}
-
-	/**
-	 *
-	 * @return Returns the city the activity takes place in
-	 */
-	public String getCity()
-	{
-		return location_city;
-	}
-
-	/**
-	 *
-	 * @param location_city Sets the city the activity takes place in
-	 */
-	public void setCity(String location_city)
-	{
-		this.location_city = location_city;
-	}
 
 	/**
 	 *

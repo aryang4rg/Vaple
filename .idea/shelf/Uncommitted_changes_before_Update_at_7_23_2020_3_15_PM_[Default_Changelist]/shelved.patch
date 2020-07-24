@@ -1,0 +1,55 @@
+Index: src/main/java/DatabaseConnectivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import com.mongodb.*;\r\nimport org.bson.types.ObjectId;\r\n\r\nimport java.net.UnknownHostException;\r\nimport java.util.ArrayList;\r\n\r\npublic class DatabaseConnectivity\r\n{\r\n\tprivate static MongoClient mongoClient;\r\n\r\n\tstatic\r\n\t{\r\n\t\ttry\r\n\t\t{\r\n\t\t\tmongoClient = new MongoClient();\r\n\t\t} catch (UnknownHostException e)\r\n\t\t{\r\n\t\t\te.printStackTrace();\r\n\t\t}\r\n\t}\r\n\r\n\tprivate static DB database = mongoClient.getDB(\"vaple\");\r\n\tprivate static DBCollection accountCollection = database.getCollection(\"account\");\r\n\tprivate static DBCollection activityCollection = database.getCollection(\"activity\");\r\n\r\n\tpublic static void addNewUser(User user)\r\n\t{\r\n\t\tString email = user.getEmail();\r\n\t\tif (accountCollection.findOne(new BasicDBObject(\"email\",email)) == null)\r\n\t\t{\r\n\t\t\taccountCollection.insert(user.getDBForm());\r\n\t\t}\r\n\t\telse\r\n\t\t{\r\n\t\t\tassert false;\r\n\t\t}\r\n\t}\r\n\r\n\tpublic static User findUser(BasicDBObject obj){\r\n\t\tDBObject object = accountCollection.findOne(obj);\r\n\r\n\t\tif(object != null)\r\n\t\t\treturn new User(object);\r\n\t\treturn null;\r\n\t}\r\n\r\n\tpublic static User getUserByEmail(String email)\r\n\t{\r\n\t\treturn findUser(new BasicDBObject(\"email\",email));\r\n\t}\r\n\r\n\tpublic static User getUserByToken(String token)\r\n\t{\r\n\t\treturn findUser(new BasicDBObject(\"token\",token));\r\n\t}\r\n\r\n\tpublic static boolean userInfoExist(String varName, String data )\r\n\t{\r\n\t\treturn true;\r\n\t}\r\n\r\n\tpublic static boolean emailAlreadyExists(String email)\r\n\t{\r\n\t\treturn getUserByEmail(email) != null;\r\n\t}\r\n\r\n\tpublic static void updateUser(User user)\r\n\t{\r\n\t\taccountCollection.update(new BasicDBObject(\"_id\",user.getObjectID()),user.getDBForm());\r\n\t}\r\n\r\n\tpublic static User getUser(ObjectId id)\r\n\t{\r\n\t\treturn findUser(new BasicDBObject(\"_id\", id));\r\n\t}\r\n\r\n\tpublic static Activity findActivity(BasicDBObject obj){\r\n\t\tDBObject object = activityCollection.findOne(obj);\r\n\r\n\t\tif(object != null)\r\n\t\t\treturn new Activity(object);\r\n\t\treturn null;\r\n\t}\r\n\r\n\tpublic static Activity getActivity(ObjectId ID)\r\n\t{\r\n\t\treturn findActivity(new BasicDBObject(\"_id\",ID));\r\n\t}\r\n\r\n\tpublic static void addNewActivity(Activity activity)\r\n\t{\r\n\t\tactivityCollection.insert(activity.getDBform());\r\n\t}\r\n\r\n\tpublic static void updateActivity(Activity activity)\r\n\t{\r\n\t\tactivityCollection.update(new BasicDBObject(\"_id\",activity.getObjectID()),activity.getDBform());\r\n\t}\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/DatabaseConnectivity.java	(revision 2908d3662d016f43b0d60e870df2f822b9335fb3)
++++ src/main/java/DatabaseConnectivity.java	(date 1595541419155)
+@@ -36,6 +36,12 @@
+ 		}
+ 	}
+ 
++	public static void main(String[] args)
++	{
++		User user = getUserByEmail("agarg.usa@gmail.com");
++		user.setFollowing(user.getObjectID(),true);
++	}
++
+ 	public static User findUser(BasicDBObject obj){
+ 		DBObject object = accountCollection.findOne(obj);
+ 
+Index: src/main/java/User.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import com.fasterxml.jackson.databind.node.JsonNodeFactory;\r\nimport com.fasterxml.jackson.databind.node.ObjectNode;\r\nimport com.mongodb.BasicDBObject;\r\nimport com.mongodb.DBObject;\r\nimport org.bson.types.ObjectId;\r\n\r\npublic class User\r\n{\r\n\tprivate DBObject object;\r\n\r\n\tpublic User(String name, String email, String password, String location_country,\r\n\t\tString location_state, String location_city, String description, String token)\r\n\t{\r\n\t\tDBObject object = new BasicDBObject();\r\n\r\n\t\tobject.put(\"name\", name);\r\n\t\tobject.put(\"email\", email);\r\n\t\tobject.put(\"password\", password);\r\n\t\tobject.put(\"location_state\", location_state);\r\n\t\tobject.put(\"location_city\", location_city);\r\n\t\tobject.put(\"description\", description);\r\n\t\tobject.put(\"token\", token);\r\n\t\tobject.put(\"following\", new BasicDBObject());\r\n\t\tobject.put(\"followers\", new BasicDBObject());\r\n\t\tobject.put(\"activities\", new BasicDBObject());\r\n\r\n\t\tthis.object = object;\r\n\t}\r\n\r\n\tpublic User(DBObject object)\r\n\t{\r\n\t\tthis.object = object;\r\n\t}\r\n\r\n\tpublic DBObject getDBForm()\r\n\t{\r\n\t\treturn object;\r\n\t}\r\n\r\n\tpublic String getName() {\r\n\t\treturn (String)object.get(\"name\");\r\n\t}\r\n\r\n\tpublic void setName(String name) {\r\n\t\tobject.put(\"name\", name);\r\n\t}\r\n\r\n\tpublic String getEmail() {\r\n\t\treturn (String)object.get(\"email\");\r\n\t}\r\n\r\n\tpublic void setEmail(String email) {\r\n\t\tobject.put(\"email\", email);\r\n\t}\r\n\r\n\tpublic String getPassword() {\r\n\t\treturn (String)object.get(\"password\");\r\n\t}\r\n\r\n\tpublic void setPassword(String password) {\r\n\t\tobject.put(\"password\", password);\r\n\t}\r\n\r\n\tpublic String getCountry() {\r\n\t\treturn (String)object.get(\"location_country\");\r\n\t}\r\n\r\n\tpublic void setCountry(String location_country) {\r\n\t\tobject.put(\"location_country\", location_country);\r\n\t}\r\n\r\n\tpublic String getState() {\r\n\t\treturn (String)object.get(\"location_state\");\r\n\t}\r\n\r\n\tpublic void setState(String location_state) {\r\n\t\tobject.put(\"location_state\", location_state);\r\n\t}\r\n\r\n\tpublic String getCity() {\r\n\t\treturn (String)object.get(\"location_city\");\r\n\t}\r\n\r\n\tpublic void setCity(String location_city) {\r\n\t\tobject.put(\"location_city\", location_city);\r\n\t}\r\n\r\n\tpublic String getDescription() {\r\n\t\treturn (String)object.get(\"description\");\r\n\t}\r\n\r\n\tpublic void setDescription(String description) {\r\n\t\tobject.put(\"description\", description);\r\n\t}\r\n\r\n\tpublic String getToken() {\r\n\t\treturn (String)object.get(\"token\");\r\n\t}\r\n\r\n\tpublic void setToken(String token) {\r\n\t\tobject.put(\"token\", token);\r\n\t}\r\n\r\n\tpublic ObjectId getObjectID()\r\n\t{\r\n\t\treturn (ObjectId)object.get(\"_id\");\r\n\t}\r\n\r\n\tpublic void setFollower(ObjectId follower, boolean following){\r\n\t\tif(following)\r\n\t\t\t((DBObject)object.get(\"followers\")).put(follower.toHexString(), true);\r\n\t\telse\r\n\t\t\t((DBObject)object.get(\"followers\")).removeField(follower.toHexString());\r\n\t}\r\n\r\n\tpublic void setFollowing(ObjectId following, boolean bfollowing){\r\n\t\tif(bfollowing)\r\n\t\t\t((DBObject)object.get(\"following\")).put(following.toHexString(), true);\r\n\t\telse\r\n\t\t\t((DBObject)object.get(\"following\")).removeField(following.toHexString());\r\n\t}\r\n\r\n\tpublic boolean isFollowing(ObjectId user){\r\n\t\treturn ((DBObject)object.get(\"following\")).get(user.toHexString()) != null;\r\n\t}\r\n\r\n\tpublic boolean isFollowedBy(ObjectId user){\r\n\t\treturn ((DBObject)object.get(\"followers\")).get(user.toHexString()) != null;\r\n\t}\r\n\r\n\tpublic int countObjectEntries(DBObject object){\r\n\t\tint size = object.keySet().size();\r\n\r\n\t\tif(object.get(\"_id\") != null)\r\n\t\t\tsize--;\r\n\t\treturn size;\r\n\t}\r\n\r\n\tpublic int countFollowers(){\r\n\t\treturn countObjectEntries((DBObject)object.get(\"followers\"));\r\n\t}\r\n\r\n\tpublic int countFollowing(){\r\n\t\treturn countObjectEntries((DBObject)object.get(\"following\"));\r\n\t}\r\n\r\n\tpublic ObjectNode toAccountNode(){\r\n\t\tObjectNode node = JsonNodeFactory.instance.objectNode();\r\n\r\n\t\tnode.put(\"name\", getName());\r\n\t\tnode.put(\"id\", getObjectID().toHexString());\r\n\r\n\t\treturn node;\r\n\t}\r\n\r\n\tpublic ObjectNode toProfileNode(){\r\n\t\tObjectNode node = JsonNodeFactory.instance.objectNode();\r\n\r\n\t\tnode.put(\"name\", getName());\r\n\t\tnode.put(\"id\", getObjectID().toHexString());\r\n\t\tnode.put(\"location_country\", getCountry());\r\n\t\tnode.put(\"location_state\", getState());\r\n\t\tnode.put(\"location_city\", getCity());\r\n\t\tnode.put(\"description\", getDescription());\r\n\t\tnode.put(\"followers_count\", countFollowers());\r\n\t\tnode.put(\"following_count\", countFollowing());\r\n\r\n\t\treturn node;\r\n\t}\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/User.java	(revision 2908d3662d016f43b0d60e870df2f822b9335fb3)
++++ src/main/java/User.java	(date 1595541558530)
+@@ -4,6 +4,8 @@
+ import com.mongodb.DBObject;
+ import org.bson.types.ObjectId;
+ 
++import java.util.ArrayList;
++
+ public class User
+ {
+ 	private DBObject object;
+@@ -16,6 +18,7 @@
+ 		object.put("name", name);
+ 		object.put("email", email);
+ 		object.put("password", password);
++		object.put("location_country",location_country);
+ 		object.put("location_state", location_state);
+ 		object.put("location_city", location_city);
+ 		object.put("description", description);
+@@ -167,4 +170,5 @@
+ 
+ 		return node;
+ 	}
++
+ }
+\ No newline at end of file
