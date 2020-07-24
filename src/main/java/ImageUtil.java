@@ -1,4 +1,6 @@
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
@@ -19,6 +21,9 @@ public class ImageUtil{
 			return "Image must be atmost 512x512";
 		if(imageBytes.length > 256 * 1024)
 			return "Image must be atmost 256KB";
+		if (!file.exists()) {
+			file.createNewFile();
+		}
 		ImageIO.write(img, "png", file);
 
 		return null;

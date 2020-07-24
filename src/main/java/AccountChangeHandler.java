@@ -145,13 +145,13 @@ public class AccountChangeHandler implements AjaxHandler
 			u.setCity(location_city);
 		if(description != null)
 			u.setDescription(description);
-		User.getDatabaseConnectivity().updateInDatabase(u);
+		User.databaseConnectivity().updateInDatabase(u);
 
 		ObjectNode node = u.toProfileNode();
 
 		if(picture != null){
 			try{
-				error = ImageUtil.writeToFile(MainServlet.getFile("/cdn/profiles/" + u.getObjectID().toHexString() + ".png"), data);
+				error = ImageUtil.writeToFile(mainServlet.getFile("/cdn/profile/" + u.getObjectID().toHexString() + ".png"), picture);
 			}catch(IOException e){
 				node.put("image", "Error creating image");
 			}
@@ -164,4 +164,21 @@ public class AccountChangeHandler implements AjaxHandler
 
         return 200;
     }
+
+    private MainServlet mainServlet;
+    AccountChangeHandler(MainServlet mainServlet)
+	{
+		this.mainServlet = mainServlet;
+	}
+
+    private static AccountChangeHandler instance;
+    public static AccountChangeHandler getInstance(MainServlet mainServlet)
+	{
+		if (instance == null)
+		{
+			instance = new AccountChangeHandler(mainServlet);
+		}
+		return instance;
+	}
+
 }

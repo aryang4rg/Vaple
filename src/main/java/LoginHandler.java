@@ -1,17 +1,20 @@
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.bson.types.ObjectId;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Base64;
 
 public class LoginHandler implements AjaxHandler
 {
+	private static LoginHandler instance = new LoginHandler();
+	public static LoginHandler getInstance()
+	{
+		return instance;
+	}
+
 	private FeedHandler handler = new FeedHandler();
 	public boolean isPage(){
 		return true;

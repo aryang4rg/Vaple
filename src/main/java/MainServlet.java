@@ -9,10 +9,11 @@ import java.util.Hashtable;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
 
+
 @WebServlet("/")
 public class MainServlet extends HttpServlet
 {
-	public static File getFile(String path){
+	public File getFile(String path){
 		return new File(getServletContext().getRealPath("/resources" + path));
 	}
 
@@ -36,6 +37,9 @@ public class MainServlet extends HttpServlet
 		Hashtable<String, AjaxHandler> hashtable = new Hashtable<String, AjaxHandler>();
 		hashtable.put("account_login", LoginServlet.getInstance());
 		hashtable.put("account_create", SignUpServlet.getInstance());
+		hashtable.put("login", LoginHandler.getInstance());
+		hashtable.put("profile", ProfileHandler.getInstance());
+		hashtable.put("account_change", AccountChangeHandler.getInstance(this));
 		return hashtable;
 	}
 
@@ -68,7 +72,7 @@ public class MainServlet extends HttpServlet
 				ObjectNode response = Util.createObjectNode();
 
 				User user = null;
-				String token = resp.getHeader("Authentication");
+				String token = req.getHeader("Authentication");
 
 				if(token != null)
 					user = (User)User.databaseConnectivity().getByInfoInDataBase(User.TOKEN, token);
