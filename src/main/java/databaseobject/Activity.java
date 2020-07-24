@@ -1,5 +1,6 @@
 package databaseobject;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import main.*;
@@ -57,22 +58,24 @@ public class Activity implements DatabaseStructureObject
 		ObjectNode node = JsonNodeFactory.instance.objectNode();
 	}
 
-	/*
+
 	public ObjectNode toFeedNode(){
 
+		ObjectNode node = JsonNodeFactory.instance.objectNode();
 		node.put("name", getName());
 		node.put("id", getObjectID().toHexString());
-		node.put("description", getDescription())
-		//node.put("type", gett());
+		node.put("description", getDescription());
+		node.put("type", getType());
+		/*
 		node.put("location_state", ());
 		node.put("location_city", ());
 		node.put("description", getDescription());
 		node.put("followers_count", ());
 		node.put("following_count", ());
-
+	`	*/
 		return node;
 	}
-	*/
+
 
 
 	public Activity(DBObject object)
