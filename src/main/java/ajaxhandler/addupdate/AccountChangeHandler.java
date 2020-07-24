@@ -126,6 +126,9 @@ public class AccountChangeHandler implements AjaxHandler
 
 					break;
 				}
+
+				if(description.length() > 256)
+					description = description.substring(0, 256);
 			}
 		}while(false);
 

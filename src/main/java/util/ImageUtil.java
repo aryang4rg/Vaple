@@ -17,6 +17,8 @@ public class ImageUtil{
 		byte[] imageBytes = Base64.getDecoder().decode(image);
 		BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageBytes));
 
+		if(img == null)
+			return "Not a valid image";
 		if(img.getWidth() < 32 || img.getHeight() < 32)
 			return "Image must be atleast 32x32";
 		if(img.getWidth() > 512 || img.getHeight() > 512)
