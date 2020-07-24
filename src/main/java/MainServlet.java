@@ -12,6 +12,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 @WebServlet("/")
 public class MainServlet extends HttpServlet
 {
+	public static File getFile(String path){
+		return new File(getServletContext().getRealPath("/resources" + path));
+	}
+
 	private static void sendFile(OutputStream out, File file) throws FileNotFoundException, IOException {
 		FileInputStream in = new FileInputStream(file);
 		byte[] buffer = new byte[16384];
@@ -109,7 +113,7 @@ public class MainServlet extends HttpServlet
 		}
 		else
 		{
-			File file = new File(getServletContext().getRealPath("/resources" + req.getRequestURI()));
+			File file = getFile(req.getRequestURI());
 
 			if (file.exists() && file.isFile())
 			{
