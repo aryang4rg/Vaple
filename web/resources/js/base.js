@@ -46,6 +46,16 @@ function createElement(tagName, args = {}, children = []){
 	return el;
 }
 
+function cdnPath(subdir, name){
+	if(subdir)
+		return '/cdn/' + subdir + '/' + name + '.png';
+	return '/cdn/' + name + '.png';
+}
+
+function setBackgroundImage(element, url){
+	element.style['background-image'] = 'url(' + url + ')';
+}
+
 const ripplingManager = new (class{
 	constructor(){
 		this.currentRippling = [];
@@ -410,7 +420,7 @@ class LoginPage extends Page{
 
 	load(){
 		document.title = 'Login';
-		history.pushState(null, document.title, '/login');
+		history.replaceState(null, document.title, '/login');
 	}
 
 	finish(token, reason){
@@ -536,16 +546,21 @@ class ProfilePage extends Page{
 
 		this.self = false;
 		this.submittingToast = new LoadingToast('Changing');
+		this.followFailed = new LoadingToast('Failed to (un)follow the user, try again');
 
 		toastManager.addToast(this.submittingToast);
+		toastManager.addToast(this.followFailed);
 
 		this.submitpfp = null;
 		this.submittedpfp = null;
+		this.id = null;
 
 		this.table = createElement('div', {className: 'profile-table'});
 		this.left = createElement('div', {className: 'profile-container left'});
 		this.middle = createElement('div', {className: 'profile-container middle'});
 		this.right = createElement('div', {className: 'profile-container right'});
+		this.left.appendChild(createElement('div', {className: 'profile-container top-padding'}));
+		this.right.appendChild(createElement('div', {className: 'profile-container top-padding'}));
 
 		this.table.appendChild(this.left);
 		this.table.appendChild(createElement('div', {className: 'profile-container expander'}));
@@ -591,15 +606,16 @@ class ProfilePage extends Page{
 
 			reader.onload = () => {
 				this.submitpfp = reader.result;
-				this.profileImage.style['background-image'] = 'url("' + reader.result + '")';
 				this.edited();
+
+				setBackgroundImage(this.profileImage, reader.result);
 			};
 
 			reader.readAsDataURL(input.files[0]);
 		});
 
 		this.details.appendChild(createElement('div', {className: 'divider'}));
-		this.bio = this.createEditableString('profile-bio text metro', 512, true);
+		this.bio = this.createEditableString('profile-bio text', 512, true);
 		this.details.appendChild(this.bio.element);
 		this.details.appendChild(createElement('div', {className: 'divider'}));
 		this.location = createElement('div', {className: 'profile-location'});
@@ -612,6 +628,8 @@ class ProfilePage extends Page{
 		this.location.appendChild(this.city.element);
 		this.submit = createElement('div', {className: 'profile-submit text metro', innerText: 'save', css: {display: 'none'}});
 		this.details.appendChild(this.submit);
+		this.follow = createElement('div', {className: 'profile-follow text metro', innerText: 'follow', css: {display: 'none'}});
+		this.details.appendChild(this.follow);
 		this.error = createElement('span', {className: 'profile-submit-error text metro'});
 		this.details.appendChild(this.error);
 		this.left.appendChild(this.profileAboutContainer);
@@ -627,13 +645,83 @@ class ProfilePage extends Page{
 			this.submittedpfp = this.submitpfp;
 
 			accountManager.changeAccount(this.name.input.value, this.bio.input.value, this.country.input.value, this.state.input.value, this.city.input.value, this.submitpfp);
+
+			this.submitpfp = null;
+		});
+
+		this.isFollowing = false;
+		this.follow.on('click', () => {
+			if(this.followRequest)
+				this.followRequest.abort();
+			const change = {};
+
+			if(this.isFollowing){
+				change.unfollowing = [this.id];
+
+				this.follow.setText('Follow');
+				this.isFollowing = false;
+			}else{
+				change.following = [this.id];
+
+				this.follow.setText('Unfollow');
+				this.isFollowing = true;
+			}
+
+			this.followRequest = accountManager.sendRequest('/follow_change', change, (status, error, resp) => {
+				this.followRequest = null;
+
+				if(error || status != 200){
+					this.followFailed.show();
+					this.followFailed.hideAfter(2000);
+				}
+			});
 		});
 
 		this.clubs = createElement('div', {className: 'profile-clubs shadow-light'});
 		this.clubs.appendChild(createElement('span', {className: 'profile-clubs-title text metro', innerText: 'Clubs'}));
-		this.noneText = createElement('span', {className: 'text metro', innerText: 'There are no clubs here', css: {display: 'none'}});
+		this.noneText = createElement('span', {className: 'text metro', css: {display: 'none'}});
 		this.clubs.appendChild(this.noneText);
+		this.clubsList = createElement('div', {className: 'profile-clubs-list'});
+		this.clubs.appendChild(this.clubsList);
 		this.right.appendChild(this.clubs);
+
+		this.fetch_activities = null;
+		this.activity_last = null;
+		this.activity_next = false;
+
+		this.svg = createElement('svg', {className: 'activities-loader'});
+
+		generateGradient(this.svg, {gradient: 'activities-gradient', mask: 'activities-mask'}, [
+			{
+				offset: "0%",
+				color: "#0f0"
+			},
+			{
+				offset: "100%",
+				color: "#00f"
+			}
+		], [
+			createElement('circle', {attributes: {cx: 50, cy: 50, r: 16}})
+		]);
+
+		this.hasCenterLoading = false;
+		this.centerLoadingIndicator = createElement('div', {className: 'center'});
+		this.hasLoading = false;
+		this.loadingIndicator = createElement('div', {className: 'activities-loader-center'});
+
+		this.element.on('scroll', (e) => {
+			const min = Math.max(0, this.element.offsetHeight - 250);
+			const pscroll = Math.max(0, this.element.scrollTop - Math.max(0,
+				this.profileAboutContainer.offsetHeight - min));
+			const cscroll = Math.max(0, this.element.scrollTop - Math.max(0,
+				this.clubs.offsetHeight - min));
+			this.profileAboutContainer.style.transform = 'translateY(' + pscroll + 'px)';
+			this.clubs.style.transform = 'translateY(' + cscroll + 'px)';
+
+			if(this.activity_next && !this.fetch_activities)
+				if(this.element.offsetHeight + this.element.scrollTop + 800 >= this.middle.offsetHeight)
+					this.fetchActivities(this.id, 0, this.activity_last);
+		});
 	}
 
 	createEditableString(textClass, maxLength = 32, textarea = false){
@@ -658,10 +746,14 @@ class ProfilePage extends Page{
 				return;
 			element.classList.add('editing');
 			input.focus();
+
+			this.updateSize();
 		});
 
 		input.on('blur', () => {
 			element.classList.remove('editing');
+
+			this.updateSize();
 
 			if(text.textContent != input.value){
 				this.edited();
@@ -679,6 +771,7 @@ class ProfilePage extends Page{
 
 	edited(){
 		this.submit.style.display = '';
+		this.updateSize();
 	}
 
 	updateResult(data){
@@ -686,15 +779,31 @@ class ProfilePage extends Page{
 		this.submittingToast.hideAfter(2000);
 		this.submittingToast.progress(0);
 
-		if(!this.self)
-			return;
 		if(!data || data.error || !data.profile){
+			this.submittingToast.text.setText('Could not update profile');
+
+			if(!this.self)
+				return;
 			const error = (data && data.error) || 'There was an error updating your profile';
 
 			this.error.setText(error);
-			this.submittingToast.text.setText('Could not update profile');
+			this.updateSize();
 
 			return;
+		}
+
+		if(data.profile.image){
+			if(!this.self)
+				return;
+			this.error.setText('Could not update image: ' + data.profile.image);
+		}else if(this.submittedpfp){
+			const url = cdnPath('profile', accountManager.id) + '?nocache=' + Date.now();
+
+			pageManager.topBar.showProfilePhoto(url);
+
+			if(!this.self)
+				return;
+			setBackgroundImage(this.profileImage, url);
 		}
 
 		this.submittingToast.text.setText('Profile updated');
@@ -705,21 +814,22 @@ class ProfilePage extends Page{
 		this.city.setText(data.profile.location_city);
 		this.submit.style.display = 'none';
 
-		if(data.profile.image)
-			this.error.setText('Could not update image: ' + data.profile.image);
-		else if(this.submittedpfp){
-			pageManager.topBar.showProfilePhoto('');
-			pageManager.topBar.showProfilePhoto('/cdn/profile/' + accountManager.id + '.png?nocache=' + Date.now());
+		this.updateSize();
+	}
 
-			this.profileImage.style['background-image'] = 'url("/cdn/profile/' + accountManager.id + '.png?nocache=' + Date.now() + '")';
-		}
+	updateSize(){
+		setTimeout(() => {
+			this.profileAboutContainer.style.height = 100 + this.details.offsetHeight + 'px';
+		}, 0);
 	}
 
 	load(data){
 		document.title = data.name + "'s profile";
-		history.pushState(null, document.title, '/profile/' + data.id);
+		history.replaceState(null, document.title, '/profile/' + data.id);
 
-		this.profileImage.style['background-image'] = 'url("/cdn/profile/' + data.id + '.png")';
+		setBackgroundImage(this.profileImage, cdnPath('profile', data.id));
+
+		this.followRequest = null;
 		this.name.setText(data.name);
 		this.followcount.setText(data.following_count);
 		this.followercount.setText(data.followers_count);
@@ -740,6 +850,8 @@ class ProfilePage extends Page{
 			this.country.element.classList.add('editable');
 			this.state.element.classList.add('editable');
 			this.city.element.classList.add('editable');
+			this.noneText.setText('You are not a part of any clubs');
+			this.follow.style.display = 'none';
 		}else{
 			this.error.setText('');
 			this.profilePhotoContainer.classList.remove('editable');
@@ -748,16 +860,306 @@ class ProfilePage extends Page{
 			this.country.element.classList.remove('editable');
 			this.state.element.classList.remove('editable');
 			this.city.element.classList.remove('editable');
+			this.noneText.setText('This user is not a part of any clubs');
+			this.follow.style.display = '';
+			this.isFollowing = data.following;
+
+			if(this.isFollowing)
+				this.follow.setText('Unfollow');
+			else
+				this.follow.setText('Follow');
 		}
 
+		this.updateSize();
+
+		while(this.clubsList.childNodes.length)
+			this.clubsList.removeChild(this.clubsList.childNodes[0]);
 		var club_count = 0;
 		for(var i in data.clubs){
 			club_count++;
 
+			const club = data.clubs[i];
+			const container = createElement('a', {className: 'profile-clubs-photo-container', attributes: {href: '/club/' + club.id}});
+			const img = createElement('div', {className: 'profile-clubs-photo'});
+
+			setBackgroundImage(img, cdnPath('club', club.id));
+
+			container.appendChild(img);
+			container.on('click', (e) => {
+				e.preventDefault();
+				pageLoader.load(container.getAttribute('href'));
+
+				return false;
+			})
+
+			this.clubsList.appendChild(container);
 		}
 
-		if(!club_count)
-			this.noneText.style.display = 'inline-block';
+		this.noneText.style.display = club_count ? 'none' : '';
+
+		if(this.fetch_activities)
+			this.fetch_activities.abort();
+		while(this.middle.childNodes.length)
+			this.middle.removeChild(this.middle.childNodes[0]);
+		this.activity_last = null;
+		this.activity_next = false;
+		this.id = data.id;
+		this.fetchActivities(data.id);
+
+		if(this.hasLoading){
+			this.loadingIndicator.removeChild(this.svg);
+			this.middle.removeChild(this.loadingIndicator);
+			this.hasLoading = false;
+		}
+
+		if(!this.hasCenterLoading){
+			this.centerLoadingIndicator.appendChild(this.svg);
+			this.middle.appendChild(this.centerLoadingIndicator);
+			this.hasCenterLoading = true;
+		}
+	}
+
+	createOffsetContainer(left = true){
+		const container = createElement('div', {className: 'profile-activity-container offset ' + (left ? 'left' : 'right')});
+
+		container.appendChild(createElement('div', {className: 'offset'}));
+
+		return container;
+	}
+
+	createActivity(data){
+		const body = createElement('div', {className: 'profile-activity shadow-light'});
+
+		do{
+			const container = createElement('div', {className: 'profile-activity-container'});
+			const left = createElement('div', {className: 'profile-activity-container left'});
+			const right = createElement('div', {className: 'profile-activity-container right'});
+
+			const creatorPhoto = createElement('a', {className: 'profile-activity-creator-photo', attributes: {href: '/profile/' + data.creator.id}});
+
+			setBackgroundImage(creatorPhoto, cdnPath('profile', data.creator.id));
+
+			creatorPhoto.on('click', function(e){
+				e.preventDefault();
+				pageLoader.load(this.getAttribute('href'));
+
+				return false;
+			});
+
+			left.appendChild(creatorPhoto);
+			left.appendChild(createElement('span', {className: 'text metro', innerText: data.creator.name}));
+
+			if(data.club){
+				const clubPhoto = createElement('a', {className: 'profile-activity-club-photo', attributes: {href: '/club/' + data.club.id}});
+
+				setBackgroundImage(clubPhoto, cdnPath('club', data.club.id));
+
+				clubPhoto.on('click', function(e){
+					e.preventDefault();
+					pageLoader.load(this.getAttribute('href'));
+
+					return false;
+				});
+
+				right.appendChild(clubPhoto);
+				right.appendChild(createElement('span', {className: 'text metro', innerText: data.club.name}));
+			}
+
+			container.appendChild(left);
+			container.appendChild(right);
+			body.appendChild(container);
+		}while(false);
+
+		do{
+			const title = this.createOffsetContainer();
+
+			title.appendChild(createElement('a', {className: 'profile-activity-title text metro', innerText: data.name, href: '/activity/' + data.id}));
+			body.appendChild(title);
+
+			title.on('click', function(e){
+				e.preventDefault();
+				pageLoader.load(this.getAttribute('href'));
+
+				return false;
+			});
+
+			const time = this.createOffsetContainer();
+			var now = Date.now();
+			var text;
+
+			if(now < data.time_start){
+				const date = new Date(data.time_start);
+				const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+				var hours = date.getHours();
+				var am = hours < 12;
+
+				if(hours > 12)
+					hours -= 12;
+				else if(hours == 0)
+					hours = 12;
+				text = month[date.getMonth()] + ' ' + date.getDate() + ' at ' + hours + ':';
+
+				if(date.getMinutes() < 10)
+					text += '0' + date.getMinutes();
+				else
+					text += date.getMinutes();
+				text += ' ' + (am ? 'AM' : 'PM');
+			}else if(now < data.time_end)
+				text = 'Ongoing now';
+			else{
+				const date = new Date(data.time_end);
+
+				now = new Date(now);
+
+				var years = now.getYear() - date.getYear();
+
+				if(now.getMonth() < date.getMonth())
+					years--;
+				else if(now.getMonth() == date.getMonth() && now.getDate() < date.getDate())
+					years--;
+				if(years){
+					if(years > 1)
+						text = years + ' years ago';
+					else
+						text = 'A year ago';
+				}else{
+					var months = now.getMonth() - date.getMonth();
+
+					if(months < 0)
+						months += 12;
+					if(now.getDate() < date.getDate())
+						months--;
+					if(months){
+						if(months > 1)
+							text = months + ' months ago';
+						else
+							text = 'A month ago';
+					}else{
+						var hours = (now.getTime() - date.getTime()) / (3600 * 1000);
+						var days = Math.floor(hours / 24);
+
+						hours = Math.floor(hours % 24);
+
+						if(days){
+							if(days > 1)
+								text = days + ' days ago';
+							else
+								text = 'Yesterday';
+						}else if(hours){
+							if(hours > 1)
+								text = hours + ' hours ago';
+							else
+								text = 'An hour ago';
+						}else
+							text = 'Just finished';
+					}
+				}
+			}
+
+			time.appendChild(createElement('div', {className: 'profile-activity-time text metro', innerText: text}));
+			body.appendChild(time);
+
+			const description = this.createOffsetContainer();
+
+			description.appendChild(createElement('span', {className: 'profile-activity-description text', innerText: data.description}));
+			body.appendChild(description);
+		}while(false);
+
+		do{
+			const container = this.createOffsetContainer();
+
+			container.appendChild(createElement('iframe', {className: 'profile-activity-location shadow-light', attributes:
+				{src: 'https://maps.google.com/maps?q=' + data.latitude + ',' + data.longitude + '&z=18&output=embed'}
+			}));
+
+			body.appendChild(container);
+		}while(false);
+
+		do{
+			const text = this.createOffsetContainer();
+
+			text.appendChild(createElement('span', {className: 'text metro', innerText: 'People Attending'}));
+			body.appendChild(text);
+
+			const attending = this.createOffsetContainer();
+
+			for(var i = 0; i < data.attending.length; i++){
+				const el = createElement('a', {className: 'profile-activity-attending-photo', attributes: {href: '/profile/' + data.attending[i].id}});
+
+				el.on('click', function(e){
+					e.preventDefault();
+					pageLoader.load(this.getAttribute('href'));
+
+					return false;
+				});
+
+				setBackgroundImage(el, cdnPath('profile', data.attending[i].id));
+
+				attending.appendChild(el);
+			}
+
+			body.appendChild(attending);
+		}while(false);
+
+		return body;
+	}
+
+	showActivities(list){
+		if(this.hasCenterLoading){
+			this.middle.removeChild(this.centerLoadingIndicator);
+			this.middle.appendChild(createElement('div', {className: 'profile-container top-padding'}));
+			this.hasCenterLoading = false;
+		}
+
+		if(this.hasLoading){
+			this.loadingIndicator.removeChild(this.svg);
+			this.middle.removeChild(this.loadingIndicator);
+			this.hasLoading = false;
+		}
+
+		if(!list){
+			this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: 'Could not load activities at this moment'}));
+
+			return;
+		}else{
+			for(var i = 0; i < list.length; i++){
+				this.activity_last = list[i].id;
+				this.middle.appendChild(this.createActivity(list[i]));
+			}
+
+			if(list.length){
+				this.activity_next = true;
+
+				if(!this.hasLoading){
+					this.loadingIndicator.appendChild(this.svg);
+					this.middle.appendChild(this.loadingIndicator);
+					this.hasLoading = true;
+				}
+			}else if(!this.activity_last){
+				this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: this.self ?
+					'You don\'t have any activities': 'This user has no activities'
+				}));
+			}
+		}
+	}
+
+	fetchActivities(id, top = 50, last){
+		this.fetch_activities = accountManager.sendRequest('/activities?id=' + id + '&top=' + top + '&last=' + last, null, (status, error, resp) => {
+			this.activity_next = false;
+			this.fetch_activities = null;
+
+			if(error || status != 200)
+				this.showActivities(null);
+			else
+				this.showActivities(resp);
+		});
+	}
+
+	hidden(){
+		if(this.fetch_activities){
+			this.fetch_activities.abort();
+			this.fetch_activities = null;
+		}
 	}
 }
 
@@ -766,7 +1168,7 @@ class FeedPage extends Page{
 		/* todo */
 
 		document.title = 'Your feed';
-		history.pushState(null, document.title, '/');
+		history.replaceState(null, document.title, '/');
 	}
 }
 
@@ -775,7 +1177,7 @@ class ExplorePage extends Page{
 		/* todo */
 
 		document.title = 'Explore';
-		history.pushState(null, document.title, '/explore');
+		history.replaceState(null, document.title, '/explore');
 	}
 }
 
@@ -784,7 +1186,7 @@ class DashboardPage extends Page{
 		/* todo */
 
 		document.title = 'Account';
-		history.pushState(null, document.title, '/dashboard');
+		history.replaceState(null, document.title, '/dashboard');
 	}
 }
 
@@ -861,11 +1263,14 @@ const pageManager = new (class{
 				this.right.appendChild(this.profileImage);
 				this.accountOptions = createElement('div', {className: 'top-bar-profile-options shadow-heavy', css: {display: 'none'}, attributes: {tabindex: 0}});
 				this.right.appendChild(this.accountOptions);
-				this.showProfilePhoto('/cdn/default.png');
+				this.showProfilePhoto(cdnPath(null, 'default'));
 				this.login.style.display = 'none';
 				this.logout.style.display = 'none';
 				this.accountOptions.appendChild(this.login);
 				this.accountOptions.appendChild(this.logout);
+				this.myProfile = this.createItem('My Profile', '')
+				this.myProfile.style.display = 'none';
+				this.accountOptions.appendChild(this.myProfile);
 
 				this.profileImage.on('click', () => {
 					this.accountOptions.style.display = '';
@@ -883,9 +1288,7 @@ const pageManager = new (class{
 				});
 
 				this.accountOptions.on('click', (e) => {
-					e.preventDefault();
-
-					return false;
+					this.accountOptions.blur();
 				});
 			}
 
@@ -894,7 +1297,7 @@ const pageManager = new (class{
 
 				el.on('click', (e) => {
 					e.preventDefault();
-					pageLoader.load(path);
+					pageLoader.load(el.getAttribute('href'));
 
 					return false;
 				});
@@ -903,7 +1306,7 @@ const pageManager = new (class{
 			}
 
 			showProfilePhoto(url){
-				this.profileImage.style['background-image'] = 'url("' + url + '")';
+				setBackgroundImage(this.profileImage, url);
 			}
 
 			showLogin(show){
@@ -928,9 +1331,9 @@ const pageManager = new (class{
 				}
 			}
 
-			showManageAccount(id){
-
-				this.accountOptions.appendChild(this.createItem('My Account', '/profile/' + id));
+			showMyProfile(id){
+				this.myProfile.setAttribute('href', '/profile/' + id);
+				this.myProfile.style.display = '';
 			}
 		});
 
@@ -985,11 +1388,13 @@ const pageLoader = new (class{
 		toastManager.addToast(this.waitforlogin);
 
 		window.addEventListener('popstate', (e) => {
-			this.load(location.href);
+			this.load(location.href, false);
 		});
 	}
 
-	load(url){
+	load(url, state = true){
+		if(state)
+			history.pushState(null, '', url);
 		if(accountManager.hasAccount || !accountManager.needAccount){
 			do{
 				if(!url.startsWith('/')){
@@ -1027,41 +1432,17 @@ const pageLoader = new (class{
 			return;
 		}
 
-		const l = new XMLHttpRequest();
-
-		l.open('POST', url);
-
-		if(accountManager.token)
-			l.setRequestHeader('Authentication', accountManager.token);
-		if(accountManager.needAccount)
-			l.send(JSON.stringify({retrieveAccount: true}));
-		else
-			l.send('{}');
-		l.addEventListener('load', () => {
+		const l = accountManager.sendRequest(url, null, (status, error, resp) => {
 			this.loadingToast.hideAfter(200);
 
-			var data;
-
-			try{
-				data = JSON.parse(l.response);
-			}catch(e){
+			if(error)
 				return pageManager.showErrorPage();
-			}
-
-			if(l.status == 404)
+			if(status == 404)
 				pageManager.showNotFoundPage();
-			else if(l.status != 200)
+			else if(status != 200)
 				pageManager.showErrorPage();
 			else
-				pageManager.load(data);
-			if(accountManager.needAccount)
-				accountManager.load(data.account);
-		});
-
-		l.addEventListener('error', () => {
-			this.loadingToast.hideAfter(200);
-
-			pageManager.showErrorPage();
+				pageManager.load(resp);
 		});
 
 		this.loading = l;
@@ -1110,17 +1491,20 @@ const accountManager = new (class{
 				this.updateButtons();
 
 				delete localStorage.token;
-				return;
+				return true;
 			}
 
 			this.hasAccount = true;
 
-			pageManager.topBar.showProfilePhoto('/cdn/profile/' + account.id + '.png');
-			pageManager.topBar.showManageAccount(account.id);
+			pageManager.topBar.showProfilePhoto(cdnPath('profile', account.id));
+			pageManager.topBar.showMyProfile(account.id);
 
 			this.id = account.id;
-		}else
-			pageManager.showErrorPage();
+
+			return true;
+		}
+
+		return false;
 	}
 
 	complete(data){
@@ -1147,24 +1531,16 @@ const accountManager = new (class{
 		}
 	}
 
-	send(path, content){
+	authenticate(path, content){
+		if(!this.needLogin())
+			return;
+		this.loggingIn = true;
+
 		pageLoader.stopLoading();
 
-		const l = new XMLHttpRequest();
-
-		l.open('POST', path);
-		l.send(JSON.stringify(content));
-		l.addEventListener('load', () => {
-			if(l.status != 200)
+		this.sendRequest(path, content, (status, error, data) => {
+			if(error || status != 200)
 				return this.complete({});
-			var data;
-
-			try{
-				data = JSON.parse(l.response);
-			}catch(e){
-				return this.complete({});
-			}
-
 			if(this.complete(data)){
 				localStorage.token = data.token;
 
@@ -1175,62 +1551,75 @@ const accountManager = new (class{
 				pageLoader.load('/');
 			}
 		});
-
-		l.addEventListener('error', () => {
-			this.complete({});
-		});
 	}
 
 	changeAccount(name, bio, country, state, city, image){
 		this.submitting = true;
 
+		const data = {name: name, location_country: country, location_state: state, location_city: city, description: bio};
 		const x = new XMLHttpRequest();
 
-		x.open('POST', '/account_change');
-		x.setRequestHeader('Authentication', this.token);
-		x.send(JSON.stringify({name: name, location_country: country, location_state: state, location_city: city, description: bio, image}));
-
-		x.addEventListener('load', () => {
+		if(image)
+			data.image = image;
+		this.sendRequest('/account_change', data, (status, error, resp) => {
 			this.submitting = false;
 
-			if(x.status != 200)
+			if(error || status != 200)
 				return pageManager.pages.profile.updateResult();
-			var data;
-
-			try{
-				data = JSON.parse(x.response);
-			}catch(e){
-				return pageManager.pages.profile.updateResult();;
-			}
-
-			pageManager.pages.profile.updateResult(data);
-		});
-
-		x.addEventListener('error', () => {
-			this.submitting = false;
-
-			pageManager.pages.profile.updateResult();
+			pageManager.pages.profile.updateResult(resp);
 		});
 	}
 
 	login(email, password){
-		if(!this.needLogin())
-			return;
-		this.loggingIn = true;
-		this.send('/account_login', {email, password});
+		this.authenticate('/account_login', {email, password});
 	}
 
 	signup(name, email, password, country, state, city){
-		if(!this.needLogin())
-			return;
-		this.loggingIn = true;
-		this.send('/account_create', {email, password, name, location_country: country, location_state: state, location_city: city});
+		this.authenticate('/account_create', {email, password, name, location_country: country, location_state: state, location_city: city});
 	}
 
 	logout(){
 		this.token = null;
 
 		delete localStorage.token;
+	}
+
+	sendRequest(url, data, callback){
+		const x = new XMLHttpRequest();
+
+		x.open('POST', url);
+
+		if(this.token)
+			x.setRequestHeader('Authentication', this.token);
+		if(this.needAccount){
+			if(!data)
+				data = {};
+			data.retrieveAccount = true;
+		}
+
+		if(data)
+			x.send(JSON.stringify(data));
+		else
+			x.send();
+		x.addEventListener('load', () => {
+			var data;
+
+			try{
+				data = JSON.parse(x.response);
+			}catch(e){
+				return callback(x.status, new Error("invalid json response"), null);
+			}
+
+			if(accountManager.needAccount && !accountManager.load(data.account))
+				return callback(x.status, new Error("expected an account"), null);
+			callback(x.status, null, data);
+		});
+
+		x.addEventListener('error', (e) => {
+			callback(null, e, null);
+		});
+
+		return x;
 	}
 });
 

@@ -19,6 +19,7 @@ a{
 	text-decoration: none;
 	color: #444;
 	-webkit-user-drag: none;
+	user-select: none;
 }
 
 .text{
@@ -292,27 +293,32 @@ a{
 	justify-content: center;
 }
 
+.profile-container{
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+}
+
 .profile-container.left{
 	width: 400px;
 	display: flex;
-	justify-content: center;
-	align-items: center;
 }
 
 .profile-container.right{
 	width: 400px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
 }
 
 .profile-container.middle{
 	flex-grow: 1;
-	overflow: auto;
 }
 
 .profile-container.expander{
 	width: 12px;
+}
+
+.profile-container .top-padding{
+	width: 100%;
+	height: 150px;
 }
 
 .profile-about-container{
@@ -390,6 +396,7 @@ a{
 	width: 100%;
 	text-align: center;
 	resize: none;
+	background-color: transparent;
 }
 
 .profile-editable-string-container textarea{
@@ -418,6 +425,7 @@ a{
 	right: 0;
 	background-color: #fff;
 	border-radius: 50%;
+	transition: opacity 0.2s;
 }
 
 .profile-editable-string-container.editable:hover .profile-editable-string-svg{
@@ -485,7 +493,7 @@ a{
 .profile-bio{
 	margin: 20px 0;
 	font-size: 16px;
-	line-height: normal;
+	line-height: 20px;
 	width: 100%;
 	font-weight: 500;
 	text-align: left !important;
@@ -498,13 +506,14 @@ a{
 	width: 100%;
 	justify-content: space-around;
 	align-items: center;
-	height: 20px;
+	min-height: 20px;
 }
 
 .profile-location .text{
 	text-overflow: ellipsis;
 	color: #444;
 	overflow: hidden;
+	word-break: break-word;
 }
 
 .profile-submit{
@@ -521,6 +530,23 @@ a{
 	cursor: pointer;
 	user-select: none;
 	background-color: #000;
+	margin-top: 24px;
+}
+
+.profile-follow{
+	border-radius: 1000px;
+	width: 100%;
+	text-transform: uppercase;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	color: #000;
+	height: 40px;
+	cursor: pointer;
+	user-select: none;
+	border: #000 1px solid;
 	margin-top: 24px;
 }
 
@@ -566,11 +592,128 @@ a{
 }
 
 .profile-clubs-photo-container{
-
+	width: 64px;
+	height: 64px;
+	margin: 2px;
 }
 
 .profile-clubs-photo{
+	width: 100%;
+	height: 100%;
+	border-radius: 4px;
+	background-position: center;
+	background-size: cover;
+}
 
+.profile-activity{
+	background-color: #fff;
+	border-radius: 8px;
+	padding: 24px;
+	width: calc(100% - 48px);
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 40px;
+	align-items: center;
+}
+
+.profile-activity-error{
+	width: 100%;
+	text-align: center;
+}
+
+.profile-activity-container{
+	display: flex;
+	align-items: center;
+	width: 100%;
+	flex-wrap: wrap;
+}
+
+.profile-activity-container.left{
+	flex-direction: row;
+	flex: 1;
+}
+
+.profile-activity-container.right{
+	flex-direction: row-reverse;
+	flex: 1;
+}
+
+.profile-activity-container.offset{
+	width: calc(100% - 128px);
+}
+
+.profile-activity-creator-photo{
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background-position: center;
+	background-size: cover;
+	margin: 16px;
+}
+
+.profile-activity-club-photo{
+	width: 32px;
+	height: 32px;
+	border-radius: 2px;
+	background-position: center;
+	background-size: cover;
+	margin: 16px;
+}
+
+.profile-activity-title{
+	font-size: 16px;
+	line-height: normal;
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+
+.profile-activity-time{
+	color: #555;
+	margin-bottom: 8px;
+	font-size: 14px;
+}
+
+.profile-activity-description{
+	word-break: break-word;
+	line-height: 20px;
+}
+
+.profile-activity-location{
+	border: none;
+	display: flex;
+	flex: 1;
+	margin: 20px 0;
+    height: 500px;
+}
+
+.profile-activity-attending-photo{
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background-position: center;
+	background-size: cover;
+	margin: 8px 4px 0 0;
+}
+
+.activities-loader-center{
+	display: flex;
+	justify-content: center;
+	padding: 40px;
+	width: 100%;
+}
+
+.activities-loader{
+	width: 100px;
+	height: 100px;
+	fill: none;
+	stroke: #fff;
+	stroke-width: 4px;
+}
+
+.activities-loader circle{
+	stroke-dasharray: 25.1327412287 25.1327412287;
+	animation: rotate 0.7s ease infinite;
+	transform-origin: 50% 50%;
 }
 
 .login-background{
@@ -654,7 +797,7 @@ a{
 
 .login-form-entry-input-focus-visualizer{
 	position: absolute;
-	bottom: 0;
+	bottom: -2px;
 	width: 100%;
 	height: 2px;
 	transform: scaleX(0);
