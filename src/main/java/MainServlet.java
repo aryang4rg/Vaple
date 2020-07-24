@@ -92,12 +92,6 @@ public class MainServlet extends HttpServlet
 				/* maybe remove later ^*/
 				int statusCode = handler.service(req, resp, request, response, uriSplit, user);
 
-				if(statusCode != 200){
-					resp.setStatus(statusCode);
-
-					return;
-				}
-
 				boolean retrieveAccount = false;
 
 				/* on a first page load, the client will ask for account id to verify the token */
@@ -115,6 +109,12 @@ public class MainServlet extends HttpServlet
 						expired.put("expired", true);
 						response.put("account", expired);
 					}
+				}
+
+				if(statusCode != 200){
+					resp.setStatus(statusCode);
+
+					return;
 				}
 
 				resp.setHeader("Content-Type", "text/json");

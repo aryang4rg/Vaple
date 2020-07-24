@@ -543,8 +543,8 @@ class ProfilePage extends Page{
 		this.table.appendChild(this.right);
 		this.element.appendChild(this.table);
 
-		this.profileAboutContainer = createElement('div', {className: 'profile-about-container shadow-heavy'});
-		this.profileImage = createElement('div', {className: 'profile-photo shadow-heavy'});
+		this.profileAboutContainer = createElement('div', {className: 'profile-about-container shadow-light'});
+		this.profileImage = createElement('div', {className: 'profile-photo shadow-light'});
 		this.profileAboutContainer.appendChild(createElement('div', {className: 'profile-photo-container'}, [this.profileImage]));
 		this.details = createElement('div', {className: 'profile-details'});
 		this.profileAboutContainer.appendChild(this.details);
@@ -567,8 +567,22 @@ class ProfilePage extends Page{
 		this.details.appendChild(createElement('div', {className: 'divider'}));
 		this.bio = createElement('span', {className: 'profile-bio text metro'});
 		this.details.appendChild(this.bio);
-
+		this.details.appendChild(createElement('div', {className: 'divider'}));
+		this.location = createElement('div', {className: 'profile-location'});
+		this.details.appendChild(this.location);
+		this.country = createElement('span', {className: 'text metro'});
+		this.location.appendChild(this.country);
+		this.state = createElement('span', {className: 'text metro'});
+		this.location.appendChild(this.state);
+		this.city = createElement('span', {className: 'text metro'});
+		this.location.appendChild(this.city);
 		this.left.appendChild(this.profileAboutContainer);
+
+		this.clubs = createElement('div', {className: 'profile-clubs shadow-light'});
+		this.clubs.appendChild(createElement('span', {className: 'profile-clubs-title text metro', innerText: 'Clubs'}));
+		this.noneText = createElement('span', {className: 'text metro', innerText: 'There are no clubs here', css: {display: 'none'}});
+		this.clubs.appendChild(this.noneText);
+		this.right.appendChild(this.clubs);
 	}
 
 	load(data){
@@ -580,6 +594,18 @@ class ProfilePage extends Page{
 		this.followcount.setText(data.following_count);
 		this.followercount.setText(data.followers_count);
 		this.bio.setText(data.description);
+		this.country.setText(data.location_country);
+		this.state.setText(data.location_state);
+		this.city.setText(data.location_city);
+
+		var club_count = 0;
+		for(var i in data.clubs){
+			club_count++;
+
+		}
+
+		if(!club_count)
+			this.noneText.style.display = 'inline-block';
 	}
 }
 
@@ -638,7 +664,7 @@ const pageManager = new (class{
 		this.body = createElement('div', {className: 'page-container'});
 		this.topBar = new (class{
 			constructor(){
-				this.element = createElement('div', {className: 'top-bar'});
+				this.element = createElement('div', {className: 'top-bar shadow-light'});
 				this.logo = createElement('svg', {className: 'logo-container', css: {cursor: 'pointer'}});
 				this.logoWaves = createElement('div', {className: 'logo'}, [this.logo]);
 				this.element.appendChild(this.logoWaves);
@@ -857,10 +883,6 @@ const pageLoader = new (class{
 		l.addEventListener('load', () => {
 			this.loadingToast.hideAfter(200);
 
-			if(l.status == 404)
-				return pageManager.showNotFoundPage();
-			if(l.status != 200)
-				return pageManager.showErrorPage();
 			var data;
 
 			try{
@@ -869,8 +891,12 @@ const pageLoader = new (class{
 				return pageManager.showErrorPage();
 			}
 
-			pageManager.load(data);
-
+			if(l.status == 404)
+				pageManager.showNotFoundPage();
+			else if(l.status != 200)
+				pageManager.showErrorPage();
+			else
+				pageManager.load(data);
 			if(accountManager.needAccount)
 				accountManager.load(data.account);
 		});

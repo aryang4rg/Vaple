@@ -11,7 +11,7 @@
 
 body{
 	margin: 0;
-	background-color: #eee;
+	background-color: #f8f8f8;
 	height: 100vh;
 }
 
@@ -82,6 +82,10 @@ a{
 	box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
 }
 
+.shadow-light{
+	box-shadow: 0 4px 8px -3px rgba(17, 17, 17, .1);
+}
+
 .waves{
 	position: relative;
 }
@@ -125,7 +129,6 @@ a{
 	background-color: #fff;
 	z-index: 2;
 	padding: 12px 48px;
-	box-shadow: 0 4px 8px -3px rgba(17, 17, 17, .1);
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -298,6 +301,9 @@ a{
 
 .profile-container.right{
 	width: 400px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .profile-container.middle{
@@ -321,7 +327,7 @@ a{
 
 .profile-photo-container{
 	transform: translateY(-50%);
-	background-color: #eee;
+	background-color: #f8f8f8;
 	width: 190px;
 	height: 190px;
 	border-radius: 50%;
@@ -350,7 +356,7 @@ a{
 	display: inline-block;
 	width: 100%;
 	height: 1px;
-	background-color: #bbb;
+	background-color: #ccc;
 	margin: 12px 0;
 }
 
@@ -399,11 +405,60 @@ a{
 }
 
 .profile-bio{
-	margin-top: 20px;
+	margin: 20px 0;
 	font-size: 16px;
 	line-height: normal;
 	width: 100%;
 	font-weight: 500;
+}
+
+.profile-location{
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	justify-content: space-around;
+	align-items: center;
+	height: 20px;
+}
+
+.profile-location .text{
+	text-overflow: ellipsis;
+	color: #444;
+	max-width: 33%;
+	overflow: hidden;
+}
+
+.profile-clubs{
+	width: 280px;
+	border-radius: 8px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	position: relative;
+	background-color: #fff;
+	min-height: 40px;
+	padding: 20px;
+}
+
+.profile-clubs-title{
+	font-size: 24px;
+	line-height: normal;
+	margin-bottom: 16px;
+}
+
+.profile-clubs-list{
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.profile-clubs-photo-container{
+
+}
+
+.profile-clubs-photo{
+
 }
 
 .login-background{
@@ -508,7 +563,7 @@ a{
 
 .login-button{
 	border-radius: 1000px;
-	width: 100%;
+	width: 320px;
 	text-transform: uppercase;
 	text-align: center;
 	display: flex;
