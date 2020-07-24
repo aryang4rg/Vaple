@@ -28,8 +28,6 @@ public class ProfileHandler implements AjaxHandler
 
 		if(user == null)
 			return 404;
-
-
 		response.put("profile", user.toProfileNode());
 
 		return 200;
