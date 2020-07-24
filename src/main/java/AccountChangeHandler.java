@@ -129,6 +129,12 @@ public class AccountChangeHandler implements AjaxHandler
 		}
 
 		if(email != null)
+			if(user.getEmail().equals(email)){
+				response.put("error", "Already your email");
+
+				return 200;
+			}
+
 			if(User.databaseConnectivity().infoExistsInDatabase(User.EMAIL, email)){
 				response.put("error", "Email already in use");
 

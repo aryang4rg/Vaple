@@ -24,6 +24,13 @@ public class ImageUtil{
 		if (!file.exists()) {
 			file.createNewFile();
 		}
+
+		int least = img.getWidth();
+
+		if(img.getHeight() < least)
+			least = img.getHeight();
+		img = img.getSubimage((img.getWidth() - least) / 2, (img.getHeight() - least) / 2, least, least);
+
 		ImageIO.write(img, "png", file);
 
 		return null;
