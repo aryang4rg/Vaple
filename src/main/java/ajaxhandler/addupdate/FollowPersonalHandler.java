@@ -30,7 +30,7 @@ public class FollowPersonalHandler implements AjaxHandler
                 JsonNode idToFollow = it.next();
 				String id = Util.removeNonAlphanumeric(Util.asText(idToFollow));
 
-				if(id != null){
+				if(id != null && !user.getObjectID().toHexString().equals(id)){
 					User other = (User) User.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(id));
 
 					if(other != null)
@@ -48,7 +48,7 @@ public class FollowPersonalHandler implements AjaxHandler
                 JsonNode idToFollow = it.next();
 				String id = Util.removeNonAlphanumeric(Util.asText(idToFollow));
 
-				if(id != null){
+				if(id != null && !user.getObjectID().toHexString().equals(id)){
 					User other = (User) User.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(id));
 
 					if(other != null)
