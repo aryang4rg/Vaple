@@ -28,12 +28,7 @@ public class DatabaseConnectivity
 	public static final DBCollection ACTIVITYCOLLECTION = database.getCollection("activity");
 	public static final DBCollection CLUBCOLLECTION = database.getCollection("club");
 
-	public static void main(String[] args)
-	{
-		User user = new User();
-		User user2 = (User) user.getByInfoInDataBase("name","hello");
-		Activity activity = new Activity("activity","activity",new ArrayList<ObjectId>(),10,10,10,new ObjectId());
-	}
+
 	/**
 	 * Adds an object to the database
 	 * @param object The object to be added
