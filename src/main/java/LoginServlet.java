@@ -24,24 +24,14 @@ public class LoginServlet implements AjaxHandler
 	public boolean isPage() {
 		return false;
 	}
-	public String toValidString(String k){
-		if(k == null || k.length() == 0)
-			return null;
-		// removes all special characters
-		k = k.replace("[^a-zA-Z0-9_-]", "");
-
-		if(k.length() == 0)
-			return null;
-		return k;
-	}
 
 	public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User nullUser) throws ServletException, IOException
 	{
 		if(uriSplit.length > 0)
 			return 400;
-		String email = Util.nullIfSpecialCharacters(request.get("email").asText());
-		String password = Util.nullIfSpecialCharacters(request.get("password").asText());
-		if (email == null || password == null || email.length() == 0 || password.length() == 0)
+		String email = Util.trimAndnullIfSpecialCharacters(request.get("email").asText());
+		String password = Util.trimAndnullIfSpecialCharacters(request.get("password").asText());
+		if (email == null || password == null)
 		{
 			response.put("token", (String)null);
 

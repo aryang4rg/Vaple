@@ -81,7 +81,7 @@ public class Activity implements DatabaseStructureObject
 	 * @return The activity object
 	 */
 	@Override
-	public DatabaseStructureObject getByInfoInDataBase(String varName, String data)
+	public DatabaseStructureObject getByInfoInDataBase(String varName, Object data)
 	{
 		return findInDatabase(new BasicDBObject(varName,data));
 
@@ -94,7 +94,7 @@ public class Activity implements DatabaseStructureObject
 	 * @return True if it exists in the database, false if it doesn't
 	 */
 	@Override
-	public boolean infoExistsInDatabase(String varName, String data)
+	public boolean infoExistsInDatabase(String varName, Object data)
 	{
 		return getByInfoInDataBase(varName, data) != null;
 	}

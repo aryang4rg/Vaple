@@ -280,6 +280,7 @@ public class User implements DatabaseStructureObject
 		node.put("location_city", getCity());
 		node.put("description", getDescription());
 		node.put("followers_count", countFollowers());
+		node.put("following_count", countFollowing());
 
 		return node;
 	}
@@ -293,12 +294,12 @@ public class User implements DatabaseStructureObject
 		return null;
 	}
 
-	public DatabaseStructureObject getByInfoInDataBase(String varName, String data)
+	public DatabaseStructureObject getByInfoInDataBase(String varName, Object data)
 	{
 		return findInDatabase(new BasicDBObject(varName,data));
 	}
 
-	public boolean infoExistsInDatabase(String varName, String data)
+	public boolean infoExistsInDatabase(String varName, Object data)
 	{
 		return getByInfoInDataBase(varName, data) != null;
 	}

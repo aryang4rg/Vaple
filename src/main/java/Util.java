@@ -12,7 +12,7 @@ public class Util{
 	public static String nullIfSpecialCharacters(String string){
 		/* all characters on the keyboard allowed */
 		for(int i = 0; i < string.length(); i++)
-			if(string.charAt(i) < 0x20 && string.charAt(i) >= 0x7f)
+			if(string.charAt(i) < 0x20 || string.charAt(i) >= 0x7f)
 				return null;
 		return string;
 	}
@@ -40,6 +40,18 @@ public class Util{
 		if(string == null)
 			return null;
 		string = removeNonAlphanumeric(string);
+
+		if(string.length() == 0)
+			return null;
+		return string;
+	}
+
+	public static String trimAndnullIfSpecialCharacters(String string){
+		string = trimString(string);
+
+		if(string == null)
+			return null;
+		string = nullIfSpecialCharacters(string);
 
 		if(string.length() == 0)
 			return null;

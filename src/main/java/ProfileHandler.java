@@ -24,11 +24,12 @@ public class ProfileHandler implements AjaxHandler
 			return 404;
 		ObjectId id = new ObjectId(uriSplit[0]);
 
-		User user = (User)User.databaseConnectivity().getByInfoInDataBase(ID, id.toHexString());
+		User user = (User)User.databaseConnectivity().getByInfoInDataBase(ID, id);
 
 		if(user == null)
 			return 404;
-		response.put("profile", user.toProfileNode());
+		response.put("data", user.toProfileNode());
+		response.put("type", "profile");
 
 		return 200;
 	}

@@ -22,7 +22,7 @@ public class SignUpServlet implements AjaxHandler
 
 	private SignUpServlet(){}
 
-	public boolean isValidEmail(String email){
+	public static boolean isValidEmail(String email){
 		if(email.indexOf(' ') != -1)
 			return false;
 		int pi = email.lastIndexOf('.');
@@ -52,19 +52,19 @@ public class SignUpServlet implements AjaxHandler
 
 	@Override
 	public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User u) throws ServletException, IOException {
-		if(uriSplit.length > 0 || u != null)
+		if(uriSplit.length > 0)
+			return 404;
+		if(u != null)
 			return 400;
-		String email = Util.nullIfSpecialCharacters(request.get("email").asText());
+		String email = Util.trimAndnullIfSpecialCharacters(request.get("email").asText());
 		String name = Util.removeTrimAndNonAlphanumeric(request.get("name").asText());
-		String password = Util.nullIfSpecialCharacters(request.get("password").asText());
+		String password = Util.trimAndnullIfSpecialCharacters(request.get("password").asText());
 		String location_country = Util.removeTrimAndNonAlphanumeric(request.get("location_country").asText());
 		String location_state = Util.removeTrimAndNonAlphanumeric(request.get("location_state").asText());
 		String location_city = Util.removeTrimAndNonAlphanumeric(request.get("location_city").asText());
 
 		if(email == null || name == null || password == null || location_country == null ||
-			location_state == null || location_city == null
-				|| email.length() == 0 || name.length() == 0 ||password.length() == 0
-				||location_country.length() == 0 ||location_state.length() == 0 || location_city.length() == 0){
+			location_state == null || location_city == null){
 				response.put("token", (String)null);
 				response.put("error", "Invalid field(s)");
 
