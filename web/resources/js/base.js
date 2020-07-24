@@ -592,15 +592,6 @@ class FeedPage extends Page{
 	}
 }
 
-class AccountPage extends Page{
-	load(data){
-		/* todo */
-
-		document.title = 'Account';
-		history.pushState(null, document.title, '/account');
-	}
-}
-
 class ExplorePage extends Page{
 	load(data){
 		/* todo */
@@ -638,7 +629,6 @@ const pageManager = new (class{
 			login: new LoginPage(),
 			profile: new ProfilePage(),
 			feed: new FeedPage(),
-			account: new AccountPage(),
 			explore: new ExplorePage(),
 			dashboard: new DashboardPage(),
 			notfound: new NotFoundPage()
@@ -692,7 +682,6 @@ const pageManager = new (class{
 				this.profileImage = createElement('div', {className: 'top-bar-profile-photo'});
 				this.right.appendChild(this.profileImage);
 				this.accountOptions = createElement('div', {className: 'top-bar-profile-options shadow-heavy', css: {display: 'none'}, attributes: {tabindex: 0}});
-				this.manageAccount = this.createItem('My Account', '/account');
 				this.right.appendChild(this.accountOptions);
 				this.showProfilePhoto('/cdn/default.png');
 
@@ -750,14 +739,15 @@ const pageManager = new (class{
 				if(show != this.logoutShowing){
 					this.logoutShowing = show;
 
-					if(show){
+					if(show)
 						this.accountOptions.appendChild(this.logout);
-						this.accountOptions.appendChild(this.manageAccount);
-					}else{
+					else
 						this.accountOptions.removeChild(this.logout);
-						this.accountOptions.removeChild(this.manageAccount);
-					}
 				}
+			}
+
+			showManageAccount(id){
+				this.accountOptions.appendChild(this.createItem('My Account', '/profile/' + id));
 			}
 		});
 
@@ -941,6 +931,7 @@ const accountManager = new (class{
 			this.hasAccount = true;
 
 			pageManager.topBar.showProfilePhoto('/cdn/profile/' + account.id + '.png');
+			pageManager.topBar.showManageAccount(account.id);
 		}else
 			pageManager.showErrorPage();
 	}
