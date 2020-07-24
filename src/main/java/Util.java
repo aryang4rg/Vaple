@@ -23,7 +23,7 @@ public class Util{
 	/* useful for username and location */
 	public static String removeNonAlphanumeric(String string){
 		/* does not remove - or _ or space */
-		return string.replace("[^a-zA-Z0-9_- ]", "");
+		return string.replaceAll("[^ a-zA-Z0-9_-]", "");
 	}
 
 	/* useful for checking if a string is empty */
