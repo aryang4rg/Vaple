@@ -154,9 +154,8 @@ class Toast{
 		this.element = createElement('div', {className: 'toast'});
 		this.content = createElement('div', {className: 'toast-content'});
 		this.element.appendChild(this.content);
-
-		if(text)
-			this.content.appendChild(createElement('span', {className: 'text', innerText: text}));
+		this.text = createElement('span', {className: 'text', innerText: text ? text : ''});
+		this.content.appendChild(this.text);
 		this.element.offsetHeight;
 		this.timeout = null;
 	}
@@ -208,6 +207,10 @@ class LoadingToast extends Toast{
 	}
 
 	progress(){
+		if(this.bar)
+			this.content.removeChild(this.bar);
+		this.bar = null;
+
 		/* todo */
 	}
 }
@@ -531,6 +534,11 @@ class ProfilePage extends Page{
 	constructor(){
 		super();
 
+		this.self = false;
+		this.submittingToast = new LoadingToast('Changing');
+
+		toastManager.addToast(this.submittingToast);
+
 		this.table = createElement('div', {className: 'profile-table'});
 		this.left = createElement('div', {className: 'profile-container left'});
 		this.middle = createElement('div', {className: 'profile-container middle'});
@@ -544,12 +552,12 @@ class ProfilePage extends Page{
 		this.element.appendChild(this.table);
 
 		this.profileAboutContainer = createElement('div', {className: 'profile-about-container shadow-light'});
-		this.profileImage = createElement('div', {className: 'profile-photo shadow-light'});
+		this.profileImage = createElement('div', {className: 'profile-photo shadow-heavy'});
 		this.profileAboutContainer.appendChild(createElement('div', {className: 'profile-photo-container'}, [this.profileImage]));
 		this.details = createElement('div', {className: 'profile-details'});
 		this.profileAboutContainer.appendChild(this.details);
-		this.name = createElement('span', {className: 'profile-name text'});
-		this.details.appendChild(this.name);
+		this.name = this.createEditableString('profile-name text');
+		this.details.appendChild(this.name.element);
 		this.followcount = createElement('div', {className: 'number text'});
 		this.followercount = createElement('div', {className: 'number text'});
 		this.details.appendChild(createElement('div', {className: 'profile-follow-count'}, [
@@ -565,24 +573,108 @@ class ProfilePage extends Page{
 		]));
 
 		this.details.appendChild(createElement('div', {className: 'divider'}));
-		this.bio = createElement('span', {className: 'profile-bio text metro'});
-		this.details.appendChild(this.bio);
+		this.bio = this.createEditableString('profile-bio text metro', 512, true);
+		this.details.appendChild(this.bio.element);
 		this.details.appendChild(createElement('div', {className: 'divider'}));
 		this.location = createElement('div', {className: 'profile-location'});
 		this.details.appendChild(this.location);
-		this.country = createElement('span', {className: 'text metro'});
-		this.location.appendChild(this.country);
-		this.state = createElement('span', {className: 'text metro'});
-		this.location.appendChild(this.state);
-		this.city = createElement('span', {className: 'text metro'});
-		this.location.appendChild(this.city);
+		this.country = this.createEditableString('text metro');
+		this.location.appendChild(this.country.element);
+		this.state = this.createEditableString('text metro');
+		this.location.appendChild(this.state.element);
+		this.city = this.createEditableString('text metro');
+		this.location.appendChild(this.city.element);
+		this.submit = createElement('div', {className: 'profile-submit text metro', innerText: 'save', css: {display: 'none'}});
+		this.details.appendChild(this.submit);
+		this.error = createElement('span', {className: 'profile-submit-error text metro'});
+		this.details.appendChild(this.error);
 		this.left.appendChild(this.profileAboutContainer);
+
+		this.submit.on('click', () => {
+			if(accountManager.submitting)
+				return;
+			this.error.setText('');
+			this.submit.classList.add('disabled');
+			this.submittingToast.text.setText('Changing');
+			this.submittingToast.show();
+			this.submittingToast.indeterminate();
+
+			accountManager.changeAccount(this.name.input.value, this.bio.input.value, this.country.input.value, this.state.input.value, this.city.input.value);
+		});
 
 		this.clubs = createElement('div', {className: 'profile-clubs shadow-light'});
 		this.clubs.appendChild(createElement('span', {className: 'profile-clubs-title text metro', innerText: 'Clubs'}));
 		this.noneText = createElement('span', {className: 'text metro', innerText: 'There are no clubs here', css: {display: 'none'}});
 		this.clubs.appendChild(this.noneText);
 		this.right.appendChild(this.clubs);
+	}
+
+	createEditableString(textClass, maxLength = 32, textarea = false){
+		const element = createElement('div', {className: 'profile-editable-string-container'});
+		const text = createElement('span', {className: textClass});
+		const input = createElement(textarea ? 'textarea' : 'input', {className: textClass, attributes: {spellcheck: false, maxlength: maxLength}});
+		const button = createElement('svg', {className: 'profile-editable-string-svg'}, [
+			createElement('path', {attributes: {fill: 'none', d: 'M0 0h24v24H0z'}}),
+			createElement('path', {attributes: {d: 'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'}})
+		]);
+
+		const data = {element, text, input, setText(text){
+			this.text.setText(text);
+			this.input.value = text;
+		}};
+
+		element.appendChild(text);
+		element.appendChild(input);
+		element.appendChild(button);
+		button.on('click', () => {
+			if(!this.self)
+				return;
+			element.classList.add('editing');
+			input.focus();
+		});
+
+		input.on('blur', () => {
+			element.classList.remove('editing');
+
+			if(text.textContent != input.value){
+				this.edited();
+
+				text.setText(input.value);
+			}
+		});
+
+		input.on('input', () => {
+			input.value = input.value.replace(/[\r\n]+/g, '');
+		});
+
+		return data;
+	}
+
+	edited(){
+		this.submit.style.display = '';
+	}
+
+	updateResult(data){
+		this.submit.classList.remove('disabled');
+		this.submittingToast.hideAfter(2000);
+		this.submittingToast.progress(0);
+
+		if(!this.self)
+			return;
+		if(!data || data.error || !data.profile){
+			const error = (data && data.error) || 'There was an error updating your profile';
+			this.error.setText(error);
+			this.submittingToast.text.setText('Could not update profile');
+
+			return;
+		}
+
+		this.name.setText(data.profile.name);
+		this.bio.setText(data.profile.description);
+		this.country.setText(data.profile.location_country);
+		this.state.setText(data.profile.location_state);
+		this.city.setText(data.profile.location_city);
+		this.submit.style.display = 'none';
 	}
 
 	load(data){
@@ -597,6 +689,26 @@ class ProfilePage extends Page{
 		this.country.setText(data.location_country);
 		this.state.setText(data.location_state);
 		this.city.setText(data.location_city);
+		this.self = data.self;
+
+		if(this.self){
+			if(accountManager.updating)
+				this.submit.style.display = '';
+			else
+				this.submit.style.display = 'none';
+			this.name.element.classList.add('editable');
+			this.bio.element.classList.add('editable');
+			this.country.element.classList.add('editable');
+			this.state.element.classList.add('editable');
+			this.city.element.classList.add('editable');
+		}else{
+			this.error.setText('');
+			this.name.element.classList.remove('editable');
+			this.bio.element.classList.remove('editable');
+			this.country.element.classList.remove('editable');
+			this.state.element.classList.remove('editable');
+			this.city.element.classList.remove('editable');
+		}
 
 		var club_count = 0;
 		for(var i in data.clubs){
@@ -925,6 +1037,7 @@ const accountManager = new (class{
 		this.needAccount = false;
 		this.hasAccount = false;
 		this.loggingIn = false;
+		this.submitting = false;
 		this.token = localStorage.token;
 
 		if(this.token)
@@ -1017,6 +1130,38 @@ const accountManager = new (class{
 
 		l.addEventListener('error', () => {
 			this.complete({});
+		});
+	}
+
+	changeAccount(name, bio, country, state, city){
+		this.submitting = true;
+
+		const x = new XMLHttpRequest();
+
+		x.open('POST', '/account_change');
+		x.setRequestHeader('Authentication', this.token);
+		x.send(JSON.stringify({name: name, location_country: country, location_state: state, location_city: city, description: bio}));
+
+		x.addEventListener('load', () => {
+			this.submitting = false;
+
+			if(x.status != 200)
+				return pageManager.pages.profile.updateResult();
+			var data;
+
+			try{
+				data = JSON.parse(x.response);
+			}catch(e){
+				return pageManager.pages.profile.updateResult();;
+			}
+
+			pageManager.pages.profile.updateResult(data);
+		});
+
+		x.addEventListener('error', () => {
+			this.submitting = false;
+
+			pageManager.pages.profile.updateResult();
 		});
 	}
 
