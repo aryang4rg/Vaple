@@ -19,6 +19,7 @@ public class Activity implements DatabaseStructureObject
 	ObjectId objectID;
 	ObjectId associated_club;
 	ObjectId owner;
+	DBObject object;
 
 	private static Activity databaseConnectivityObject = new Activity();
 	public static Activity databaseConnectivity()
@@ -56,6 +57,13 @@ public class Activity implements DatabaseStructureObject
 		longitude = (double)object.get("longitude");
 		owner = (ObjectId)object.get("owner");
 		associated_club = (ObjectId)object.get("associated_club");
+
+		this.object = object;
+	}
+
+	public void addUserToActivity(User user)
+	{
+		((DBObject)object.get("members")).put(user.getObjectID().toHexString(), true);
 	}
 
 	/**
