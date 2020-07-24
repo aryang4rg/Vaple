@@ -1,3 +1,9 @@
+package ajaxhandler.addupdate;
+
+import ajaxhandler.AjaxHandler;
+import databaseobject.*;
+import util.*;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bson.types.ObjectId;
@@ -25,7 +31,7 @@ public class FollowPersonalHandler implements AjaxHandler
 				String id = Util.removeNonAlphanumeric(Util.asText(idToFollow));
 
 				if(id != null){
-					User other = (User) User.databaseConnectivity().getByInfoInDataBase(ID, new ObjectId(id));
+					User other = (User) User.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(id));
 
 					if(other != null)
 						continue;
@@ -43,7 +49,7 @@ public class FollowPersonalHandler implements AjaxHandler
 				String id = Util.removeNonAlphanumeric(Util.asText(idToFollow));
 
 				if(id != null){
-					User other = (User) User.databaseConnectivity().getByInfoInDataBase(ID, new ObjectId(id));
+					User other = (User) User.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(id));
 
 					if(other != null)
 						continue;

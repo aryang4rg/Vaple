@@ -1,3 +1,10 @@
+package ajaxhandler.login;
+
+import ajaxhandler.AjaxHandler;
+import ajaxhandler.fulfiller.FeedHandler;
+import databaseobject.*;
+
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -6,6 +13,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/*
+	if already logged in redirects person to feed
+	if not redirects to log in page
+ */
 public class LoginHandler implements AjaxHandler
 {
 	private static LoginHandler instance = new LoginHandler();

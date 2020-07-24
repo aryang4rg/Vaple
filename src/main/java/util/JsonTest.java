@@ -1,3 +1,5 @@
+package util;
+
 public class JsonTest {
 	private String name, password, id, token;
 	private int i;
