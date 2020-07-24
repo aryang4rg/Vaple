@@ -405,8 +405,8 @@ class LoginPage extends Page{
 					error = true;
 				}
 
-				// if(error)
-				// 	return;
+				if(error)
+					return;
 				this.button.classList.add('disabled');
 
 				accountManager.signup(this.name.field.value, this.email.field.value, this.password.field.value,
@@ -565,7 +565,7 @@ class ProfilePage extends Page{
 
 	load(data){
 		document.title = data.name + "'s profile";
-		history.pushState(null, document.title, '/profiles/' + data.id);
+		history.pushState(null, document.title, '/profile/' + data.id);
 
 		this.profileImage.style['background-image'] = 'url("/cdn/profile/' + data.id + '.png")';
 		this.name.setText(data.name);
@@ -681,12 +681,30 @@ const pageManager = new (class{
 
 				this.logoutShowing = false;
 				this.loginShowing = false;
-				this.profileImage = createElement('a', {className: 'top-bar-profile-photo', attributes: {href: '/account'}});
+				this.profileImage = createElement('div', {className: 'top-bar-profile-photo'});
 				this.right.appendChild(this.profileImage);
+				this.accountOptions = createElement('div', {className: 'top-bar-profile-options shadow-heavy', css: {display: 'none'}, attributes: {tabindex: 0}});
+				this.manageAccount = this.createItem('My Account', '/account');
+				this.right.appendChild(this.accountOptions);
+				this.showProfilePhoto('/cdn/default.png');
 
-				this.profileImage.on('click', (e) => {
+				this.profileImage.on('click', () => {
+					this.accountOptions.style.display = '';
+					this.accountOptions.focus();
+				});
+
+				this.accountOptions.on('blur', () => {
+					this.accountOptions.style.display = 'none';
+				});
+
+				this.accountOptions.on('mousedown', (e) => {
 					e.preventDefault();
-					pageLoader.load('/account');
+
+					return false;
+				});
+
+				this.accountOptions.on('click', (e) => {
+					e.preventDefault();
 
 					return false;
 				});
@@ -714,9 +732,9 @@ const pageManager = new (class{
 					this.loginShowing = show;
 
 					if(show)
-						this.right.appendChild(this.login);
+						this.accountOptions.appendChild(this.login);
 					else
-						this.right.removeChild(this.login);
+						this.accountOptions.removeChild(this.login);
 				}
 			}
 
@@ -724,10 +742,13 @@ const pageManager = new (class{
 				if(show != this.logoutShowing){
 					this.logoutShowing = show;
 
-					if(show)
-						this.right.appendChild(this.logout);
-					else
-						this.right.removeChild(this.logout);
+					if(show){
+						this.accountOptions.appendChild(this.logout);
+						this.accountOptions.appendChild(this.manageAccount);
+					}else{
+						this.accountOptions.removeChild(this.logout);
+						this.accountOptions.removeChild(this.manageAccount);
+					}
 				}
 			}
 		});

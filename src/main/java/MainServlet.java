@@ -63,7 +63,7 @@ public class MainServlet extends HttpServlet
 		{
 			AjaxHandler handler = null;
 
-			if(uriSplit.length == 1)
+			if(uriSplit.length <= 1)
 			{
 				handler = pathToHandler.get("home");
 			}
@@ -139,6 +139,12 @@ public class MainServlet extends HttpServlet
 				sendFile(resp.getOutputStream(), file);
 
 				return;
+			}
+			else if (uriSplit.length > 3 && (uriSplit[1].equals("cdn") && uriSplit[2].equals("profile")))
+			{
+				//File defaultPic = new File()
+				String userPNG = uriSplit[4];
+
 			}
 		}
 

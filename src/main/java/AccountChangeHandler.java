@@ -22,8 +22,9 @@ public class AccountChangeHandler implements AjaxHandler
 			return 404;
 		if(u == null)
 			return 400;
+
 		String email = Util.asText(request.get("email"));
-		String name = Util.asText(request.get("name")));
+		String name = Util.asText(request.get("name"));
 		String password = Util.asText(request.get("password"));
 		String location_country = Util.asText(request.get("location_country"));
 		String location_state = Util.asText(request.get("location_state"));

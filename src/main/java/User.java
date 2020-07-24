@@ -53,6 +53,11 @@ public class User implements DatabaseStructureObject
 		.sort(new BasicDBObject("time",1)).limit(limit).toArray();
 	}
 
+	public ArrayList<DBObject> getActivities()
+	{
+		return (ArrayList<DBObject>)DatabaseConnectivity.ACTIVITYCOLLECTION.find().toArray();
+	}
+
 	public User(DBObject object)
 	{
 		this.object = object;
@@ -244,6 +249,12 @@ public class User implements DatabaseStructureObject
 	 */
 	public boolean isFollowedBy(ObjectId user){
 		return ((DBObject)object.get("followers")).get(user.toHexString()) != null;
+	}
+
+	public ArrayList<String> getFollowing()
+	{
+		DBObject followingObject = (DBObject)object.get("following");
+		return new ArrayList<String>(followingObject.keySet());
 	}
 
 	public int countObjectEntries(DBObject object){
