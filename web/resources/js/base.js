@@ -539,6 +539,7 @@ class ProfilePage extends Page{
 
 		toastManager.addToast(this.submittingToast);
 
+		this.submitpfp = null;
 		this.table = createElement('div', {className: 'profile-table'});
 		this.left = createElement('div', {className: 'profile-container left'});
 		this.middle = createElement('div', {className: 'profile-container middle'});
@@ -553,7 +554,12 @@ class ProfilePage extends Page{
 
 		this.profileAboutContainer = createElement('div', {className: 'profile-about-container shadow-light'});
 		this.profileImage = createElement('div', {className: 'profile-photo shadow-heavy'});
-		this.profileAboutContainer.appendChild(createElement('div', {className: 'profile-photo-container'}, [this.profileImage]));
+		this.profilePhotoContainer = createElement('div', {className: 'profile-photo-container'});
+		this.profilePhotoContainer.appendChild(this.profileImage);
+		this.fileChooser = createElement('input', {attributes: {type: 'file', name: 'name', accept: 'image/*'}});
+		this.photoEditButton = createElement('div', {className: 'profile-edit-button text metro', innerText: 'Change avatar'});
+		this.profilePhotoContainer.appendChild(this.photoEditButton);
+		this.profileAboutContainer.appendChild(this.profilePhotoContainer);
 		this.details = createElement('div', {className: 'profile-details'});
 		this.profileAboutContainer.appendChild(this.details);
 		this.name = this.createEditableString('profile-name text');
@@ -571,6 +577,24 @@ class ProfilePage extends Page{
 				this.followcount
 			]),
 		]));
+
+		this.photoEditButton.on('click', () => {
+			this.fileChooser.click();
+		});
+
+		this.fileChooser.on('change', (file) => {
+			var input = file.target;
+
+			var reader = new FileReader();
+
+			reader.onload = () => {
+				this.submitpfp = reader.result;
+				this.profileImage.style['background-image'] = 'url("' + reader.result + '")';
+				this.edited();
+			};
+
+			reader.readAsDataURL(input.files[0]);
+		});
 
 		this.details.appendChild(createElement('div', {className: 'divider'}));
 		this.bio = this.createEditableString('profile-bio text metro', 512, true);
@@ -599,7 +623,7 @@ class ProfilePage extends Page{
 			this.submittingToast.show();
 			this.submittingToast.indeterminate();
 
-			accountManager.changeAccount(this.name.input.value, this.bio.input.value, this.country.input.value, this.state.input.value, this.city.input.value);
+			accountManager.changeAccount(this.name.input.value, this.bio.input.value, this.country.input.value, this.state.input.value, this.city.input.value, this.submitpfp);
 		});
 
 		this.clubs = createElement('div', {className: 'profile-clubs shadow-light'});
@@ -677,6 +701,9 @@ class ProfilePage extends Page{
 		this.state.setText(data.profile.location_state);
 		this.city.setText(data.profile.location_city);
 		this.submit.style.display = 'none';
+
+		if(data.profile.image)
+			this.error.setText('Could not update image: ' + data.profile.image);
 	}
 
 	load(data){
@@ -698,6 +725,7 @@ class ProfilePage extends Page{
 				this.submit.style.display = '';
 			else
 				this.submit.style.display = 'none';
+			this.profilePhotoContainer.classList.add('editable');
 			this.name.element.classList.add('editable');
 			this.bio.element.classList.add('editable');
 			this.country.element.classList.add('editable');
@@ -705,6 +733,7 @@ class ProfilePage extends Page{
 			this.city.element.classList.add('editable');
 		}else{
 			this.error.setText('');
+			this.profilePhotoContainer.classList.remove('editable');
 			this.name.element.classList.remove('editable');
 			this.bio.element.classList.remove('editable');
 			this.country.element.classList.remove('editable');
@@ -1135,14 +1164,14 @@ const accountManager = new (class{
 		});
 	}
 
-	changeAccount(name, bio, country, state, city){
+	changeAccount(name, bio, country, state, city, image){
 		this.submitting = true;
 
 		const x = new XMLHttpRequest();
 
 		x.open('POST', '/account_change');
 		x.setRequestHeader('Authentication', this.token);
-		x.send(JSON.stringify({name: name, location_country: country, location_state: state, location_city: city, description: bio}));
+		x.send(JSON.stringify({name: name, location_country: country, location_state: state, location_city: city, description: bio, image}));
 
 		x.addEventListener('load', () => {
 			this.submitting = false;

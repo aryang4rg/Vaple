@@ -334,6 +334,7 @@ a{
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	position: relative;
 }
 
 .profile-photo{
@@ -342,6 +343,28 @@ a{
 	border-radius: 50%;
 	background-position: center;
 	background-size: cover;
+}
+
+.profile-edit-button{
+	width: 180px;
+	height: 180px;
+	border-radius: 50%;
+	position: absolute;
+	justify-content: center;
+	align-items: center;
+	background-color: #0008;
+	display: none;
+	opacity: 0;
+	transition: opacity 0.2s ease;
+	cursor: pointer;
+}
+
+.profile-photo-container.editable .profile-edit-button{
+	display: flex;
+}
+
+.profile-photo-container.editable .profile-edit-button:hover{
+	opacity: 1;
 }
 
 .profile-details{
