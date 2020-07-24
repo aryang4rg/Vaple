@@ -47,7 +47,8 @@ public class FollowPersonHandler implements AjaxHandler
 					User.databaseConnectivity().updateInDatabase(other);
 					String recipient = other.getEmail();
 					String subject = "New Follower";
-					String messageText = "<h1>You have a new Follower!<br>Your new follower is: " + user.getName() + "</h1>";
+					String messageText = "<h3>You have a new Follower!<br>Your new follower is: " + user.getName() + "</h3>" +
+                            "<h5> Their<a href=\"" + IP_ADDRESS + "/profile" + user.getObjectID() + "\">profile</a><br></h5>";
 					try
                     {
                         JavaMail.sendMessage(recipient, subject, messageText);
