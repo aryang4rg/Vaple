@@ -229,6 +229,7 @@ public class User implements DatabaseStructureObject
 			((DBObject)object.get("followers")).put(follower.toHexString(), true);
 		else
 			((DBObject)object.get("followers")).removeField(follower.toHexString());
+
 	}
 
 	/**
@@ -241,6 +242,7 @@ public class User implements DatabaseStructureObject
 			((DBObject)object.get("following")).put(following.toHexString(), true);
 		else
 			((DBObject)object.get("following")).removeField(following.toHexString());
+
 	}
 
 	public void setActivities(ObjectId activityId, boolean isAdding){
@@ -248,6 +250,13 @@ public class User implements DatabaseStructureObject
 			((DBObject)object.get(ACTIVITIES)).put(activityId.toHexString(), true);
 		else
 			((DBObject)object.get(ACTIVITIES)).removeField(activityId.toHexString());
+	}
+
+	public void setClubs(ObjectId activityId, boolean isAdding){
+		if(isAdding)
+			((DBObject)object.get("clubs")).put(activityId.toHexString(), true);
+		else
+			((DBObject)object.get("clubs")).removeField(activityId.toHexString());
 	}
 
 	/**
