@@ -18,7 +18,7 @@ public class Activity implements DatabaseStructureObject
 	BasicDBObject form;
 	ObjectId objectID;
 	ObjectId associated_club;
-	ObjectId creator;
+	ObjectId owner;
 
 	private static Activity databaseConnectivityObject = new Activity();
 	public static Activity databaseConnectivity()
@@ -28,12 +28,12 @@ public class Activity implements DatabaseStructureObject
 
 	public Activity() {}
 
-	public Activity(String name, String description, ObjectId creator, ArrayList<ObjectId> attending, long time_start, long time_end, double latitude, double longitude, Club associated_club)
+	public Activity(String name, String description, ObjectId owner, ArrayList<ObjectId> attending, long time_start, long time_end, double latitude, double longitude, Club associated_club)
 	{
 		this.name = name;
 		this.description = description;
 		this.attending = attending;
-		this.creator = creator;
+		this.owner = owner;
 		this.time_start = time_start;
 		this.time_end = time_end;
 		this.latitude = latitude;
@@ -54,7 +54,7 @@ public class Activity implements DatabaseStructureObject
 		time_end = (Long)object.get("time_end");
 		latitude = (double)object.get("latitude");
 		longitude = (double)object.get("longitude");
-		creator = (ObjectId)object.get("creator");
+		owner = (ObjectId)object.get("owner");
 		associated_club = (ObjectId)object.get("associated_club");
 	}
 
@@ -143,14 +143,13 @@ public class Activity implements DatabaseStructureObject
 		form.append("name",getName());
 		form.append("description",getDescription());
 		form.append("attending",getAttending());
-		form.append("creator", getCreator());
+		form.append("owner", getOwner());
 		form.append("time_start",getTime_start());
 		form.append("time_end",getTime_end());
-
 		form.append("latitude",getLatitude());
 		form.append("longitude",getLongitude());
-
 		form.append("associated_club", getAssociated_club());
+
 		return form;
 	}
 
@@ -298,11 +297,11 @@ public class Activity implements DatabaseStructureObject
 		this.associated_club = associated_club;
 	}
 
-	public ObjectId getCreator() {
-		return creator;
+	public ObjectId getOwner() {
+		return owner;
 	}
 
-	public void setCreator(ObjectId creator) {
-		this.creator = creator;
+	public void setOwner(ObjectId owner) {
+		this.owner = owner;
 	}
 }
