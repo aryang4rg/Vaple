@@ -4,6 +4,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
+
 /**
  * <PRE>The user class describes a user object, which stores the user's name, location, description, password, email, a list of followers and
  * following, a list of the activities they have done, and a unique token.</PRE>
@@ -42,6 +44,13 @@ public class User implements DatabaseStructureObject
 		object.put("activities", new BasicDBObject());
 
 		this.object = object;
+	}
+
+	public ArrayList<DBObject> getActivities(int limit)
+	{
+		ArrayList<DBObject> activities = (ArrayList<DBObject>) object.get("activities");
+		activities.addAll((ArrayList<DBObject>)DatabaseConnectivity.ACTIVITYCOLLECTION.find().sort(new BasicDBObject("time",1)).limit(limit - activities.size()).toArray());
+		return activities;
 	}
 
 	public User(DBObject object)

@@ -48,7 +48,7 @@ public class DatabaseConnectivity
 	}
 
 	/**
-	 * Returns a list of all objects that share a specificed common property
+	 * Returns a list of all objects that share a specified common property
 	 * @param varName The property name
 	 * @param data The value of the property
 	 * @param collection The collection to search through
