@@ -43,7 +43,7 @@ public class LoginServlet implements AjaxHandler
 		String password = Util.nullIfSpecialCharacters(request.get("password").asText());
 		if (email == null || password == null || email.length() == 0 || password.length() == 0)
 		{
-			response.put("token", (Short)null);
+			response.put("token", (String)null);
 
 			return 200;
 		}
@@ -53,7 +53,7 @@ public class LoginServlet implements AjaxHandler
 		User user = (User) User.databaseConnectivity().getByInfoInDataBase(User.EMAIL, email);
 		if (user == null || !user.getPassword().equals(password))
 		{
-			response.put("token", (Short)null);
+			response.put("token", (String)null);
 		}
 		else
 		{
