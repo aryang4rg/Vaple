@@ -1,3 +1,4 @@
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
@@ -15,13 +16,9 @@ public class Activity implements DatabaseStructureObject
 	ArrayList<ObjectId> attending;
 	long time_start, time_end;
 	BasicDBObject form;
-<<<<<<< Updated upstream
-	ObjectId objectID, owner;
-=======
 	ObjectId objectID;
 	ObjectId associated_club;
 	ObjectId creator;
->>>>>>> Stashed changes
 
 	private static Activity databaseConnectivityObject = new Activity();
 	public static Activity databaseConnectivity()
@@ -31,11 +28,7 @@ public class Activity implements DatabaseStructureObject
 
 	public Activity() {}
 
-<<<<<<< Updated upstream
-	public Activity(String name, String description, ArrayList<ObjectId> attending, long time, double latitude, double longitude, ObjectId owner)
-=======
 	public Activity(String name, String description, ObjectId creator, ArrayList<ObjectId> attending, long time_start, long time_end, double latitude, double longitude, Club associated_club)
->>>>>>> Stashed changes
 	{
 		this.name = name;
 		this.description = description;
@@ -45,26 +38,10 @@ public class Activity implements DatabaseStructureObject
 		this.time_end = time_end;
 		this.latitude = latitude;
 		this.longitude = longitude;
-<<<<<<< Updated upstream
-		this.owner = owner;
-	}
-
-	public Activity(DBObject object)
-	{
-		name = (String)object.get("name");
-		description = (String)object.get("description");
-		objectID = (ObjectId)object.get("_id");
-		attending = (ArrayList<ObjectId>)object.get("attending");
-		time = (Long)object.get("time");
-		latitude = (double)object.get("latitude");
-		longitude = (double)object.get("longitude");
-		owner = (ObjectId)object.get("owner");
-=======
 		if (associated_club != null) {
 			this.associated_club = associated_club.getObjectID();
 		}
 
->>>>>>> Stashed changes
 	}
 
 	public Activity(DBObject object)
@@ -77,12 +54,8 @@ public class Activity implements DatabaseStructureObject
 		time_end = (Long)object.get("time_end");
 		latitude = (double)object.get("latitude");
 		longitude = (double)object.get("longitude");
-<<<<<<< Updated upstream
-		owner = (ObjectId)object.get("owner");
-=======
 		creator = (ObjectId)object.get("creator");
 		associated_club = (ObjectId)object.get("associated_club");
->>>>>>> Stashed changes
 	}
 
 	/**
