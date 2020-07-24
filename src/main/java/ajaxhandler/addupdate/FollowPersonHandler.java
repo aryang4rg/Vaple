@@ -14,8 +14,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Iterator;
 
-public class FollowPersonalHandler implements AjaxHandler
+public class FollowPersonHandler implements AjaxHandler
 {
+    private static FollowPersonHandler instance = new FollowPersonHandler();
+
+    public static FollowPersonHandler getInstance() {
+        return instance;
+    }
+
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException {
         JsonNode jsonNode = request.get("following");

@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+
+//change to make it get all of a users activities
 public class FeedHandler implements AjaxHandler
 {
     public boolean isPage(){

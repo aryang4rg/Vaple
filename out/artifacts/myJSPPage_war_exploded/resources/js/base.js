@@ -539,6 +539,9 @@ class ProfilePage extends Page{
 
 		toastManager.addToast(this.submittingToast);
 
+		this.submitpfp = null;
+		this.submittedpfp = null;
+
 		this.table = createElement('div', {className: 'profile-table'});
 		this.left = createElement('div', {className: 'profile-container left'});
 		this.middle = createElement('div', {className: 'profile-container middle'});
@@ -553,7 +556,12 @@ class ProfilePage extends Page{
 
 		this.profileAboutContainer = createElement('div', {className: 'profile-about-container shadow-light'});
 		this.profileImage = createElement('div', {className: 'profile-photo shadow-heavy'});
-		this.profileAboutContainer.appendChild(createElement('div', {className: 'profile-photo-container'}, [this.profileImage]));
+		this.profilePhotoContainer = createElement('div', {className: 'profile-photo-container'});
+		this.profilePhotoContainer.appendChild(this.profileImage);
+		this.fileChooser = createElement('input', {attributes: {type: 'file', name: 'name', accept: 'image/*'}});
+		this.photoEditButton = createElement('div', {className: 'profile-edit-button text metro', innerText: 'Change avatar'});
+		this.profilePhotoContainer.appendChild(this.photoEditButton);
+		this.profileAboutContainer.appendChild(this.profilePhotoContainer);
 		this.details = createElement('div', {className: 'profile-details'});
 		this.profileAboutContainer.appendChild(this.details);
 		this.name = this.createEditableString('profile-name text');
@@ -571,6 +579,24 @@ class ProfilePage extends Page{
 				this.followcount
 			]),
 		]));
+
+		this.photoEditButton.on('click', () => {
+			this.fileChooser.click();
+		});
+
+		this.fileChooser.on('change', (file) => {
+			var input = file.target;
+
+			var reader = new FileReader();
+
+			reader.onload = () => {
+				this.submitpfp = reader.result;
+				this.profileImage.style['background-image'] = 'url("' + reader.result + '")';
+				this.edited();
+			};
+
+			reader.readAsDataURL(input.files[0]);
+		});
 
 		this.details.appendChild(createElement('div', {className: 'divider'}));
 		this.bio = this.createEditableString('profile-bio text metro', 512, true);
@@ -598,8 +624,9 @@ class ProfilePage extends Page{
 			this.submittingToast.text.setText('Changing');
 			this.submittingToast.show();
 			this.submittingToast.indeterminate();
+			this.submittedpfp = this.submitpfp;
 
-			accountManager.changeAccount(this.name.input.value, this.bio.input.value, this.country.input.value, this.state.input.value, this.city.input.value);
+			accountManager.changeAccount(this.name.input.value, this.bio.input.value, this.country.input.value, this.state.input.value, this.city.input.value, this.submitpfp);
 		});
 
 		this.clubs = createElement('div', {className: 'profile-clubs shadow-light'});
@@ -663,18 +690,29 @@ class ProfilePage extends Page{
 			return;
 		if(!data || data.error || !data.profile){
 			const error = (data && data.error) || 'There was an error updating your profile';
+
 			this.error.setText(error);
 			this.submittingToast.text.setText('Could not update profile');
 
 			return;
 		}
 
+		this.submittingToast.text.setText('Profile updated');
 		this.name.setText(data.profile.name);
 		this.bio.setText(data.profile.description);
 		this.country.setText(data.profile.location_country);
 		this.state.setText(data.profile.location_state);
 		this.city.setText(data.profile.location_city);
 		this.submit.style.display = 'none';
+
+		if(data.profile.image)
+			this.error.setText('Could not update image: ' + data.profile.image);
+		else if(this.submittedpfp){
+			pageManager.topBar.showProfilePhoto('');
+			pageManager.topBar.showProfilePhoto('/cdn/profile/' + accountManager.id + '.png?nocache=' + Date.now());
+
+			this.profileImage.style['background-image'] = 'url("/cdn/profile/' + accountManager.id + '.png?nocache=' + Date.now() + '")';
+		}
 	}
 
 	load(data){
@@ -696,6 +734,7 @@ class ProfilePage extends Page{
 				this.submit.style.display = '';
 			else
 				this.submit.style.display = 'none';
+			this.profilePhotoContainer.classList.add('editable');
 			this.name.element.classList.add('editable');
 			this.bio.element.classList.add('editable');
 			this.country.element.classList.add('editable');
@@ -703,6 +742,7 @@ class ProfilePage extends Page{
 			this.city.element.classList.add('editable');
 		}else{
 			this.error.setText('');
+			this.profilePhotoContainer.classList.remove('editable');
 			this.name.element.classList.remove('editable');
 			this.bio.element.classList.remove('editable');
 			this.country.element.classList.remove('editable');
@@ -822,6 +862,10 @@ const pageManager = new (class{
 				this.accountOptions = createElement('div', {className: 'top-bar-profile-options shadow-heavy', css: {display: 'none'}, attributes: {tabindex: 0}});
 				this.right.appendChild(this.accountOptions);
 				this.showProfilePhoto('/cdn/default.png');
+				this.login.style.display = 'none';
+				this.logout.style.display = 'none';
+				this.accountOptions.appendChild(this.login);
+				this.accountOptions.appendChild(this.logout);
 
 				this.profileImage.on('click', () => {
 					this.accountOptions.style.display = '';
@@ -867,9 +911,9 @@ const pageManager = new (class{
 					this.loginShowing = show;
 
 					if(show)
-						this.accountOptions.appendChild(this.login);
+						this.login.style.display = '';
 					else
-						this.accountOptions.removeChild(this.login);
+						this.login.style.display = 'none';
 				}
 			}
 
@@ -878,13 +922,14 @@ const pageManager = new (class{
 					this.logoutShowing = show;
 
 					if(show)
-						this.accountOptions.appendChild(this.logout);
+						this.logout.style.display = '';
 					else
-						this.accountOptions.removeChild(this.logout);
+						this.logout.style.display = 'none';
 				}
 			}
 
 			showManageAccount(id){
+
 				this.accountOptions.appendChild(this.createItem('My Account', '/profile/' + id));
 			}
 		});
@@ -1039,6 +1084,7 @@ const accountManager = new (class{
 		this.loggingIn = false;
 		this.submitting = false;
 		this.token = localStorage.token;
+		this.id = null;
 
 		if(this.token)
 			this.needAccount = true;
@@ -1071,6 +1117,8 @@ const accountManager = new (class{
 
 			pageManager.topBar.showProfilePhoto('/cdn/profile/' + account.id + '.png');
 			pageManager.topBar.showManageAccount(account.id);
+
+			this.id = account.id;
 		}else
 			pageManager.showErrorPage();
 	}
@@ -1133,14 +1181,14 @@ const accountManager = new (class{
 		});
 	}
 
-	changeAccount(name, bio, country, state, city){
+	changeAccount(name, bio, country, state, city, image){
 		this.submitting = true;
 
 		const x = new XMLHttpRequest();
 
 		x.open('POST', '/account_change');
 		x.setRequestHeader('Authentication', this.token);
-		x.send(JSON.stringify({name: name, location_country: country, location_state: state, location_city: city, description: bio}));
+		x.send(JSON.stringify({name: name, location_country: country, location_state: state, location_city: city, description: bio, image}));
 
 		x.addEventListener('load', () => {
 			this.submitting = false;

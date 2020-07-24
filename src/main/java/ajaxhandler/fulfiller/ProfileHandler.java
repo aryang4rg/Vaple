@@ -52,7 +52,7 @@ public class ProfileHandler implements AjaxHandler
 			return 404;
 		ObjectNode node = user.toProfileNode();
 
-		if(u.isFollowing(user))
+		if(u.isFollowing(user.getObjectID()))
 			node.put("following", true);
 		response.put("data", node);
 		response.put("type", "profile");
