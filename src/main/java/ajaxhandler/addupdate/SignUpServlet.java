@@ -109,6 +109,7 @@ public class SignUpServlet implements AjaxHandler
 
 				User.databaseConnectivity().addInDatabase(user);
 				String verificationLink = "";
+				
 				try {
 					JavaMail.sendMessage(user.getEmail(),"Verify Email",verificationLink);
 				} catch (Exception e)
