@@ -10,7 +10,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
 
-public class FeedHandler implements AjaxHandler
+public class AccountChangeHandler implements AjaxHandler
 {
     public boolean isPage(){
         return false;
@@ -31,7 +31,11 @@ public class FeedHandler implements AjaxHandler
 		String description = request.get("description").asText();
 		String picture = request.get("image").asText();
 
-		String base64Image = data.split(",")[1];
+
+
+		String[] base64Image = data.split(",");
+
+		String image = data[1];
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
 
         return 200;
