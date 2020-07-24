@@ -280,6 +280,7 @@ public class User implements DatabaseStructureObject
 		node.put("location_city", getCity());
 		node.put("description", getDescription());
 		node.put("followers_count", countFollowers());
+		node.put("following_count", countFollowing());
 
 		return node;
 	}

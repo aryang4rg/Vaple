@@ -22,7 +22,7 @@ public class SignUpServlet implements AjaxHandler
 
 	private SignUpServlet(){}
 
-	public boolean isValidEmail(String email){
+	public static boolean isValidEmail(String email){
 		if(email.indexOf(' ') != -1)
 			return false;
 		int pi = email.lastIndexOf('.');
