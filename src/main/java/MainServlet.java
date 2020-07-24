@@ -3,6 +3,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -152,9 +153,23 @@ public class MainServlet extends HttpServlet
 			}
 			else if (uriSplit.length > 3 && (uriSplit[1].equals("cdn") && uriSplit[2].equals("profile")))
 			{
-				//File defaultPic = new File()
-				String userPNG = uriSplit[4];
 
+				if (uriSplit[3] == null || Util.nullIfSpecialCharacters(uriSplit[3]) == null)
+				{
+					resp.setStatus(400);
+					return;
+				}
+				int index = file.getName().lastIndexOf('.');
+				String extension = file.getName().substring(index + 1);
+				if (!extension.equals("png"))
+				{
+					resp.setStatus(400);
+					return;
+				}
+
+				File defaultPic = getFile("/cdn/default.png");
+				sendFile(resp.getOutputStream(), defaultPic);
+				return;
 			}
 		}
 
