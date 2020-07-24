@@ -91,7 +91,7 @@ public class MainServlet extends HttpServlet
 
 			if (handler != null)
 			{
-				JsonNode request = Json.parse(req.getReader());
+				JsonNode request = Json.parse(req.getInputStream());
 				ObjectNode response = Util.createObjectNode();
 
 				User user = null;

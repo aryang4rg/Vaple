@@ -41,7 +41,11 @@ public class Json
 
 	public static JsonNode parse(InputStream src) throws IOException
 	{
-		return  objectMapper.readTree(src);
+		try{
+			return  objectMapper.readTree(src);
+		}catch(Exception e){
+			return Util.createObjectNode();
+		}
 	}
 
 
