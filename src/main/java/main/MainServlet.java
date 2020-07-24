@@ -64,7 +64,7 @@ public class MainServlet extends HttpServlet
 	}
 
 	private Hashtable<String, String> extensionToMimeHM(){
-		Hashtable<String, String> map = new Hashtable<>();
+		Hashtable<String, String> map = new Hashtable<String, String>();
 
 		map.put("js", "application/javascript");
 		map.put("css", "text/css");

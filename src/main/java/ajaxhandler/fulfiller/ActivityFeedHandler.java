@@ -32,7 +32,7 @@ public class ActivityFeedHandler implements AjaxHandler
             return 400;
         }
 
-        ArrayList<Activity> activities = new ArrayList<>();
+        ArrayList<Activity> activities = new ArrayList<Activity>();
         ArrayList<String> following = user.getFollowing();
         for (String idString : following)
         {
