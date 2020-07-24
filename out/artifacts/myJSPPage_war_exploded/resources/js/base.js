@@ -332,86 +332,7 @@ class LoginPage extends Page{
 		});
 
 		this.button.on('click', () => {
-			if(!accountManager.needLogin())
-				return;
-			this.actionError.style.display = 'none';
-
-			var error = false;
-
-			if(this.email.field.value)
-				this.email.error.setText('');
-			else{
-				this.email.error.setText('Enter your email');
-
-				error = true;
-			}
-
-			if(this.password.field.value){
-				if(this.password.field.value.length > 32){
-					error = true;
-
-					this.password.error.setText('Password can be atmost 32 characters');
-				}else
-					this.password.error.setText('');
-			}else{
-				this.password.error.setText('Enter your password');
-
-				error = true;
-			}
-
-			if(this.mode == 'login'){
-				if(error)
-					return;
-				this.button.classList.add('disabled');
-
-				accountManager.login(this.email.field.value, this.password.field.value);
-			}else{
-				if(this.name.field.value)
-					this.name.error.setText('');
-				else{
-					this.name.error.setText('Enter your name');
-					error = true;
-				}
-
-				const email = this.email.field.value;
-				var pi = email.lastIndexOf('.');
-				var ai = email.indexOf('@');
-
-				if(ai < 1 || pi <= ai + 1 || pi + 1 >= email.length){
-					this.email.error.setText('Enter a valid email');
-					error = true;
-				}else{
-					this.email.error.setText('');
-				}
-
-				if(this.country.field.value)
-					this.country.error.setText('');
-				else{
-					this.country.error.setText('Enter a valid country');
-					error = true;
-				}
-
-				if(this.state.field.value)
-					this.state.error.setText('');
-				else{
-					this.state.error.setText('Enter a valid state');
-					error = true;
-				}
-
-				if(this.city.field.value)
-					this.city.error.setText('');
-				else{
-					this.city.error.setText('Enter a valid city');
-					error = true;
-				}
-
-				if(error)
-					return;
-				this.button.classList.add('disabled');
-
-				accountManager.signup(this.name.field.value, this.email.field.value, this.password.field.value,
-					this.country.field.value, this.state.field.value, this.city.field.value);
-			}
+			this.trySubmit();
 		});
 	}
 
@@ -429,6 +350,10 @@ class LoginPage extends Page{
 		cont.appendChild(createElement('div', {className: 'login-form-entry-input-focus-visualizer login-background'}));
 		entry.appendChild(cont);
 		entry.appendChild(error);
+		field.on('keyup', (e) => {
+			if(e.keyCode == 13)
+				this.trySubmit();
+		});
 
 		return {entry, field, error};
 	}
@@ -517,6 +442,89 @@ class LoginPage extends Page{
 				this.successText.setText('Signup successful. You will be shortly redirected');
 		}
 	}
+
+	trySubmit(){
+		if(!accountManager.needLogin())
+			return;
+		this.actionError.style.display = 'none';
+
+		var error = false;
+
+		if(this.email.field.value)
+			this.email.error.setText('');
+		else{
+			this.email.error.setText('Enter your email');
+
+			error = true;
+		}
+
+		if(this.password.field.value){
+			if(this.password.field.value.length > 32){
+				error = true;
+
+				this.password.error.setText('Password can be atmost 32 characters');
+			}else
+				this.password.error.setText('');
+		}else{
+			this.password.error.setText('Enter your password');
+
+			error = true;
+		}
+
+		if(this.mode == 'login'){
+			if(error)
+				return;
+			this.button.classList.add('disabled');
+
+			accountManager.login(this.email.field.value, this.password.field.value);
+		}else{
+			if(this.name.field.value)
+				this.name.error.setText('');
+			else{
+				this.name.error.setText('Enter your name');
+				error = true;
+			}
+
+			const email = this.email.field.value;
+			var pi = email.lastIndexOf('.');
+			var ai = email.indexOf('@');
+
+			if(ai < 1 || pi <= ai + 1 || pi + 1 >= email.length){
+				this.email.error.setText('Enter a valid email');
+				error = true;
+			}else{
+				this.email.error.setText('');
+			}
+
+			if(this.country.field.value)
+				this.country.error.setText('');
+			else{
+				this.country.error.setText('Enter a valid country');
+				error = true;
+			}
+
+			if(this.state.field.value)
+				this.state.error.setText('');
+			else{
+				this.state.error.setText('Enter a valid state');
+				error = true;
+			}
+
+			if(this.city.field.value)
+				this.city.error.setText('');
+			else{
+				this.city.error.setText('Enter a valid city');
+				error = true;
+			}
+
+			if(error)
+				return;
+			this.button.classList.add('disabled');
+
+			accountManager.signup(this.name.field.value, this.email.field.value, this.password.field.value,
+				this.country.field.value, this.state.field.value, this.city.field.value);
+		}
+	}
 }
 
 class ProfilePage extends Page{
@@ -584,15 +592,6 @@ class FeedPage extends Page{
 	}
 }
 
-class AccountPage extends Page{
-	load(data){
-		/* todo */
-
-		document.title = 'Account';
-		history.pushState(null, document.title, '/account');
-	}
-}
-
 class ExplorePage extends Page{
 	load(data){
 		/* todo */
@@ -630,7 +629,6 @@ const pageManager = new (class{
 			login: new LoginPage(),
 			profile: new ProfilePage(),
 			feed: new FeedPage(),
-			account: new AccountPage(),
 			explore: new ExplorePage(),
 			dashboard: new DashboardPage(),
 			notfound: new NotFoundPage()
@@ -684,7 +682,6 @@ const pageManager = new (class{
 				this.profileImage = createElement('div', {className: 'top-bar-profile-photo'});
 				this.right.appendChild(this.profileImage);
 				this.accountOptions = createElement('div', {className: 'top-bar-profile-options shadow-heavy', css: {display: 'none'}, attributes: {tabindex: 0}});
-				this.manageAccount = this.createItem('My Account', '/account');
 				this.right.appendChild(this.accountOptions);
 				this.showProfilePhoto('/cdn/default.png');
 
@@ -742,14 +739,15 @@ const pageManager = new (class{
 				if(show != this.logoutShowing){
 					this.logoutShowing = show;
 
-					if(show){
+					if(show)
 						this.accountOptions.appendChild(this.logout);
-						this.accountOptions.appendChild(this.manageAccount);
-					}else{
+					else
 						this.accountOptions.removeChild(this.logout);
-						this.accountOptions.removeChild(this.manageAccount);
-					}
 				}
+			}
+
+			showManageAccount(id){
+				this.accountOptions.appendChild(this.createItem('My Account', '/profile/' + id));
 			}
 		});
 
@@ -933,6 +931,7 @@ const accountManager = new (class{
 			this.hasAccount = true;
 
 			pageManager.topBar.showProfilePhoto('/cdn/profile/' + account.id + '.png');
+			pageManager.topBar.showManageAccount(account.id);
 		}else
 			pageManager.showErrorPage();
 	}

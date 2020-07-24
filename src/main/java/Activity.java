@@ -1,4 +1,3 @@
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
@@ -16,7 +15,7 @@ public class Activity implements DatabaseStructureObject
 	ArrayList<ObjectId> attending;
 	long time;
 	BasicDBObject form;
-	ObjectId objectID;
+	ObjectId objectID, owner;
 
 	private static Activity databaseConnectivityObject = new Activity();
 	public static Activity databaseConnectivity()
@@ -26,7 +25,7 @@ public class Activity implements DatabaseStructureObject
 
 	public Activity() {}
 
-	public Activity(String name, String description, ArrayList<ObjectId> attending, long time, double latitude, double longitude)
+	public Activity(String name, String description, ArrayList<ObjectId> attending, long time, double latitude, double longitude, ObjectId owner)
 	{
 		this.name = name;
 		this.description = description;
@@ -34,6 +33,7 @@ public class Activity implements DatabaseStructureObject
 		this.time = time;
 		this.latitude = latitude;
 		this.longitude = longitude;
+		this.owner = owner;
 	}
 
 	public Activity(DBObject object)
@@ -45,6 +45,7 @@ public class Activity implements DatabaseStructureObject
 		time = (Long)object.get("time");
 		latitude = (double)object.get("latitude");
 		longitude = (double)object.get("longitude");
+		owner = (ObjectId)object.get("owner");
 	}
 
 
@@ -57,6 +58,7 @@ public class Activity implements DatabaseStructureObject
 		time = (Long)object.get("time");
 		latitude = (double)object.get("latitude");
 		longitude = (double)object.get("longitude");
+		owner = (ObjectId)object.get("owner");
 	}
 
 	/**

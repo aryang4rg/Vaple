@@ -21,7 +21,7 @@ public class ActivityFeedHandler implements AjaxHandler
         ArrayList<String> following = user.getFollowing();
         for (String idString : following)
         {
-            User followingUser = (User)User.databaseConnectivity().getByInfoInDataBase(ID, new ObjectId(idString) );
+            User followingUser = (User) User.databaseConnectivity().getByInfoInDataBase(AjaxHandler.ID, new ObjectId(idString) );
             //followingUser.getActivities()
         }
         return 0;
