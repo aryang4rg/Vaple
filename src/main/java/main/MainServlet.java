@@ -16,6 +16,7 @@ import ajaxhandler.addupdate.update.AccountChangeHandler;
 import ajaxhandler.addupdate.update.ClubFollowHandler;
 import ajaxhandler.addupdate.update.FollowPersonHandler;
 import ajaxhandler.fulfiller.ActivityFeedHandler;
+import ajaxhandler.fulfiller.NewActivityHandler;
 import ajaxhandler.fulfiller.ProfileHandler;
 import ajaxhandler.login.LoginHandler;
 import ajaxhandler.login.LoginServlet;
@@ -63,6 +64,9 @@ public class MainServlet extends HttpServlet
 		hashtable.put("follow_change", FollowPersonHandler.getInstance());
 		hashtable.put("activity_feed", new ActivityFeedHandler(true));
 		hashtable.put("activities", new ActivityFeedHandler(false));
+		hashtable.put("home", new ActivityFeedHandler(true));
+		hashtable.put("new_activity", NewActivityHandler.getInstance());
+
 		return hashtable;
 	}
 
