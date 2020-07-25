@@ -1188,6 +1188,7 @@ class NewActivityPage extends Page{
 		super();
 
 		this.creatingToast = new LoadingToast('Creating activity');
+		this.creatingToast.indeterminate();
 
 		toastManager.addToast(this.creatingToast);
 
@@ -1507,8 +1508,9 @@ class NewActivityPage extends Page{
 						this.form.removeChild(this.formContainer);
 						this.form.appendChild(this.successText);
 						this.successText.setText('Activity created, you will be shortly redirected to it');
-						this.pageLoader.load('/activity/' + data.activity.id);
 						this.creatingToast.text.setText('Activity created');
+
+						pageLoader.load('/activity/' + data.activity.id);
 					}
 				}
 			});
