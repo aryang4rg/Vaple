@@ -1493,7 +1493,7 @@ class NewActivityPage extends Page{
 		this.creatingToast.text.setText('Creating activity');
 		this.creatingToast.show();
 
-		this.submitting = accountManager.sendRequest('/activity_create', {title: this.title.field.value, type: this.type.field.value, description: this.description.type.value,
+		this.submitting = accountManager.sendRequest('/activity_create', {title: this.title.field.value, type: this.type.field.value, description: this.description.field.value,
 			latitude: this.selectedLocation.lat, longitude: this.selectedLocation.lng, time_start, time_end, club: null}, (status, error, data) => {
 				this.submitting = null;
 				this.button.classList.remove('disabled');
