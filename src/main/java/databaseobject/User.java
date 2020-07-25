@@ -52,7 +52,7 @@ public class User implements DatabaseStructureObject
 		object.put("activities", new BasicDBObject());
 		object.put("clubs",new BasicDBObject());
 		object.put("verified",verifiedUser);
-		object.put("sentEmails", 0);
+		object.put("sentEmails", new Long(0));
 		object.put(VERIFICATION_TOKEN, verification_token);
 
 		this.object = object;
@@ -422,8 +422,7 @@ public class User implements DatabaseStructureObject
 
 	public long getLastEmailTime()
 	{
-		String str = (String)object.get("sentEmails");
-		Long l = Long.parseLong(str);
+		Long l = (Long)object.get("sentEmails");
 		return l;
 	}
 
