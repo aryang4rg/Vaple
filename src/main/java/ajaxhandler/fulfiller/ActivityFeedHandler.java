@@ -30,7 +30,6 @@ public class ActivityFeedHandler implements AjaxHandler
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException {
 
-
         int numToFetch;
         String specificUserId = req.getParameter("id");
         int index = 0;
@@ -46,8 +45,6 @@ public class ActivityFeedHandler implements AjaxHandler
         {
             numToFetch = 50;
         }
-
-
 
         if (specificUserId != null)
         {
