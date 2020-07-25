@@ -142,12 +142,7 @@ public class MainServlet extends HttpServlet
 					}
 				}
 
-				if(statusCode != 200){
-					resp.setStatus(statusCode);
-
-					return;
-				}
-
+				resp.setStatus(statusCode);
 				resp.setHeader("Content-Type", "text/json");
 				resp.getWriter().print(Json.stringify(response));
 
