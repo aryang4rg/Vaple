@@ -1714,6 +1714,39 @@ class FeedPage extends Page{
 	}
 }
 
+class ActivityPage extends Page{
+	constructor(){
+		super();
+
+		this.table = createElement('div', {className: 'profile-table'});
+		this.left = createElement('div', {className: 'profile-container left'});
+		this.middle = createElement('div', {className: 'profile-container middle'});
+		this.right = createElement('div', {className: 'profile-container right'});
+
+		this.table.appendChild(this.left);
+		this.table.appendChild(createElement('div', {className: 'profile-container expander'}));
+		this.table.appendChild(this.middle);
+		this.table.appendChild(createElement('div', {className: 'profile-container expander'}));
+		this.table.appendChild(this.right);
+		this.element.appendChild(this.table);
+	}
+
+	load(data){
+		while(this.middle.childNodes.length)
+			this.middle.removeChild(this.middle.childNodes[0]);
+		this.middle.appendChild(createElement('div', {className: 'profile-container top-padding'}));
+
+		if(!data.activity)
+			this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: 'Could not load the activity at this moment'}));
+		else{
+			this.middle.appendChild(activityManager.createActivity(data.activity));
+
+			document.title = data.activity.title;
+			history.replaceState(null, document.title, '/activity/' + data.activity.id);
+		}
+	}
+}
+
 class ExplorePage extends Page{
 	load(data){
 		/* todo */
@@ -1754,7 +1787,8 @@ const pageManager = new (class{
 			explore: new ExplorePage(),
 			dashboard: new DashboardPage(),
 			notfound: new NotFoundPage(),
-			new_activity: new NewActivityPage()
+			new_activity: new NewActivityPage(),
+			activity: new ActivityPage()
 		};
 
 		this.showingPage = null;
