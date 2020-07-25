@@ -2,6 +2,7 @@ package databaseobject;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mongodb.DBCursor;
 import main.*;
 
 import com.mongodb.BasicDBObject;
@@ -187,6 +188,13 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 		return (ArrayList<String>)object.get("tags");
 	}
 
+	public static ArrayList<Activity> getActivitiesByTag(String tag)
+	{
+		ArrayList<DBObject> objects = (ArrayList<DBObject>)DatabaseConnectivity.findObjectsByCommonProperty("tags",tag, DatabaseConnectivity.ACTIVITYCOLLECTION);
+		ArrayList<Activity> activities = new ArrayList<Activity>();
+		for (int i = 0; i < objects.size(); i++)
+			activities.add(new Activity(objects.get(i)));
 
-
+		return activities;
+	}
 }

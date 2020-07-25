@@ -1,7 +1,10 @@
 package main;
 
 import com.mongodb.*;
+import databaseobject.Activity;
+
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
