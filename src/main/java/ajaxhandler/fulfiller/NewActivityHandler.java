@@ -16,10 +16,10 @@ import java.io.IOException;
 /**
  * Gives profile information given id
  */
-public class ProfileHandler implements AjaxHandler
+public class NewActivityHandler implements AjaxHandler
 {
-	private static ProfileHandler instance = new ProfileHandler();
-	public static ProfileHandler getInstance()
+	private static NewActivityHandler instance = new NewActivityHandler();
+	public static NewActivityHandler getInstance()
 	{
 		return instance;
 	}
@@ -32,6 +32,8 @@ public class ProfileHandler implements AjaxHandler
 	public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User u) throws ServletException, IOException {
 		if(uriSplit.length == 0)
 			return 404;
+		if(u == null)
+			return 400;
 		response.put("type", "new_activity");
 
 		return 200;
