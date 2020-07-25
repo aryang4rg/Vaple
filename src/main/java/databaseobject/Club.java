@@ -10,12 +10,14 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Club implements DatabaseStructureObject
 {
     private DBObject object;
     public static final String NAME = "name", DESCRIPTION = "description", LOCATION_COUNTRY = "location_country", LOCATION_STATE = "location_state",
     LOCATION_CITY = "location_city", CLUB_TYPE = "club_type", ACTIVITY = "activity";
+    List<String> tags;
 
     private static Club databaseConnectivityObject = new Club();
     public static Club databaseConnectivity()
@@ -37,6 +39,7 @@ public class Club implements DatabaseStructureObject
         object.put("members",new BasicDBObject());
         object.put("owner",owner);
         object.put("activity", new BasicDBObject());
+        object.put("tags",tags);
 
         this.object = object;
         setMember(owner, true);
@@ -144,5 +147,32 @@ public class Club implements DatabaseStructureObject
         return (ObjectId)object.get("_id");
     }
 
+    public void addTag(String tag)
+    {
+        tags = (ArrayList<String>)object.get("tags");
+        tags.add(tag);
+        object.put("tags",tags);
+    }
 
+    public void removeTag(String tag)
+    {
+        tags = (ArrayList<String>)object.get("tags");
+        tags.remove(tag);
+        object.put("tags",tags);
+    }
+
+    public ArrayList<String> getTags()
+    {
+        return (ArrayList<String>)object.get("tags");
+    }
+
+    public static ArrayList<Club> getActivitiesByTag(String tag)
+    {
+        ArrayList<DBObject> objects = (ArrayList<DBObject>)DatabaseConnectivity.findObjectsByCommonProperty("tags",tag, DatabaseConnectivity.CLUBCOLLECTION);
+        ArrayList<Club> clubs = new ArrayList<Club>();
+        for (int i = 0; i < objects.size(); i++)
+            clubs.add(new Club(objects.get(i)));
+
+        return clubs;
+    }
 }
