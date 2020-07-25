@@ -30,6 +30,7 @@ public class DatabaseConnectivity
 	public static final DBCollection ACCOUNTCOLLECTION = database.getCollection("account");
 	public static final DBCollection ACTIVITYCOLLECTION = database.getCollection("activity");
 	public static final DBCollection CLUBCOLLECTION = database.getCollection("club");
+	public static final DBCollection CHALLENGECOLLECTION = database.getCollection("challenge");
 
 	/**
 	 * Adds an object to the database
