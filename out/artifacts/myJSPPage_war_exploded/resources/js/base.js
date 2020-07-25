@@ -878,6 +878,8 @@ class ProfilePage extends Page{
 	}
 
 	load(data){
+		if(!data)
+			return pageManager.showErrorPage();
 		document.title = data.name + "'s profile";
 		history.replaceState(null, document.title, '/profile/' + data.id);
 
@@ -1685,7 +1687,7 @@ class FeedPage extends Page{
 			this.hasCenterLoading = true;
 		}
 
-		this.showActivities(data.activities);
+		this.showActivities(data && data.activities);
 	}
 
 	showActivities(list){
@@ -1719,11 +1721,8 @@ class FeedPage extends Page{
 					this.middle.appendChild(this.loadingIndicator);
 					this.hasLoading = true;
 				}
-			}else if(!this.activity_last){
-				this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: this.self ?
-					'You don\'t have any activities': 'This user has no activities'
-				}));
-			}
+			}else if(!this.activity_last)
+				this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: 'There are no activities in your feed. Begin by following someone' }));
 		}
 	}
 
@@ -1769,13 +1768,641 @@ class ActivityPage extends Page{
 			this.middle.removeChild(this.middle.childNodes[0]);
 		this.middle.appendChild(createElement('div', {className: 'profile-container top-padding'}));
 
-		if(!data.activity)
+		if(!data || !data.activity)
 			this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: 'Could not load the activity at this moment'}));
 		else{
 			this.middle.appendChild(activityManager.createActivity(data.activity));
 
 			document.title = data.activity.title;
 			history.replaceState(null, document.title, '/activity/' + data.activity.id);
+		}
+	}
+}
+
+class ClubCreationPage extends Page{
+	constructor(){
+		super();
+
+		this.showingsuccess = false;
+		this.creatingToast = new Toast("Creating club");
+
+		toastManager.addToast(this.creatingToast);
+
+		this.form = createElement('div', {className: 'login-form shadow-heavy'});
+		this.title = createElement('span', {className: 'login-form-title text metro', innerText: 'Create a Club'});
+		this.form.appendChild(this.title);
+		this.formContainer = createElement('div', {className: 'login-form-container'});
+		this.entries = createElement('div', {className: 'login-form-entries'});
+		this.name = this.createEntry('Name', 'text');
+		this.entries.appendChild(this.name.entry);
+		this.type = this.createEntry('Type', 'text');
+		this.entries.appendChild(this.type.entry);
+		this.description = this.createEntry('Description', 'text', this.passwordIcon);
+		this.entries.appendChild(this.description.entry);
+		this.entries.appendChild(createElement('div', {className: 'login-form-entry break'}));
+		this.country = this.createEntry('Country', 'text');
+		this.entries.appendChild(this.country.entry);
+		this.state = this.createEntry('Province/State', 'text');
+		this.entries.appendChild(this.state.entry);
+		this.city = this.createEntry('City', 'text');
+		this.entries.appendChild(this.city.entry);
+		this.formContainer.appendChild(this.entries);
+		this.button = createElement('div', {className: 'login-button text metro', innerText: 'create'});
+		this.formContainer.appendChild(this.button);
+		this.actionError = createElement('span', {className: 'login-form-entry-error text metro'});
+		this.formContainer.appendChild(this.actionError);
+		this.successText = createElement('span', {className: 'text metro'});
+		this.form.appendChild(this.formContainer);
+		this.element.appendChild(createElement('div', {className: 'center'}, [this.form]));
+		this.element.classList.add('login-background');
+
+		this.actionError.style.display = 'none';
+
+		this.button.on('click', () => {
+			this.trySubmit();
+		});
+	}
+
+	createEntry(name, type, icon){
+		const entry = createElement('div', {className: 'login-form-entry'});
+		const cont = createElement('div', {className: 'login-form-entry-input-container'});
+		const field = createElement('input', {className: 'login-form-entry-input text metro', attributes: {placeholder: 'Enter your ' + name.toLowerCase(), type, spellcheck: false}});
+		const error = createElement('span', {className: 'login-form-entry-error text metro'});
+
+		entry.appendChild(createElement('span', {className: 'text metro', innerText: name}));
+
+		if(icon)
+			cont.appendChild(icon);
+		cont.appendChild(field);
+		cont.appendChild(createElement('div', {className: 'login-form-entry-input-focus-visualizer login-background'}));
+		entry.appendChild(cont);
+		entry.appendChild(error);
+		field.on('keyup', (e) => {
+			if(e.keyCode == 13)
+				this.trySubmit();
+		});
+
+		return {entry, field, error};
+	}
+
+	showing(){
+		this.type.field.value = '';
+		this.description.field.value = '';
+		this.name.field.value = '';
+		this.country.field.value = '';
+		this.state.field.value = '';
+		this.city.field.value = '';
+
+		this.loginMode();
+
+		if(this.showingsuccess){
+			this.showingsuccess = false;
+			this.form.appendChild(this.formContainer);
+			this.form.removeChild(this.successText);
+		}
+	}
+
+	load(){
+		document.title = 'Create a Club';
+		history.replaceState(null, document.title, '/new_club');
+	}
+
+	trySubmit(){
+		if(this.submitting)
+			return;
+		this.actionError.style.display = 'none';
+
+		var error = false;
+
+		if(this.type.field.value)
+			this.type.error.setText('');
+		else{
+			this.type.error.setText('Enter a type');
+
+			error = true;
+		}
+
+		if(this.description.field.value)
+			this.description.error.setText('');
+		else{
+			this.description.error.setText('Enter a description');
+
+			error = true;
+		}
+
+		if(this.name.field.value)
+			this.name.error.setText('');
+		else{
+			this.name.error.setText('Enter a name');
+			error = true;
+		}
+
+		if(this.country.field.value)
+			this.country.error.setText('');
+		else{
+			this.country.error.setText('Enter a valid country');
+			error = true;
+		}
+
+		if(this.state.field.value)
+			this.state.error.setText('');
+		else{
+			this.state.error.setText('Enter a valid state');
+			error = true;
+		}
+
+		if(this.city.field.value)
+			this.city.error.setText('');
+		else{
+			this.city.error.setText('Enter a valid city');
+			error = true;
+		}
+
+		if(error)
+			return;
+		this.button.classList.add('disabled');
+		this.creatingToast.show();
+		this.creatingToast.text.setText('Creating Club');
+		this.creatingToast.indeterminate();
+		this.submitting = accountManager.sendRequest('/club_create', {name: this.name.field.value, description: this.description.field.value, type: this.type.field.value,
+			country: this.country.field.value, state: this.state.field.value, city: this.city.field.value}, (status, error, data) => {
+				this.submitting = null;
+				this.submitting = null;
+				this.button.classList.remove('disabled');
+				this.creatingToast.hideAfter(2000);
+				this.creatingToast.progress();
+
+				if(error || status != 200 || (data && (data.error || !data.club))){
+					this.actionError.setText((data && data.error) || 'There was an error creating this club, try again later');
+					this.creatingToast.text.setText('Could not create the club');
+				}else{
+					if(!this.showingsuccess){
+						this.showingsuccess = true;
+						this.form.removeChild(this.formContainer);
+						this.form.appendChild(this.successText);
+						this.successText.setText('Club created, you will be shortly redirected to it');
+						this.creatingToast.text.setText('Club created');
+
+						pageLoader.load('/club/' + data.club.id);
+					}
+				}
+			});
+	}
+}
+
+class ClubPage extends Page{
+	constructor(){
+		super();
+
+		this.self = false;
+		this.submittingToast = new LoadingToast('Changing');
+		this.followFailed = new LoadingToast('Failed to (un)follow the user, try again');
+
+		toastManager.addToast(this.submittingToast);
+		toastManager.addToast(this.followFailed);
+
+		this.submitpfp = null;
+		this.submittedpfp = null;
+		this.id = null;
+
+		this.table = createElement('div', {className: 'profile-table'});
+		this.left = createElement('div', {className: 'profile-container left'});
+		this.middle = createElement('div', {className: 'profile-container middle'});
+		this.right = createElement('div', {className: 'profile-container right'});
+		this.left.appendChild(createElement('div', {className: 'profile-container top-padding'}));
+		this.right.appendChild(createElement('div', {className: 'profile-container top-padding'}));
+
+		this.table.appendChild(this.left);
+		this.table.appendChild(createElement('div', {className: 'profile-container expander'}));
+		this.table.appendChild(this.middle);
+		this.table.appendChild(createElement('div', {className: 'profile-container expander'}));
+		this.table.appendChild(this.right);
+		this.element.appendChild(this.table);
+
+		this.profileAboutContainer = createElement('div', {className: 'profile-about-container shadow-light'});
+		this.profileImage = createElement('div', {className: 'profile-photo shadow-heavy'});
+		this.profilePhotoContainer = createElement('div', {className: 'profile-photo-container'});
+		this.profilePhotoContainer.appendChild(this.profileImage);
+		this.fileChooser = createElement('input', {attributes: {type: 'file', name: 'name', accept: 'image/*'}});
+		this.photoEditButton = createElement('div', {className: 'profile-edit-button text metro', innerText: 'Change avatar'});
+		this.profilePhotoContainer.appendChild(this.photoEditButton);
+		this.profileAboutContainer.appendChild(this.profilePhotoContainer);
+		this.details = createElement('div', {className: 'profile-details'});
+		this.profileAboutContainer.appendChild(this.details);
+		this.name = this.createEditableString('profile-name text');
+		this.details.appendChild(this.name.element);
+		this.followcount = createElement('div', {className: 'number text'});
+		this.followercount = createElement('div', {className: 'number text'});
+		this.details.appendChild(createElement('div', {className: 'profile-follow-count'}, [
+			createElement('div', {className: 'profile-follow-counter'}, [
+				createElement('div', {className: 'title text', innerText: 'Followers'}),
+				this.followercount
+			]),
+			createElement('div', {className: 'divider'}),
+			createElement('div', {className: 'profile-follow-counter'}, [
+				createElement('div', {className: 'title text', innerText: 'Following'}),
+				this.followcount
+			]),
+		]));
+
+		this.photoEditButton.on('click', () => {
+			this.fileChooser.click();
+		});
+
+		this.fileChooser.on('change', (file) => {
+			var input = file.target;
+
+			var reader = new FileReader();
+
+			reader.onload = () => {
+				this.submitpfp = reader.result;
+				this.edited();
+
+				setBackgroundImage(this.profileImage, reader.result);
+			};
+
+			reader.readAsDataURL(input.files[0]);
+		});
+
+		this.details.appendChild(createElement('div', {className: 'divider'}));
+		this.bio = this.createEditableString('profile-bio text', 512, true);
+		this.details.appendChild(this.bio.element);
+		this.details.appendChild(createElement('div', {className: 'divider'}));
+		this.location = createElement('div', {className: 'profile-location'});
+		this.details.appendChild(this.location);
+		this.country = this.createEditableString('text metro');
+		this.location.appendChild(this.country.element);
+		this.state = this.createEditableString('text metro');
+		this.location.appendChild(this.state.element);
+		this.city = this.createEditableString('text metro');
+		this.location.appendChild(this.city.element);
+		this.submit = createElement('div', {className: 'profile-submit text metro', innerText: 'save', css: {display: 'none'}});
+		this.details.appendChild(this.submit);
+		this.follow = createElement('div', {className: 'profile-follow text metro', innerText: 'follow', css: {display: 'none'}});
+		this.details.appendChild(this.follow);
+		this.error = createElement('span', {className: 'profile-submit-error text metro'});
+		this.details.appendChild(this.error);
+		this.left.appendChild(this.profileAboutContainer);
+
+		this.submit.on('click', () => {
+			if(accountManager.submitting)
+				return;
+			this.error.setText('');
+			this.submit.classList.add('disabled');
+			this.submittingToast.text.setText('Changing');
+			this.submittingToast.show();
+			this.submittingToast.indeterminate();
+			this.submittedpfp = this.submitpfp;
+
+			accountManager.changeAccount(this.name.input.value, this.bio.input.value, this.country.input.value, this.state.input.value, this.city.input.value, this.submitpfp);
+
+			this.submitpfp = null;
+		});
+
+		this.isFollowing = false;
+		this.follow.on('click', () => {
+			if(this.followRequest)
+				this.followRequest.abort();
+			const change = {};
+
+			if(this.isFollowing){
+				change.unfollowing = [this.id];
+
+				this.follow.setText('Follow');
+				this.isFollowing = false;
+			}else{
+				change.following = [this.id];
+
+				this.follow.setText('Unfollow');
+				this.isFollowing = true;
+			}
+
+			const x = this.followRequest = accountManager.sendRequest('/follow_change', change, (status, error, resp) => {
+				var err = false;
+
+				if(error || status != 200){
+					this.followFailed.show();
+					this.followFailed.hideAfter(2000);
+
+					err = true;
+				}
+
+				if(this.followRequest == x){
+					this.followRequest = null;
+
+					if(!err)
+						return;
+					if(this.isFollowing){
+						this.follow.setText('Follow');
+						this.isFollowing = false;
+					}else{
+						this.follow.setText('Unfollow');
+						this.isFollowing = true;
+					}
+				}
+			});
+		});
+
+		this.clubs = createElement('div', {className: 'profile-clubs shadow-light'});
+		this.clubs.appendChild(createElement('span', {className: 'profile-clubs-title text metro', innerText: 'Clubs'}));
+		this.noneText = createElement('span', {className: 'text metro', css: {display: 'none'}});
+		this.clubs.appendChild(this.noneText);
+		this.clubsList = createElement('div', {className: 'profile-clubs-list'});
+		this.clubs.appendChild(this.clubsList);
+		this.right.appendChild(this.clubs);
+
+		this.fetch_activities = null;
+		this.activity_last = null;
+		this.activity_next = false;
+
+		this.svg = createElement('svg', {className: 'activities-loader'});
+
+		generateGradient(this.svg, {gradient: 'activities-gradient', mask: 'activities-mask'}, [
+			{
+				offset: "0%",
+				color: "#0f0"
+			},
+			{
+				offset: "100%",
+				color: "#00f"
+			}
+		], [
+			createElement('circle', {attributes: {cx: 50, cy: 50, r: 16}})
+		]);
+
+		this.hasCenterLoading = false;
+		this.centerLoadingIndicator = createElement('div', {className: 'center'});
+		this.hasLoading = false;
+		this.loadingIndicator = createElement('div', {className: 'activities-loader-center'});
+
+		this.element.on('scroll', (e) => {
+			const min = Math.max(0, this.element.offsetHeight - 250);
+			const pscroll = Math.max(0, this.element.scrollTop - Math.max(0,
+				this.profileAboutContainer.offsetHeight - min));
+			const cscroll = Math.max(0, this.element.scrollTop - Math.max(0,
+				this.clubs.offsetHeight - min));
+			this.profileAboutContainer.style.transform = 'translateY(' + pscroll + 'px)';
+			this.clubs.style.transform = 'translateY(' + cscroll + 'px)';
+
+			if(this.activity_next && !this.fetch_activities)
+				if(this.element.offsetHeight + this.element.scrollTop + 800 >= this.middle.offsetHeight)
+					this.fetchActivities(this.id, 0, this.activity_last);
+		});
+	}
+
+	createEditableString(textClass, maxLength = 32, textarea = false){
+		const element = createElement('div', {className: 'profile-editable-string-container'});
+		const text = createElement('span', {className: textClass});
+		const input = createElement(textarea ? 'textarea' : 'input', {className: textClass, attributes: {spellcheck: false, maxlength: maxLength}});
+		const button = createElement('svg', {className: 'profile-editable-string-svg'}, [
+			createElement('path', {attributes: {fill: 'none', d: 'M0 0h24v24H0z'}}),
+			createElement('path', {attributes: {d: 'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'}})
+		]);
+
+		const data = {element, text, input, setText(text){
+			this.text.setText(text);
+			this.input.value = text;
+		}};
+
+		element.appendChild(text);
+		element.appendChild(input);
+		element.appendChild(button);
+		button.on('click', () => {
+			if(!this.self)
+				return;
+			element.classList.add('editing');
+			input.focus();
+
+			this.updateSize();
+		});
+
+		input.on('blur', () => {
+			element.classList.remove('editing');
+
+			this.updateSize();
+
+			if(text.textContent != input.value){
+				this.edited();
+
+				text.setText(input.value);
+			}
+		});
+
+		input.on('input', () => {
+			input.value = input.value.replace(/[\r\n]+/g, '');
+		});
+
+		return data;
+	}
+
+	edited(){
+		this.submit.style.display = '';
+		this.updateSize();
+	}
+
+	updateResult(data){
+		this.submit.classList.remove('disabled');
+		this.submittingToast.hideAfter(2000);
+		this.submittingToast.progress(0);
+
+		if(!data || data.error || !data.profile){
+			this.submittingToast.text.setText('Could not update profile');
+
+			if(!this.self)
+				return;
+			const error = (data && data.error) || 'There was an error updating your profile';
+
+			this.error.setText(error);
+			this.updateSize();
+
+			return;
+		}
+
+		if(data.profile.image){
+			if(!this.self)
+				return;
+			this.error.setText('Could not update image: ' + data.profile.image);
+		}else if(this.submittedpfp){
+			const url = cdnPath('profile', accountManager.id) + '?nocache=' + Date.now();
+
+			pageManager.topBar.showProfilePhoto(url);
+
+			if(!this.self)
+				return;
+			setBackgroundImage(this.profileImage, url);
+		}
+
+		this.submittingToast.text.setText('Profile updated');
+		this.name.setText(data.profile.name);
+		this.bio.setText(data.profile.description);
+		this.country.setText(data.profile.location_country);
+		this.state.setText(data.profile.location_state);
+		this.city.setText(data.profile.location_city);
+		this.submit.style.display = 'none';
+
+		this.updateSize();
+	}
+
+	updateSize(){
+		setTimeout(() => {
+			this.profileAboutContainer.style.height = 100 + this.details.offsetHeight + 'px';
+		}, 0);
+	}
+
+	load(data){
+		if(!data)
+			return pageManager.showErrorPage();
+		document.title = data.name + "'s profile";
+		history.replaceState(null, document.title, '/profile/' + data.id);
+
+		setBackgroundImage(this.profileImage, cdnPath('profile', data.id));
+
+		this.followRequest = null;
+		this.name.setText(data.name);
+		this.followcount.setText(data.following_count);
+		this.followercount.setText(data.followers_count);
+		this.bio.setText(data.description);
+		this.country.setText(data.location_country);
+		this.state.setText(data.location_state);
+		this.city.setText(data.location_city);
+		this.self = data.self;
+
+		if(this.self){
+			if(accountManager.updating)
+				this.submit.style.display = '';
+			else
+				this.submit.style.display = 'none';
+			this.profilePhotoContainer.classList.add('editable');
+			this.name.element.classList.add('editable');
+			this.bio.element.classList.add('editable');
+			this.country.element.classList.add('editable');
+			this.state.element.classList.add('editable');
+			this.city.element.classList.add('editable');
+			this.noneText.setText('You are not a part of any clubs');
+			this.follow.style.display = 'none';
+		}else{
+			this.error.setText('');
+			this.profilePhotoContainer.classList.remove('editable');
+			this.name.element.classList.remove('editable');
+			this.bio.element.classList.remove('editable');
+			this.country.element.classList.remove('editable');
+			this.state.element.classList.remove('editable');
+			this.city.element.classList.remove('editable');
+			this.noneText.setText('This user is not a part of any clubs');
+			this.follow.style.display = '';
+			this.isFollowing = data.following;
+
+			if(this.isFollowing)
+				this.follow.setText('Unfollow');
+			else
+				this.follow.setText('Follow');
+		}
+
+		this.updateSize();
+
+		while(this.clubsList.childNodes.length)
+			this.clubsList.removeChild(this.clubsList.childNodes[0]);
+		var club_count = 0;
+		for(var i in data.clubs){
+			club_count++;
+
+			const club = data.clubs[i];
+			const container = createElement('a', {className: 'profile-clubs-photo-container', attributes: {href: '/club/' + club.id}});
+			const img = createElement('div', {className: 'profile-clubs-photo'});
+
+			setBackgroundImage(img, cdnPath('club', club.id));
+			ajaxify(container);
+
+			container.appendChild(img);
+
+			this.clubsList.appendChild(container);
+		}
+
+		this.noneText.style.display = club_count ? 'none' : '';
+
+		if(this.fetch_activities)
+			this.fetch_activities.abort();
+		if(this.hasLoading){
+			this.loadingIndicator.removeChild(this.svg);
+			this.middle.removeChild(this.loadingIndicator);
+			this.hasLoading = false;
+		}
+
+		if(this.hasCenterLoading){
+			this.centerLoadingIndicator.removeChild(this.svg);
+			this.middle.removeChild(this.centerLoadingIndicator);
+			this.hasCenterLoading = false;
+		}
+
+		while(this.middle.childNodes.length)
+			this.middle.removeChild(this.middle.childNodes[0]);
+		this.activity_last = null;
+		this.activity_next = false;
+		this.id = data.id;
+		this.fetchActivities(data.id);
+
+		if(!this.hasCenterLoading){
+			this.centerLoadingIndicator.appendChild(this.svg);
+			this.middle.appendChild(this.centerLoadingIndicator);
+			this.hasCenterLoading = true;
+		}
+	}
+
+	showActivities(list){
+		if(this.hasCenterLoading){
+			this.middle.removeChild(this.centerLoadingIndicator);
+			this.middle.appendChild(createElement('div', {className: 'profile-container top-padding'}));
+			this.hasCenterLoading = false;
+		}
+
+		if(this.hasLoading){
+			this.loadingIndicator.removeChild(this.svg);
+			this.middle.removeChild(this.loadingIndicator);
+			this.hasLoading = false;
+		}
+
+		if(!list){
+			this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: 'Could not load activities at this moment'}));
+
+			return;
+		}else{
+			for(var i = 0; i < list.length; i++){
+				this.activity_last = list[i].id;
+				this.middle.appendChild(activityManager.createActivity(list[i]));
+			}
+
+			if(list.length){
+				this.activity_next = true;
+
+				if(!this.hasLoading){
+					this.loadingIndicator.appendChild(this.svg);
+					this.middle.appendChild(this.loadingIndicator);
+					this.hasLoading = true;
+				}
+			}else if(!this.activity_last){
+				this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: this.self ?
+					'You don\'t have any activities': 'This user has no activities'
+				}));
+			}
+		}
+	}
+
+	fetchActivities(id, top = 50, last){
+		this.fetch_activities = accountManager.sendRequest('/activities?id=' + id + '&top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
+			this.activity_next = false;
+			this.fetch_activities = null;
+
+			if(error || status != 200)
+				this.showActivities(null);
+			else
+				this.showActivities(resp.activities);
+		});
+	}
+
+	hidden(){
+		if(this.fetch_activities){
+			this.fetch_activities.abort();
+			this.fetch_activities = null;
 		}
 	}
 }
@@ -1821,7 +2448,9 @@ const pageManager = new (class{
 			dashboard: new DashboardPage(),
 			notfound: new NotFoundPage(),
 			new_activity: new NewActivityPage(),
-			activity: new ActivityPage()
+			activity: new ActivityPage(),
+			new_club: new ClubCreationPage(),
+			club: new ClubPage()
 		};
 
 		this.showingPage = null;

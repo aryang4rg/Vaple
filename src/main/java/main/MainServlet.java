@@ -124,6 +124,10 @@ public class MainServlet extends HttpServlet
 					uriSplit = new String[]{};
 				}
 
+				if (user != null && !(Boolean)user.get(User.VERIFIED))
+				{
+
+				}
 				/* maybe remove later ^*/
 				int statusCode = handler.service(req, resp, request, response, uriSplit, user);
 

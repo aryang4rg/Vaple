@@ -56,5 +56,4 @@ public class NewActivityHandler implements AjaxHandler
 			response.put("data", data);
 			return 200;
 		}
-
 }

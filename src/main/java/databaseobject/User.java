@@ -22,7 +22,7 @@ public class User implements DatabaseStructureObject
 
 	public static final String NAME = "name", EMAIL = "email", PASSWORD = "password", LOCATION_COUNTRY = "location_country", LOCATION_STATE = "location_state",
 	LOCATION_CITY = "location_city", DESCRIPTION = "description", TOKEN = "token", FOLLOWING = "following",
-			FOLLOWERS = "followers", ACTIVITIES = "activities", CLUB = "clubs";
+			FOLLOWERS = "followers", ACTIVITIES = "activities", CLUB = "clubs", VERIFIED = "verified", VERIFICATION_TOKEN = "verification_token";
 
 	private boolean verifiedUser = false;
 	public int emailsSentToday = 0;
@@ -35,7 +35,7 @@ public class User implements DatabaseStructureObject
 	public User() {}
 
 	public User(String name, String email, String password, String location_country,
-		String location_state, String location_city, String description, String token)
+		String location_state, String location_city, String description, String token, String verification_token)
 	{
 		DBObject object = new BasicDBObject();
 
@@ -52,7 +52,8 @@ public class User implements DatabaseStructureObject
 		object.put("activities", new BasicDBObject());
 		object.put("clubs",new BasicDBObject());
 		object.put("verified",verifiedUser);
-		object.put("sentEmails", 0);
+		object.put("sentEmails", new Long(0));
+		object.put(VERIFICATION_TOKEN, verification_token);
 
 		this.object = object;
 	}
@@ -421,13 +422,84 @@ public class User implements DatabaseStructureObject
 
 	public long getLastEmailTime()
 	{
-		return (Long) object.get("sentEmails");
+		Long l = (Long)object.get("sentEmails");
+		return l;
 	}
 
 	public void setLastEmailTime()
 	{
 		set("sentEmails",System.currentTimeMillis());
 		updateInDatabase(this);
+	}
+
+	public ArrayList<String> makeUnique(ArrayList<String> mutuals, ArrayList<String> current)
+	{
+		for (int i = mutuals.size() - 1; i >= 0; i--)
+		{
+			for (int j = 0; j < current.size(); j++)
+			{
+				if (mutuals.get(i).equals(current.get(j)))
+				{
+					mutuals.remove(i);
+					break;
+				}
+			}
+		}
+
+		return mutuals;
+	}
+
+	public ArrayList<ObjectId> mutualFriends(ObjectId id)
+	{
+		User user = (User)getFromInfoInDataBase("_id",id);
+		ArrayList<String> mutuals = user.getFollowing();
+		ArrayList<String> currentFriends = getFollowing();
+
+		mutuals = makeUnique(mutuals,currentFriends);
+
+		ArrayList<ObjectId> mutualFriends = new ArrayList<ObjectId>();
+
+		for (int i = 0; i < mutuals.size(); i++)
+		{
+			mutualFriends.add(new ObjectId(mutuals.get(i)));
+		}
+		return mutualFriends;
+	}
+
+	public ArrayList<ObjectId> mutualActivities(ObjectId id)
+	{
+		User user = (User)getFromInfoInDataBase("_id",id);
+		ArrayList<String> mutuals = user.getActivitiesList();
+		ArrayList<String> currentActivities = getActivitiesList();
+
+		mutuals = makeUnique(mutuals,currentActivities);
+
+		ArrayList<ObjectId> mutualActivities = new ArrayList<ObjectId>();
+
+		for (int i = 0; i < mutuals.size(); i++)
+		{
+			mutualActivities.add(new ObjectId(mutuals.get(i)));
+		}
+
+		return mutualActivities;
+	}
+
+	public ArrayList<ObjectId> mutualClubs(ObjectId id)
+	{
+		User user = (User)getFromInfoInDataBase("_id",id);
+		ArrayList<String> mutuals = user.getClubList();
+		ArrayList<String> currentClubs = getClubList();
+
+		mutuals = makeUnique(mutuals,currentClubs);
+
+		ArrayList<ObjectId> mutualClubs = new ArrayList<ObjectId>();
+
+		for (int i = 0; i < mutuals.size(); i++)
+		{
+			mutualClubs.add(new ObjectId(mutuals.get(i)));
+		}
+
+		return mutualClubs;
 	}
 
 }
