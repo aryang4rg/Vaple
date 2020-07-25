@@ -432,10 +432,31 @@ public class User implements DatabaseStructureObject
 		updateInDatabase(this);
 	}
 
+	public ArrayList<String> makeUnique(ArrayList<String> mutuals, ArrayList<String> current)
+	{
+		for (int i = mutuals.size() - 1; i >= 0; i--)
+		{
+			for (int j = 0; j < current.size(); j++)
+			{
+				if (mutuals.get(i).equals(current.get(j)))
+				{
+					mutuals.remove(i);
+					break;
+				}
+			}
+		}
+
+		return mutuals;
+	}
+
 	public ArrayList<ObjectId> mutualFriends(ObjectId id)
 	{
 		User user = (User)getFromInfoInDataBase("_id",id);
 		ArrayList<String> mutuals = user.getFollowing();
+		ArrayList<String> currentFriends = getFollowing();
+
+		mutuals = makeUnique(mutuals,currentFriends);
+
 		ArrayList<ObjectId> mutualFriends = new ArrayList<ObjectId>();
 
 		for (int i = 0; i < mutuals.size(); i++)
@@ -443,6 +464,42 @@ public class User implements DatabaseStructureObject
 			mutualFriends.add(new ObjectId(mutuals.get(i)));
 		}
 		return mutualFriends;
+	}
+
+	public ArrayList<ObjectId> mutualActivities(ObjectId id)
+	{
+		User user = (User)getFromInfoInDataBase("_id",id);
+		ArrayList<String> mutuals = user.getActivitiesList();
+		ArrayList<String> currentActivities = getActivitiesList();
+
+		mutuals = makeUnique(mutuals,currentActivities);
+
+		ArrayList<ObjectId> mutualActivities = new ArrayList<ObjectId>();
+
+		for (int i = 0; i < mutuals.size(); i++)
+		{
+			mutualActivities.add(new ObjectId(mutuals.get(i)));
+		}
+
+		return mutualActivities;
+	}
+
+	public ArrayList<ObjectId> mutualClubs(ObjectId id)
+	{
+		User user = (User)getFromInfoInDataBase("_id",id);
+		ArrayList<String> mutuals = user.getClubList();
+		ArrayList<String> currentClubs = getClubList();
+
+		mutuals = makeUnique(mutuals,currentClubs);
+
+		ArrayList<ObjectId> mutualClubs = new ArrayList<ObjectId>();
+
+		for (int i = 0; i < mutuals.size(); i++)
+		{
+			mutualClubs.add(new ObjectId(mutuals.get(i)));
+		}
+
+		return mutualClubs;
 	}
 
 }
