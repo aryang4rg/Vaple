@@ -430,4 +430,18 @@ public class User implements DatabaseStructureObject
 		updateInDatabase(this);
 	}
 
+	public ArrayList<ObjectId> mutualFriends(ObjectId id)
+	{
+		User user = (User)findInDatabase(new BasicDBObject("_id",id));
+		ArrayList<String> mutuals = user.getFollowing();
+		ArrayList<ObjectId> mutualFriends = new ArrayList<ObjectId>();
+
+		for (int i = 0; i < mutuals.size(); i++)
+		{
+			DBObject object = ((User)findInDatabase(new BasicDBObject("_id",id))).getDBForm();
+			mutualFriends.add((ObjectId)object.get("_id"));
+		}
+		return mutualFriends;
+	}
+
 }

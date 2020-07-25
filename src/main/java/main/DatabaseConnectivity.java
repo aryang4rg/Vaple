@@ -2,6 +2,7 @@ package main;
 
 import com.mongodb.*;
 import databaseobject.Activity;
+import databaseobject.User;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -105,6 +106,11 @@ public class DatabaseConnectivity
 		}
 
 		return finalList;
+	}
+
+	public static void main(String[] args)
+	{
+
 	}
 
 }
