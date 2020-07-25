@@ -362,7 +362,7 @@ class LoginPage extends Page{
 		this.textcontainer.appendChild(this.text);
 		this.textcontainer.appendChild(this.textbutton);
 		this.formContainer.appendChild(this.textcontainer);
-		this.successText = createElement('span', {className: 'text metro', css: {'font-size': '12px', 'margin-top': '40px'}});
+		this.successText = createElement('span', {className: 'text metro'});
 		this.form.appendChild(this.formContainer);
 		this.element.appendChild(createElement('div', {className: 'center'}, [this.form]));
 		this.element.classList.add('login-background');
@@ -1426,7 +1426,6 @@ class NewActivityPage extends Page{
 		if(this.submitting)
 			return;
 		this.actionError.setText('');
-		this.actionError.style.display = 'none';
 
 		var error = false;
 
@@ -1495,10 +1494,11 @@ class NewActivityPage extends Page{
 
 		this.submitting = accountManager.sendRequest('/activity_create', {title: this.title.field.value, type: this.type.field.value,
 			latitude: this.selectedLocation.lat, longitude: this.selectedLocation.lng, time_start, time_end, club: null}, (status, error, data) => {
+				this.submitting = null;
 				this.button.classList.remove('disabled');
 				this.creatingToast.hideAfter(2000);
 
-				if(error || status != 200 || (data && data.error)){
+				if(error || status != 200 || (data && (data.error || !data.activity))){
 					this.actionError.setText((data && data.error) || 'There was an error creating this activity, try again later');
 					this.creatingToast.text.setText('Could not create the activity');
 				}else{
@@ -1507,7 +1507,7 @@ class NewActivityPage extends Page{
 						this.form.removeChild(this.formContainer);
 						this.form.appendChild(this.successText);
 						this.successText.setText('Activity created, you will be shortly redirected to it');
-						this.pageLoader.load('/activity/' + data.id);
+						this.pageLoader.load('/activity/' + data.activity.id);
 						this.creatingToast.text.setText('Activity created');
 					}
 				}
