@@ -1825,7 +1825,7 @@ class ActivityCreationPage extends Page{
 						this.showingsuccess = true;
 						this.form.removeChild(this.formContainer);
 						this.form.appendChild(this.successText);
-						this.form.style.width = '320px';
+						this.form.style.width = '390px';
 						this.successText.setText('Activity created, you will be shortly redirected to it');
 						this.creatingToast.text.setText('Activity created');
 
@@ -1995,10 +1995,10 @@ class ActivityPage extends Page{
 		while(this.middle.childNodes.length)
 			this.middle.removeChild(this.middle.childNodes[0]);
 		this.middle.appendChild(createElement('div', {className: 'profile-container top-padding'}));
-		this.middle.appendChild(activityManager.createActivity(data.activity));
+		this.middle.appendChild(activityManager.createActivity(data));
 
-		document.title = data.activity.name;
-		history.replaceState(null, document.title, '/activity/' + data.activity.id);
+		document.title = data.name;
+		history.replaceState(null, document.title, '/activity/' + data.id);
 	}
 }
 
