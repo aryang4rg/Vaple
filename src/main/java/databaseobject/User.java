@@ -421,7 +421,9 @@ public class User implements DatabaseStructureObject
 
 	public long getLastEmailTime()
 	{
-		return new Long((int)object.get("sentEmails"));
+		String str = (String)object.get("sentEmails");
+		Long l = Long.parseLong(str);
+		return l;
 	}
 
 	public void setLastEmailTime()
