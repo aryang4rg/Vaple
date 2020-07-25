@@ -5,6 +5,7 @@ import org.bson.types.ObjectId;
 
 public interface DatabaseStructureObject
 {
+    String ID = "_id";
     DatabaseStructureObject findInDatabase(DBObject object);
     DatabaseStructureObject getFromInfoInDataBase(String varName, Object data);
     boolean infoExistsInDatabase(String varName, Object data);

@@ -116,7 +116,12 @@ public class ActivityFeedHandler implements AjaxHandler
             }
             else
             {
-                response.put("activities", Json.toJson(activities.subList(index, activities.size())));
+                ArrayList<JsonNode> jsonNodeHolderForActivities = new ArrayList<>();
+                for (int i = index; i < activities.size(); i++)
+                {
+                    jsonNodeHolderForActivities.add(activities.get(i).toFeedNode());
+                }
+                response.put("activities", Json.toJson(jsonNodeHolderForActivities));
             }
         }
         else
@@ -129,6 +134,6 @@ public class ActivityFeedHandler implements AjaxHandler
 
     @Override
     public boolean isPage() {
-        return true;
+        return isAPage;
     }
 }

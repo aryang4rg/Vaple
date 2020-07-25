@@ -71,11 +71,11 @@ public class ActivityCreatorHandler implements AjaxHandler
             if (club != null)
             {
                 club.setActivity(activity.getObjectID(), true);
-                Club.databaseConnectivity().addInDatabase(club);
+                Club.databaseConnectivity().updateInDatabase(club);
             }
 
             user.setActivities(activity.getObjectID(), true);
-            User.databaseConnectivity().addInDatabase(user);
+            User.databaseConnectivity().updateInDatabase(user);
 
             if(picture != null){
                 try{

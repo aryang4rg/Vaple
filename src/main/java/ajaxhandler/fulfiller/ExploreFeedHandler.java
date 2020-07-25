@@ -23,7 +23,7 @@ public class ExploreFeedHandler implements AjaxHandler
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException
     {
-
+        return 400;
     }
 
     @Override

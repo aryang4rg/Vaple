@@ -53,8 +53,46 @@ function cdnPath(subdir, name){
 }
 
 function setBackgroundImage(element, url){
-	element.style['background-image'] = 'url(' + url + ')';
+	element.style.backgroundImage = 'url(' + url + ')';
 }
+
+function ajaxify(el){
+	el.on('click', function(e){
+		e.preventDefault();
+		pageLoader.load(this.getAttribute('href'));
+
+		return false;
+	});
+}
+
+window.mapCallbacks = [];
+window.initMap = function(){
+	for(var i = 0; i < this.mapCallbacks.length; i++)
+		this.mapCallbacks[i]();
+	this.mapCallbacks = null;
+};
+
+window.waitForMap = function(callback){
+	if(this.mapCallbacks)
+		this.mapCallbacks.push(callback);
+	else
+		callback();
+}
+
+const numberToMonth = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December'
+];
 
 const ripplingManager = new (class{
 	constructor(){
@@ -324,7 +362,7 @@ class LoginPage extends Page{
 		this.textcontainer.appendChild(this.text);
 		this.textcontainer.appendChild(this.textbutton);
 		this.formContainer.appendChild(this.textcontainer);
-		this.successText = createElement('span', {className: 'text metro', css: {'font-size': '12px', 'margin-top': '40px'}});
+		this.successText = createElement('span', {className: 'text metro'});
 		this.form.appendChild(this.formContainer);
 		this.element.appendChild(createElement('div', {className: 'center'}, [this.form]));
 		this.element.classList.add('login-background');
@@ -883,14 +921,9 @@ class ProfilePage extends Page{
 			const img = createElement('div', {className: 'profile-clubs-photo'});
 
 			setBackgroundImage(img, cdnPath('club', club.id));
+			ajaxify(container);
 
 			container.appendChild(img);
-			container.on('click', (e) => {
-				e.preventDefault();
-				pageLoader.load(container.getAttribute('href'));
-
-				return false;
-			})
 
 			this.clubsList.appendChild(container);
 		}
@@ -899,18 +932,18 @@ class ProfilePage extends Page{
 
 		if(this.fetch_activities)
 			this.fetch_activities.abort();
+		if(this.hasLoading){
+			this.loadingIndicator.removeChild(this.svg);
+			this.middle.removeChild(this.loadingIndicator);
+			this.hasLoading = false;
+		}
+
 		while(this.middle.childNodes.length)
 			this.middle.removeChild(this.middle.childNodes[0]);
 		this.activity_last = null;
 		this.activity_next = false;
 		this.id = data.id;
 		this.fetchActivities(data.id);
-
-		if(this.hasLoading){
-			this.loadingIndicator.removeChild(this.svg);
-			this.middle.removeChild(this.loadingIndicator);
-			this.hasLoading = false;
-		}
 
 		if(!this.hasCenterLoading){
 			this.centerLoadingIndicator.appendChild(this.svg);
@@ -938,13 +971,7 @@ class ProfilePage extends Page{
 			const creatorPhoto = createElement('a', {className: 'profile-activity-creator-photo', attributes: {href: '/profile/' + data.creator.id}});
 
 			setBackgroundImage(creatorPhoto, cdnPath('profile', data.creator.id));
-
-			creatorPhoto.on('click', function(e){
-				e.preventDefault();
-				pageLoader.load(this.getAttribute('href'));
-
-				return false;
-			});
+			ajaxify(creatorPhoto);
 
 			left.appendChild(creatorPhoto);
 			left.appendChild(createElement('span', {className: 'text metro', innerText: data.creator.name}));
@@ -953,13 +980,7 @@ class ProfilePage extends Page{
 				const clubPhoto = createElement('a', {className: 'profile-activity-club-photo', attributes: {href: '/club/' + data.club.id}});
 
 				setBackgroundImage(clubPhoto, cdnPath('club', data.club.id));
-
-				clubPhoto.on('click', function(e){
-					e.preventDefault();
-					pageLoader.load(this.getAttribute('href'));
-
-					return false;
-				});
+				ajaxify(clubPhoto);
 
 				right.appendChild(clubPhoto);
 				right.appendChild(createElement('span', {className: 'text metro', innerText: data.club.name}));
@@ -976,12 +997,7 @@ class ProfilePage extends Page{
 			title.appendChild(createElement('a', {className: 'profile-activity-title text metro', innerText: data.name, href: '/activity/' + data.id}));
 			body.appendChild(title);
 
-			title.on('click', function(e){
-				e.preventDefault();
-				pageLoader.load(this.getAttribute('href'));
-
-				return false;
-			});
+			ajaxify(title);
 
 			const time = this.createOffsetContainer();
 			var now = Date.now();
@@ -989,7 +1005,6 @@ class ProfilePage extends Page{
 
 			if(now < data.time_start){
 				const date = new Date(data.time_start);
-				const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 				var hours = date.getHours();
 				var am = hours < 12;
 
@@ -997,7 +1012,7 @@ class ProfilePage extends Page{
 					hours -= 12;
 				else if(hours == 0)
 					hours = 12;
-				text = month[date.getMonth()] + ' ' + date.getDate() + ' at ' + hours + ':';
+				text = numberToMonth[date.getMonth()] + ' ' + date.getDate() + ' at ' + hours + ':';
 
 				if(date.getMinutes() < 10)
 					text += '0' + date.getMinutes();
@@ -1067,18 +1082,29 @@ class ProfilePage extends Page{
 
 		do{
 			const container = this.createOffsetContainer();
+			const map = createElement('div', {className: 'profile-activity-location shadow-light'});
 
-			container.appendChild(createElement('iframe', {className: 'profile-activity-location shadow-light', attributes:
-				{src: 'https://maps.google.com/maps?q=' + data.latitude + ',' + data.longitude + '&z=18&output=embed'}
-			}));
-
+			container.appendChild(map);
 			body.appendChild(container);
+
+			window.waitForMap(() => {
+				var gmap = new google.maps.Map(map, {
+					center: {lat: data.latitude, lng: data.longitude},
+					zoom: 18
+				});
+
+				new google.maps.Marker({
+					position: {lat: data.latitude, lng: data.longitude},
+					map: gmap,
+					title: data.title
+				});
+			});
 		}while(false);
 
 		do{
 			const text = this.createOffsetContainer();
 
-			text.appendChild(createElement('span', {className: 'text metro', innerText: 'People Attending'}));
+			text.appendChild(createElement('span', {className: 'text metro', innerText: data.attending.length ? 'People Attending' : 'No one is attending yet. Be the first!'}));
 			body.appendChild(text);
 
 			const attending = this.createOffsetContainer();
@@ -1086,13 +1112,7 @@ class ProfilePage extends Page{
 			for(var i = 0; i < data.attending.length; i++){
 				const el = createElement('a', {className: 'profile-activity-attending-photo', attributes: {href: '/profile/' + data.attending[i].id}});
 
-				el.on('click', function(e){
-					e.preventDefault();
-					pageLoader.load(this.getAttribute('href'));
-
-					return false;
-				});
-
+				ajaxify(el);
 				setBackgroundImage(el, cdnPath('profile', data.attending[i].id));
 
 				attending.appendChild(el);
@@ -1144,14 +1164,14 @@ class ProfilePage extends Page{
 	}
 
 	fetchActivities(id, top = 50, last){
-		this.fetch_activities = accountManager.sendRequest('/activities?id=' + id + '&top=' + top + '&last=' + last, null, (status, error, resp) => {
+		this.fetch_activities = accountManager.sendRequest('/activities?id=' + id + '&top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
 			this.activity_next = false;
 			this.fetch_activities = null;
 
 			if(error || status != 200)
 				this.showActivities(null);
 			else
-				this.showActivities(resp);
+				this.showActivities(resp.activities);
 		});
 	}
 
@@ -1160,6 +1180,338 @@ class ProfilePage extends Page{
 			this.fetch_activities.abort();
 			this.fetch_activities = null;
 		}
+	}
+}
+
+class NewActivityPage extends Page{
+	constructor(){
+		super();
+
+		this.creatingToast = new LoadingToast('Creating activity');
+
+		toastManager.addToast(this.creatingToast);
+
+		this.form = createElement('div', {className: 'new-activity-form shadow-heavy'});
+		this.formContainer = createElement('div', {className: 'new-activity-form-container'});
+		this.leftFormContainer = createElement('div', {className: 'new-activity-form-container column'});
+		this.rightFormContainer = createElement('div', {className: 'new-activity-form-container column'});
+		this.title = createElement('span', {className: 'new-activity-form-title text metro', innerText: 'Create an Activity'});
+		this.leftFormContainer.appendChild(this.title);
+		this.entries = createElement('div', {className: 'new-activity-form-entries'});
+		this.title = this.createEntry('Title', 'text');
+		this.entries.appendChild(this.title.entry);
+		this.type = this.createEntry('Type', 'text');
+		this.entries.appendChild(this.type.entry);
+		this.description = this.createEntry('Description', 'text', true);
+		this.entries.appendChild(this.description.entry);
+		this.time = this.createTimeEntry('Start time');
+		this.entries.appendChild(this.time.entry);
+		this.endtime = this.createTimeEntry('End time');
+		this.entries.appendChild(this.endtime.entry);
+		this.club = this.createEntry('Club', 'text');
+		this.entries.appendChild(this.club.entry);
+		this.leftFormContainer.appendChild(this.entries);
+		this.button = createElement('div', {className: 'new-activity-button text metro', innerText: 'Create'});
+		this.leftFormContainer.appendChild(this.button);
+		this.actionError = createElement('span', {className: 'new-activity-form-entry-error text metro'});
+		this.leftFormContainer.appendChild(this.actionError);
+		this.successText = createElement('span', {className: 'text metro', css: {'font-size': '12px', 'margin-top': '40px'}});
+
+		this.formContainer.appendChild(this.leftFormContainer);
+		this.formContainer.appendChild(this.rightFormContainer);
+		this.form.appendChild(this.formContainer);
+		this.element.appendChild(createElement('div', {className: 'center'}, [this.form]));
+		this.element.classList.add('login-background');
+
+		this.showingsuccess = false;
+		this.gmapmarker = null;
+		this.gmap = null;
+		this.selectedLocation = null;
+		this.map = createElement('div', {className: 'new-activity-location shadow-light'});
+		this.rightFormContainer.appendChild(this.map);
+		this.mapError = createElement('span', {className: 'new-activity-form-entry-error text metro'});
+		this.rightFormContainer.appendChild(this.mapError);
+		this.submitting = null;
+
+		window.waitForMap(() => {
+			this.gmap = new google.maps.Map(this.map, {
+				zoom: 18,
+				center: {lat: 0, lng: 0},
+			});
+
+			google.maps.event.addListener(this.gmap, 'click', (e) => {
+				if(this.gmapmarker)
+					this.gmapmarker.setMap(null);
+				this.selectedLocation = {lat: e.latLng.lat(), lng: e.latLng.lng()};
+				this.gmapmarker = new google.maps.Marker({
+					position: this.selectedLocation,
+					map: this.gmap,
+					title: 'Activity Location'
+				});
+			});
+		});
+
+		this.button.on('click', () => {
+			this.trySubmit();
+		});
+	}
+
+	createEntry(name, type, large = false){
+		const entry = createElement('div', {className: 'new-activity-form-entry' + (large ? ' large' : '')});
+		const cont = createElement('div', {className: 'new-activity-form-entry-input-container'});
+		const field = createElement(large ? 'textarea' : 'input', {className: 'new-activity-form-entry-input text metro', attributes: {placeholder: 'Enter the activity ' + name.toLowerCase(), type, spellcheck: false}});
+		const error = createElement('span', {className: 'new-activity-form-entry-error text metro'});
+
+		entry.appendChild(createElement('span', {className: 'text metro', innerText: name}));
+		cont.appendChild(field);
+		cont.appendChild(createElement('div', {className: 'new-activity-form-entry-input-focus-visualizer login-background'}));
+		entry.appendChild(cont);
+		entry.appendChild(error);
+		field.on('keyup', (e) => {
+			if(e.keyCode == 13)
+				this.trySubmit();
+		});
+
+		return {entry, field, error};
+	}
+
+	createDropdown(valuesList, defaultv, placeholder, short){
+		var selectedIndex = -1;
+		if(defaultv !== undefined && defaultv !== null)
+			selectedIndex = defaultv;
+		const entry = createElement('div', {className: 'new-activity-form-entry-dropdown' + (short ? ' short' : ''), attributes: {tabindex: 0}});
+		const text = createElement('div', {className: 'new-activity-form-entry-dropdown-text text metro placeholder', innerText: selectedIndex != -1 ? valuesList[defaultv] : placeholder});
+		const svg = createElement('svg', {className: 'new-activity-form-entry-dropdown-svg'}, [
+			createElement('path', {attributes: {fill: 'none', d: 'M0 0h24v24H0z'}}),
+			createElement('path', {attributes: {d: 'M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z'}})
+		]);
+
+		const values = createElement('div', {className: 'new-activity-form-entry-dropdown-values shadow-light'});
+
+		var hasFocus = false;
+
+		entry.appendChild(svg);
+		entry.appendChild(text);
+		entry.appendChild(values);
+
+		entry.on('click', () => {
+			hasFocus = !hasFocus;
+
+			if(hasFocus){
+				entry.classList.add('choosing');
+				entry.focus();
+			}else{
+				entry.classList.remove('choosing');
+				entry.blur();
+			}
+		});
+
+		entry.on('blur', () => {
+			entry.classList.remove('choosing');
+			hasFocus = false;
+		});
+
+		const data = {entry, selectedIndex, updateValues: (valuesList) => {
+			while(values.childNodes.length)
+				values.removeChild(values.childNodes[0]);
+			for(let i = 0; i < valuesList.length; i++){
+				const el = createElement('div', {className: 'new-activity-form-entry-dropdown-value text metro', innerText: valuesList[i]});
+
+				values.appendChild(el);
+				el.on('click', () => {
+					data.selectedIndex = i;
+					text.classList.remove('placeholder');
+					text.setText(valuesList[i]);
+
+					if(data.chosen)
+						data.chosen();
+				});
+			}
+
+			if(selectedIndex > valuesList.length){
+				selectedIndex = -1;
+				text.classList.add('placeholder');
+				text.setText(placeholder);
+			}
+		}};
+
+		data.updateValues(valuesList);
+
+		return data;
+	}
+
+	createTimeEntry(name){
+		const days = [];
+
+		for(var i = 0; i < 31; i++)
+			days.push(i + 1);
+		const now = new Date();
+		var monthdays = new Date();
+
+		monthdays.setMonth(monthdays.getMonth() + 1);
+		monthdays.setDate(0);
+		monthdays = monthdays.getDate();
+
+		const entry = createElement('div', {className: 'new-activity-form-entry large'});
+		const cont = createElement('div', {className: 'new-activity-form-entry-input-container row'});
+		const error = createElement('span', {className: 'new-activity-form-entry-error text metro'});
+		const month = this.createDropdown(numberToMonth, now.getMonth());
+		const day = this.createDropdown(days.slice(0, monthdays), now.getDate() - 1, 'Select a day', true);
+		const year = this.createDropdown([now.getFullYear(), now.getFullYear() + 1], 0, '', true);
+
+		entry.appendChild(createElement('span', {className: 'text metro', innerText: name}));
+		cont.appendChild(month.entry);
+		cont.appendChild(day.entry);
+		cont.appendChild(year.entry);
+		entry.appendChild(cont);
+		entry.appendChild(error);
+
+		month.chosen = () => {
+			monthdays = new Date(now.getYear() + year.selectedIndex, month.selectedIndex + 1, 0).getDate();
+
+			day.updateValues(days.slice(0, monthdays));
+		};
+
+		year.chosen = month.chosen;
+
+		const hours = [];
+		const minutes = [];
+
+		for(var i = 0; i < 12; i++)
+			hours.push(i + 1);
+		for(var i = 0; i < 12; i++)
+			minutes.push((i * 5) + '');
+		var hourz = now.getHours() % 12;
+
+		if(hourz == 0)
+			hourz = 12;
+		const hour = this.createDropdown(hours, hourz - 1, '', true);
+		const minute = this.createDropdown(minutes, Math.floor(now.getMinutes() / 5), '', true);
+		const ampm = this.createDropdown(['AM', 'PM'], now.getHours() >= 12 ? 1 : 0, '', true);
+
+		cont.appendChild(hour.entry);
+		cont.appendChild(minute.entry);
+		cont.appendChild(ampm.entry);
+
+		return {entry, fields: {month, day, year}, error, calculateTime(){
+			if(day.selectedIndex == -1)
+				return null;
+			var hours = hour.selectedIndex + 1;
+
+			if(ampm.selectedIndex == 0){
+				if(hours == 12)
+					hours = 0;
+			}else{
+				if(hours != 12)
+					hours += 12;
+			}
+
+			return new Date(now.getFullYear() + year.selectedIndex, month.selectedIndex, day.selectedIndex + 1, hours, minute.selectedIndex * 5);
+		}};
+	}
+
+	showing(){
+		this.title.field.value = '';
+		this.type.field.value = '';
+		this.description.field.value = '';
+
+		if(this.showingsuccess){
+			this.showingsuccess = false;
+			this.form.appendChild(this.formContainer);
+			this.form.removeChild(this.successText);
+		}
+	}
+
+	trySubmit(){
+		if(this.submitting)
+			return;
+		this.actionError.setText('');
+
+		var error = false;
+
+		if(this.title.field.value)
+			this.title.error.setText('');
+		else{
+			this.title.error.setText('Enter the title');
+
+			error = true;
+		}
+
+		if(this.type.field.value)
+			this.type.error.setText('');
+		else{
+			this.type.error.setText('Enter the type');
+
+			error = true;
+		}
+
+		if(this.description.field.value)
+			this.description.error.setText('');
+		else{
+			this.description.error.setText('Enter a description');
+
+			error = true;
+		}
+
+		if(this.selectedLocation)
+			this.mapError.setText('');
+		else{
+			this.mapError.setText('Select a location');
+
+			error = true;
+		}
+
+		var time_start = this.time.calculateTime();
+		var time_end = this.endtime.calculateTime();
+
+		if(time_start == null){
+			this.time.error.setText('Select a valid time');
+
+			error = true;
+		}else
+			time_start = time_start.getTime();
+		if(time_end == null){
+			this.endtime.error.setText('Select a valid time');
+
+			error = true;
+		}else
+			time_end = time_end.getTime();
+		if(time_start && time_end && time_start >= time_end){
+			this.time.error.setText('Must be less than end time');
+			this.endtime.error.setText('Must be greater than start time');
+
+			error = true;
+		}else{
+			this.time.error.setText('');
+			this.endtime.error.setText('');
+		}
+
+		if(error)
+			return;
+		this.button.classList.add('disabled');
+		this.creatingToast.text.setText('Creating activity');
+		this.creatingToast.show();
+
+		this.submitting = accountManager.sendRequest('/activity_create', {title: this.title.field.value, type: this.type.field.value,
+			latitude: this.selectedLocation.lat, longitude: this.selectedLocation.lng, time_start, time_end, club: null}, (status, error, data) => {
+				this.submitting = null;
+				this.button.classList.remove('disabled');
+				this.creatingToast.hideAfter(2000);
+
+				if(error || status != 200 || (data && (data.error || !data.activity))){
+					this.actionError.setText((data && data.error) || 'There was an error creating this activity, try again later');
+					this.creatingToast.text.setText('Could not create the activity');
+				}else{
+					if(!this.showingsuccess){
+						this.showingsuccess = true;
+						this.form.removeChild(this.formContainer);
+						this.form.appendChild(this.successText);
+						this.successText.setText('Activity created, you will be shortly redirected to it');
+						this.pageLoader.load('/activity/' + data.activity.id);
+						this.creatingToast.text.setText('Activity created');
+					}
+				}
+			});
 	}
 }
 
@@ -1211,7 +1563,8 @@ const pageManager = new (class{
 			feed: new FeedPage(),
 			explore: new ExplorePage(),
 			dashboard: new DashboardPage(),
-			notfound: new NotFoundPage()
+			notfound: new NotFoundPage(),
+			new_activity: new NewActivityPage()
 		};
 
 		this.showingPage = null;
@@ -1290,17 +1643,33 @@ const pageManager = new (class{
 				this.accountOptions.on('click', (e) => {
 					this.accountOptions.blur();
 				});
+
+				this.newActivityButton = createElement('a', {className: 'top-bar-new-activity-container', attributes: {href: '/new_activity'}});
+				this.svg = createElement('svg', {className: 'top-bar-new-activity', attributes: {viewBox: '0 0 48 48'}});
+
+				ajaxify(this.newActivityButton);
+				generateGradient(this.svg, {gradient: 'activity-add-gradient', mask: 'activity-add-mask'}, [
+					{
+						offset: "0%",
+						color: "#f00"
+					},
+					{
+						offset: "100%",
+						color: "#00f"
+					}
+				], [
+					createElement('path', {attributes: {d: 'M23.5,23.5 m -19.5 0 a 19.5,19.5 0 1,0 39,0 a 19.5,19.5 0 1,0 -39,0 z', stroke: '#fff', 'stroke-width': '3px'}}),
+					createElement('path', {attributes: {d: 'M14,22 22,22 22,14 25,14 25,22 33,22 33,25 25,25 25,33 22,33 22,25 25,25 14,25z', fill: '#fff'}})
+				]);
+
+				this.newActivityButton.appendChild(this.svg);
+				this.right.appendChild(this.newActivityButton);
 			}
 
 			createItem(text, path){
 				const el = createElement('a', {className: 'quick-nav text metro', innerText: text, attributes: {href: path}});
 
-				el.on('click', (e) => {
-					e.preventDefault();
-					pageLoader.load(el.getAttribute('href'));
-
-					return false;
-				});
+				ajaxify(el);
 
 				return el;
 			}
@@ -1435,10 +1804,10 @@ const pageLoader = new (class{
 		const l = accountManager.sendRequest(url, null, (status, error, resp) => {
 			this.loadingToast.hideAfter(200);
 
-			if(error)
-				return pageManager.showErrorPage();
 			if(status == 404)
 				pageManager.showNotFoundPage();
+			else if(error)
+				pageManager.showErrorPage();
 			else if(status != 200)
 				pageManager.showErrorPage();
 			else

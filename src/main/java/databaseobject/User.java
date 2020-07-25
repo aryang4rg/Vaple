@@ -57,13 +57,13 @@ public class User implements DatabaseStructureObject
 
 	public ArrayList<DBObject> getActivities(int limit)
 	{
-		return (ArrayList<DBObject>) DatabaseConnectivity.ACTIVITYCOLLECTION.find()
+		return (ArrayList<DBObject>) DatabaseConnectivity.ACTIVITYCOLLECTION.find(new BasicDBObject("creator", getObjectID()))
 		.sort(new BasicDBObject("time",1)).limit(limit).toArray();
 	}
 
 	public ArrayList<DBObject> getActivities()
 	{
-		return (ArrayList<DBObject>) DatabaseConnectivity.ACTIVITYCOLLECTION.find()
+		return (ArrayList<DBObject>) DatabaseConnectivity.ACTIVITYCOLLECTION.find(new BasicDBObject("creator", getObjectID()))
 				.sort(new BasicDBObject("time",1)).toArray();
 	}
 

@@ -1,22 +1,27 @@
 package databaseobject;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mongodb.DB;
 import main.*;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import util.Json;
+import util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Club implements DatabaseStructureObject
 {
     private DBObject object;
     public static final String NAME = "name", DESCRIPTION = "description", LOCATION_COUNTRY = "location_country", LOCATION_STATE = "location_state",
-    LOCATION_CITY = "location_city", CLUB_TYPE = "club_type", ACTIVITY = "activity";
+    LOCATION_CITY = "location_city", CLUB_TYPE = "club_type", ACTIVITY = "activity", OWNER = "owner", MEMBER = "members";
     List<String> tags;
 
     private static Club databaseConnectivityObject = new Club();
@@ -26,6 +31,38 @@ public class Club implements DatabaseStructureObject
     }
     public Club() {}
 
+    public ObjectNode getConciseDataNode(){
+
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        node.put("name", (String)get(NAME));
+        node.put("id", getObjectID().toHexString());
+        node.put("description", (String)get(DESCRIPTION));
+        node.put("country", (String)get(LOCATION_COUNTRY));
+        node.put("city", (String)get(LOCATION_CITY));
+        node.put("state", (String)get(LOCATION_STATE));
+        node.put("country", (String)get(LOCATION_COUNTRY));
+        node.put("club_type", (String)get(CLUB_TYPE));
+        node.put("owner", ((ObjectId)get(OWNER)).toHexString());
+
+        ObjectNode actNode = Util.createObjectNode();
+        ArrayList<String> activities = getActivities();
+        for (String str : activities)
+        {
+            actNode.put("str", true);
+        }
+
+        ArrayNode memNode = new ArrayNode(JsonNodeFactory.instance);
+        ArrayList<DBObject> members = getMembers();
+        for (DBObject mem : members)
+        {
+            memNode.add( ((ObjectId) mem.get(ID)).toHexString());
+        }
+
+        node.put(MEMBER, memNode);
+
+
+        return node;
+    }
     public Club(String name, String description, String location_country, String location_state, String location_city, String club_type, ObjectId owner)
     {
         DBObject object = new BasicDBObject();
@@ -41,15 +78,15 @@ public class Club implements DatabaseStructureObject
         object.put("activity", new BasicDBObject());
         object.put("tags",tags);
 
+
         this.object = object;
-        setMember(owner, true);
     }
 
-    public Object getConciseDataNode()
+    public ArrayList<String> getActivities()
     {
-        ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
-        //getDBForm().get(NAME)
-        return null;
+        Set<String> activities = ((DBObject)(object.get("activities"))).keySet();
+        ArrayList<String> actList = new ArrayList<>(activities);
+        return actList;
     }
 
 

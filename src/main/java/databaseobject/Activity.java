@@ -3,12 +3,14 @@ package databaseobject;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.DBCursor;
+import com.sun.xml.internal.bind.v2.model.core.ID;
 import main.*;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import util.Json;
+import util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +93,11 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 		node.put("time_end", (long)get(TIME_END));
 		node.put(LATITUDE, (double)get(LATITUDE));
 		node.put(LONGITUDE, (double)get(LONGITUDE));
+		ObjectNode creator = Util.createObjectNode();
+		creator.put("id", ((ObjectId)get(CREATOR)).toHexString());
+		creator.put("name", (String)((User)User.databaseConnectivity().getFromInfoInDataBase(ID, get(CREATOR))).get(NAME));
+		node.put("creator", creator);
+
 
 		return node;
 	}
