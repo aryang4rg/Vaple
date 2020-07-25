@@ -22,7 +22,7 @@ public class PasswordHasher
         this.pepper = pepper;
     }
 
-    private String pepper = "dQw4w9WgXcQ";
+    private String pepper = /*https://www.youtube.com/watch?v=*/ "dQw4w9WgXcQ";
     private PasswordHasher(){}
 
     public static void main(String... args)

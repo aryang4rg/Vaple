@@ -16,20 +16,25 @@ import java.io.IOException;
 
 public class ActivityHandler implements AjaxHandler
 {
+    private static ActivityHandler instance = new ActivityHandler();
+    private ActivityHandler(){}
+
+    public static ActivityHandler getInstance() {
+        return instance;
+    }
+
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException {
-        if(uriSplit.length != 3) // 0: / 1: activity 2: id
+        if(uriSplit.length != 1) // 0: / 1: activity 2: id
             return 404;
-        String id = uriSplit[2];
+        String id = uriSplit[0];
         Activity activity = (Activity)Activity.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(id));
         if (activity == null)
         {
             return 404;
         }
 
-        ObjectNode node = Util.createObjectNode();
-        response.put("data", node);
-        response.put("type", "club");
+        response.put("type", "activity");
         response.put("data", activity.toFeedNode());
         return 200;
 

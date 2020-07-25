@@ -3,7 +3,6 @@ package ajaxhandler.addupdate.add;
 import ajaxhandler.AjaxHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import databaseobject.Activity;
 import databaseobject.Club;
 import databaseobject.User;
 import main.MainServlet;
@@ -17,7 +16,22 @@ import java.io.IOException;
 
 public class ClubCreateHandler implements AjaxHandler
 {
-    MainServlet mainServlet = new MainServlet();
+
+    private static ClubCreateHandler instance;
+    public static ClubCreateHandler getInstance(MainServlet mainServlet)
+    {
+        if (instance == null)
+            instance = new ClubCreateHandler(mainServlet);
+        return instance;
+
+    }
+
+    private ClubCreateHandler(MainServlet mainServlet)
+    {
+        this.mainServlet = mainServlet;
+    }
+
+    MainServlet mainServlet;
 
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException {

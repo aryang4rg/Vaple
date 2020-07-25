@@ -2,6 +2,7 @@ package ajaxhandler.login;
 
 import ajaxhandler.AjaxHandler;
 import ajaxhandler.fulfiller.ActivityFeedHandler;
+import ajaxhandler.fulfiller.NewClubHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import databaseobject.User;
@@ -13,6 +14,9 @@ import java.io.IOException;
 
 public class UnverifiedHandler implements AjaxHandler
 {
+
+    private UnverifiedHandler(){}
+
     private static UnverifiedHandler instance = new UnverifiedHandler();
     public static UnverifiedHandler getInstance()
     {
@@ -25,6 +29,9 @@ public class UnverifiedHandler implements AjaxHandler
 
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User u) throws ServletException, IOException {
+
+        if(uriSplit.length > 0)
+            return 404;
 
         response.put("type", "unverified");
 
