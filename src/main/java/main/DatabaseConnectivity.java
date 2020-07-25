@@ -3,6 +3,7 @@ package main;
 import com.mongodb.*;
 import databaseobject.Activity;
 import databaseobject.User;
+import org.bson.types.ObjectId;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -110,7 +111,10 @@ public class DatabaseConnectivity
 
 	public static void main(String[] args)
 	{
-
+		User user = new User();
+		User user2 = (User)user.getFromInfoInDataBase("email","gay2@gmail.com");
+		ArrayList<ObjectId> list = user2.mutualFriends(user2.getObjectID());
+		System.out.println(list);
 	}
 
 }
