@@ -75,7 +75,7 @@ public class Util{
 	}
 
 	public static String asText(JsonNode textNode){
-		if(textNode == null)
+		if(textNode == null || textNode.asText().equals("null"))
 			return null;
 		return textNode.asText();
 	}

@@ -47,7 +47,7 @@ public class ActivityCreatorHandler implements AjaxHandler
 
 
 
-        if (!Util.checkIfStringsAreValid(title,description,type,time_end,time_start))
+        if (!Util.checkIfStringsAreValid(title,type,time_end,time_start))
         {
             return 400;
         }
@@ -65,6 +65,10 @@ public class ActivityCreatorHandler implements AjaxHandler
         }
 
         try {
+            if (Long.parseLong(time_start) > Long.parseLong(time_end))
+            {
+                return 400;
+            }
             Activity activity = new Activity(title, description, type, user.getObjectID(), new ArrayList<ObjectId>(), Long.parseLong(time_start),
                     Long.parseLong(time_end), Double.parseDouble(latitude), Double.parseDouble(longitude), club);
             Activity.databaseConnectivity().addInDatabase(activity);
@@ -85,7 +89,7 @@ public class ActivityCreatorHandler implements AjaxHandler
                 }
 
             }
-
+            response.put("activity", activity.toFeedNode());
             return 200;
         }
         catch (NumberFormatException e)

@@ -705,12 +705,28 @@ class ProfilePage extends Page{
 				this.isFollowing = true;
 			}
 
-			this.followRequest = accountManager.sendRequest('/follow_change', change, (status, error, resp) => {
-				this.followRequest = null;
+			const x = this.followRequest = accountManager.sendRequest('/follow_change', change, (status, error, resp) => {
+				var err = false;
 
 				if(error || status != 200){
 					this.followFailed.show();
 					this.followFailed.hideAfter(2000);
+
+					err = true;
+				}
+
+				if(this.followRequest == x){
+					this.followRequest = null;
+
+					if(!err)
+						return;
+					if(this.isFollowing){
+						this.follow.setText('Follow');
+						this.isFollowing = false;
+					}else{
+						this.follow.setText('Unfollow');
+						this.isFollowing = true;
+					}
 				}
 			});
 		});
@@ -938,6 +954,12 @@ class ProfilePage extends Page{
 			this.hasLoading = false;
 		}
 
+		if(this.hasCenterLoading){
+			this.centerLoadingIndicator.removeChild(this.svg);
+			this.middle.removeChild(this.centerLoadingIndicator);
+			this.hasCenterLoading = false;
+		}
+
 		while(this.middle.childNodes.length)
 			this.middle.removeChild(this.middle.childNodes[0]);
 		this.activity_last = null;
@@ -950,6 +972,97 @@ class ProfilePage extends Page{
 			this.middle.appendChild(this.centerLoadingIndicator);
 			this.hasCenterLoading = true;
 		}
+	}
+
+	showActivities(list){
+		if(this.hasCenterLoading){
+			this.middle.removeChild(this.centerLoadingIndicator);
+			this.middle.appendChild(createElement('div', {className: 'profile-container top-padding'}));
+			this.hasCenterLoading = false;
+		}
+
+		if(this.hasLoading){
+			this.loadingIndicator.removeChild(this.svg);
+			this.middle.removeChild(this.loadingIndicator);
+			this.hasLoading = false;
+		}
+
+		if(!list){
+			this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: 'Could not load activities at this moment'}));
+
+			return;
+		}else{
+			for(var i = 0; i < list.length; i++){
+				this.activity_last = list[i].id;
+				this.middle.appendChild(activityManager.createActivity(list[i]));
+			}
+
+			if(list.length){
+				this.activity_next = true;
+
+				if(!this.hasLoading){
+					this.loadingIndicator.appendChild(this.svg);
+					this.middle.appendChild(this.loadingIndicator);
+					this.hasLoading = true;
+				}
+			}else if(!this.activity_last){
+				this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: this.self ?
+					'You don\'t have any activities': 'This user has no activities'
+				}));
+			}
+		}
+	}
+
+	fetchActivities(id, top = 50, last){
+		this.fetch_activities = accountManager.sendRequest('/activities?id=' + id + '&top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
+			this.activity_next = false;
+			this.fetch_activities = null;
+
+			if(error || status != 200)
+				this.showActivities(null);
+			else
+				this.showActivities(resp.activities);
+		});
+	}
+
+	hidden(){
+		if(this.fetch_activities){
+			this.fetch_activities.abort();
+			this.fetch_activities = null;
+		}
+	}
+}
+
+const activityManager = new (class{
+	constructor(){
+		this.activityParcitipateChange = {};
+		this.errorToast = new Toast("Could not change participation in activity");
+
+		toastManager.addToast(this.errorToast);
+	}
+
+	changeParticipate(id, participate, resultcb){
+		const existing = this.activityParcitipateChange[id];
+
+		if(existing && existing.participate != participate){
+			existing.callback(!participate);
+			existing.request.abort();
+		}
+
+		this.activityParcitipateChange[id] = {participate, request: accountManager.sendRequest('/add_to_activity', {activity: id, addToActivity: participate ? true : false}, (status, err, resp) => {
+			this.activityParcitipateChange[id] = null;
+
+			if(status != 200 || error){
+				this.errorToast.show();
+				this.errorToast.hideAfter(2000);
+
+				resultcb(!participate);
+
+				return;
+			}
+
+			resultcb(participate);
+		})};
 	}
 
 	createOffsetContainer(left = true){
@@ -991,16 +1104,17 @@ class ProfilePage extends Page{
 			body.appendChild(container);
 		}while(false);
 
+		var ctime = Date.now();
 		do{
 			const title = this.createOffsetContainer();
 
-			title.appendChild(createElement('a', {className: 'profile-activity-title text metro', innerText: data.name, href: '/activity/' + data.id}));
+			title.appendChild(createElement('a', {className: 'profile-activity-title text metro', innerText: data.name, attributes: {href: '/activity/' + data.id}}));
 			body.appendChild(title);
 
 			ajaxify(title);
 
 			const time = this.createOffsetContainer();
-			var now = Date.now();
+			var now = ctime;
 			var text;
 
 			if(now < data.time_start){
@@ -1104,7 +1218,8 @@ class ProfilePage extends Page{
 		do{
 			const text = this.createOffsetContainer();
 
-			text.appendChild(createElement('span', {className: 'text metro', innerText: data.attending.length ? 'People Attending' : 'No one is attending yet. Be the first!'}));
+			text.appendChild(createElement('span', {className: 'text metro', innerText: data.time_end > ctime ? (data.attending.length ? 'People Attending' : 'No one is attending yet. Be the first!') :
+																												(data.attending.length ? 'People Attended' : '')}));
 			body.appendChild(text);
 
 			const attending = this.createOffsetContainer();
@@ -1123,71 +1238,14 @@ class ProfilePage extends Page{
 
 		return body;
 	}
-
-	showActivities(list){
-		if(this.hasCenterLoading){
-			this.middle.removeChild(this.centerLoadingIndicator);
-			this.middle.appendChild(createElement('div', {className: 'profile-container top-padding'}));
-			this.hasCenterLoading = false;
-		}
-
-		if(this.hasLoading){
-			this.loadingIndicator.removeChild(this.svg);
-			this.middle.removeChild(this.loadingIndicator);
-			this.hasLoading = false;
-		}
-
-		if(!list){
-			this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: 'Could not load activities at this moment'}));
-
-			return;
-		}else{
-			for(var i = 0; i < list.length; i++){
-				this.activity_last = list[i].id;
-				this.middle.appendChild(this.createActivity(list[i]));
-			}
-
-			if(list.length){
-				this.activity_next = true;
-
-				if(!this.hasLoading){
-					this.loadingIndicator.appendChild(this.svg);
-					this.middle.appendChild(this.loadingIndicator);
-					this.hasLoading = true;
-				}
-			}else if(!this.activity_last){
-				this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: this.self ?
-					'You don\'t have any activities': 'This user has no activities'
-				}));
-			}
-		}
-	}
-
-	fetchActivities(id, top = 50, last){
-		this.fetch_activities = accountManager.sendRequest('/activities?id=' + id + '&top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
-			this.activity_next = false;
-			this.fetch_activities = null;
-
-			if(error || status != 200)
-				this.showActivities(null);
-			else
-				this.showActivities(resp.activities);
-		});
-	}
-
-	hidden(){
-		if(this.fetch_activities){
-			this.fetch_activities.abort();
-			this.fetch_activities = null;
-		}
-	}
-}
+});
 
 class NewActivityPage extends Page{
 	constructor(){
 		super();
 
 		this.creatingToast = new LoadingToast('Creating activity');
+		this.creatingToast.indeterminate();
 
 		toastManager.addToast(this.creatingToast);
 
@@ -1492,11 +1550,12 @@ class NewActivityPage extends Page{
 		this.creatingToast.text.setText('Creating activity');
 		this.creatingToast.show();
 
-		this.submitting = accountManager.sendRequest('/activity_create', {title: this.title.field.value, type: this.type.field.value,
+		this.submitting = accountManager.sendRequest('/activity_create', {title: this.title.field.value, type: this.type.field.value, description: this.description.field.value,
 			latitude: this.selectedLocation.lat, longitude: this.selectedLocation.lng, time_start, time_end, club: null}, (status, error, data) => {
 				this.submitting = null;
 				this.button.classList.remove('disabled');
 				this.creatingToast.hideAfter(2000);
+				this.creatingToast.progress();
 
 				if(error || status != 200 || (data && (data.error || !data.activity))){
 					this.actionError.setText((data && data.error) || 'There was an error creating this activity, try again later');
@@ -1507,8 +1566,9 @@ class NewActivityPage extends Page{
 						this.form.removeChild(this.formContainer);
 						this.form.appendChild(this.successText);
 						this.successText.setText('Activity created, you will be shortly redirected to it');
-						this.pageLoader.load('/activity/' + data.activity.id);
 						this.creatingToast.text.setText('Activity created');
+
+						pageLoader.load('/activity/' + data.activity.id);
 					}
 				}
 			});
@@ -1516,11 +1576,141 @@ class NewActivityPage extends Page{
 }
 
 class FeedPage extends Page{
-	load(data){
-		/* todo */
+	constructor(){
+		super();
 
+		this.fetch_activities = null;
+		this.activity_last = null;
+		this.activity_next = false;
+
+		this.table = createElement('div', {className: 'profile-table'});
+		this.left = createElement('div', {className: 'profile-container left'});
+		this.middle = createElement('div', {className: 'profile-container middle'});
+		this.right = createElement('div', {className: 'profile-container right'});
+
+		this.table.appendChild(this.left);
+		this.table.appendChild(createElement('div', {className: 'profile-container expander'}));
+		this.table.appendChild(this.middle);
+		this.table.appendChild(createElement('div', {className: 'profile-container expander'}));
+		this.table.appendChild(this.right);
+		this.element.appendChild(this.table);
+
+		this.svg = createElement('svg', {className: 'activities-loader'});
+
+		generateGradient(this.svg, {gradient: 'activities-gradient', mask: 'activities-mask'}, [
+			{
+				offset: "0%",
+				color: "#0f0"
+			},
+			{
+				offset: "100%",
+				color: "#00f"
+			}
+		], [
+			createElement('circle', {attributes: {cx: 50, cy: 50, r: 16}})
+		]);
+
+		this.hasCenterLoading = false;
+		this.centerLoadingIndicator = createElement('div', {className: 'center'});
+		this.hasLoading = false;
+		this.loadingIndicator = createElement('div', {className: 'activities-loader-center'});
+
+		this.element.on('scroll', (e) => {
+			if(this.activity_next && !this.fetch_activities)
+				if(this.element.offsetHeight + this.element.scrollTop + 800 >= this.middle.offsetHeight)
+					this.fetchActivities(0, this.activity_last);
+		});
+	}
+
+	load(data){
 		document.title = 'Your feed';
 		history.replaceState(null, document.title, '/');
+
+		if(this.fetch_activities)
+			this.fetch_activities.abort();
+		if(this.hasLoading){
+			this.loadingIndicator.removeChild(this.svg);
+			this.middle.removeChild(this.loadingIndicator);
+			this.hasLoading = false;
+		}
+
+		if(this.hasCenterLoading){
+			this.centerLoadingIndicator.removeChild(this.svg);
+			this.middle.removeChild(this.centerLoadingIndicator);
+			this.hasCenterLoading = false;
+		}
+
+		while(this.middle.childNodes.length)
+			this.middle.removeChild(this.middle.childNodes[0]);
+		this.activity_last = null;
+		this.activity_next = false;
+		this.fetch_activities = null;
+
+		if(!this.hasCenterLoading){
+			this.centerLoadingIndicator.appendChild(this.svg);
+			this.middle.appendChild(this.centerLoadingIndicator);
+			this.hasCenterLoading = true;
+		}
+
+		this.showActivities(data.activities);
+	}
+
+	showActivities(list){
+		if(this.hasCenterLoading){
+			this.middle.removeChild(this.centerLoadingIndicator);
+			this.middle.appendChild(createElement('div', {className: 'profile-container top-padding'}));
+			this.hasCenterLoading = false;
+		}
+
+		if(this.hasLoading){
+			this.loadingIndicator.removeChild(this.svg);
+			this.middle.removeChild(this.loadingIndicator);
+			this.hasLoading = false;
+		}
+
+		if(!list){
+			this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: 'Could not load activities at this moment'}));
+
+			return;
+		}else{
+			for(var i = 0; i < list.length; i++){
+				this.activity_last = list[i].id;
+				this.middle.appendChild(activityManager.createActivity(list[i]));
+			}
+
+			if(list.length){
+				this.activity_next = true;
+
+				if(!this.hasLoading){
+					this.loadingIndicator.appendChild(this.svg);
+					this.middle.appendChild(this.loadingIndicator);
+					this.hasLoading = true;
+				}
+			}else if(!this.activity_last){
+				this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: this.self ?
+					'You don\'t have any activities': 'This user has no activities'
+				}));
+			}
+		}
+	}
+
+	fetchActivities(top = 50, last){
+		this.fetch_activities = accountManager.sendRequest('/activity_feed?top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
+			this.activity_next = false;
+			this.fetch_activities = null;
+
+			if(error || status != 200)
+				this.showActivities(null);
+			else
+				this.showActivities(resp.activities);
+		});
+	}
+
+	hidden(){
+		if(this.fetch_activities){
+			this.fetch_activities.abort();
+			this.fetch_activities = null;
+		}
 	}
 }
 

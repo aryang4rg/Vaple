@@ -22,6 +22,8 @@ import java.util.List;
 public class Activity implements DatabaseStructureObject, Comparable<Activity>
 {
 
+
+
 	public static final String NAME = "name", DESCRIPTION = "description", LATITUDE = "latitude", LONGITUDE = "longitude",
 			ATTENDING = "attending", TIME_START = "time_start", TIME_END = "time_end", FORM = "form", OBJECTID = "objectID",
 			ASSOCIATED_CLUB = "associated_club", CREATOR = "creator", TYPE = "type";
@@ -66,6 +68,13 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 	}
 
 	public Activity() {}
+
+	public void setAttending(ObjectId activityId, boolean isAdding){
+		if(isAdding)
+			((DBObject)object.get(ATTENDING)).put(activityId.toHexString(), true);
+		else
+			((DBObject)object.get(ATTENDING)).removeField(activityId.toHexString());
+	}
 
 	@Override
 	public Object get(String string) {

@@ -21,7 +21,8 @@ public class User implements DatabaseStructureObject
 	private DBObject object;
 
 	public static final String NAME = "name", EMAIL = "email", PASSWORD = "password", LOCATION_COUNTRY = "location_country", LOCATION_STATE = "location_state",
-	LOCATION_CITY = "location_city", DESCRIPTION = "description", TOKEN = "token", FOLLOWING = "following", FOLLOWERS = "followers", ACTIVITIES = "activities";
+	LOCATION_CITY = "location_city", DESCRIPTION = "description", TOKEN = "token", FOLLOWING = "following",
+			FOLLOWERS = "followers", ACTIVITIES = "activities", CLUB = "clubs";
 
 	private boolean verifiedUser = false;
 	public int emailsSentToday = 0;
@@ -56,16 +57,15 @@ public class User implements DatabaseStructureObject
 		this.object = object;
 	}
 
-	public ArrayList<DBObject> getActivities(int limit)
+
+	public ArrayList<String> getActivitiesList()
 	{
-		return (ArrayList<DBObject>) DatabaseConnectivity.ACTIVITYCOLLECTION.find(new BasicDBObject("creator", getObjectID()))
-		.sort(new BasicDBObject("time",1)).limit(limit).toArray();
+		return new ArrayList<String>( ((DBObject)get(ACTIVITIES)).keySet());
 	}
 
-	public ArrayList<DBObject> getActivities()
+	public ArrayList<String> getClubList()
 	{
-		return (ArrayList<DBObject>) DatabaseConnectivity.ACTIVITYCOLLECTION.find(new BasicDBObject("creator", getObjectID()))
-				.sort(new BasicDBObject("time",1)).toArray();
+		return new ArrayList<String>( ((DBObject)get(CLUB)).keySet());
 	}
 
 	public ObjectNode toProfileNode(){
@@ -80,11 +80,9 @@ public class User implements DatabaseStructureObject
 		node.put("followers_count", countFollowers());
 		node.put("following_count", countFollowing());
 		node.put("clubs", Json.toJson(dbObjectClubListToArrayList(getClubs())));
-
 		return node;
 	}
-
-	public ArrayList<String> dbObjectClubListToArrayList(DBObject clubs)
+	public static ArrayList<String> dbObjectClubListToArrayList(DBObject clubs)
 	{
 		return new ArrayList<>(clubs.keySet());
 	}
@@ -93,6 +91,8 @@ public class User implements DatabaseStructureObject
 	{
 		return (DBObject) object.get("clubs");
 	}
+
+
 
 	public void addClubToUser(Club club)
 	{
@@ -298,9 +298,9 @@ public class User implements DatabaseStructureObject
 	}
 
 	public void setActivities(ObjectId activityId, boolean isAdding){
-		if(isAdding)
-			((DBObject)object.get(ACTIVITIES)).put(activityId.toHexString(), true);
-		else
+			if(isAdding)
+				((DBObject)object.get(ACTIVITIES)).put(activityId.toHexString(), true);
+			else
 			((DBObject)object.get(ACTIVITIES)).removeField(activityId.toHexString());
 	}
 
