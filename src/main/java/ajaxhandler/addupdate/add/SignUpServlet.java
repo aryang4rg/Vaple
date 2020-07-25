@@ -2,6 +2,7 @@ package ajaxhandler.addupdate.add;
 
 import ajaxhandler.AjaxHandler;
 import databaseobject.*;
+import main.MainServlet;
 import util.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -102,18 +103,25 @@ public class SignUpServlet implements AjaxHandler
 		password = PasswordHasher.getInstance().createHash(password);
 
 		for(int i = 0; i < 100; i++){
-			String token = generateSafeToken();
+			String account_token = generateSafeToken();
+			if (User.databaseConnectivity().infoExistsInDatabase(User.TOKEN, account_token)) {
+				continue;
+			}
 
-			if(!User.databaseConnectivity().infoExistsInDatabase(User.TOKEN, token)){
-				User user = new User(name, email, password, location_country, location_state, location_city, "", token);
+			for (int j = 0;j < 100; j++) {
+				String verification_token = generateSafeToken();
+				if (User.databaseConnectivity().infoExistsInDatabase(User.TOKEN, account_token)) {
+					continue;
+				}
+
+				User user = new User(name, email, password, location_country, location_state, location_city, "", account_token, verification_token);
 
 				User.databaseConnectivity().addInDatabase(user);
-				String verificationLink = "";
-				
+				String verificationLink = IP_ADDRESS + "/verify_account/" + verification_token;
+
 				try {
-					JavaMail.sendMessage(user.getEmail(),"Verify Email to access Vaple",verificationLink);
-				} catch (Exception e)
-				{
+					JavaMail.sendMessage(user.getEmail(), "Verify Email to access Vaple", verificationLink);
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 
@@ -121,6 +129,7 @@ public class SignUpServlet implements AjaxHandler
 				response.put("token", user.getToken());
 
 				return 200;
+
 			}
 		}
 

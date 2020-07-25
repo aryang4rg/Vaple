@@ -22,7 +22,7 @@ public class User implements DatabaseStructureObject
 
 	public static final String NAME = "name", EMAIL = "email", PASSWORD = "password", LOCATION_COUNTRY = "location_country", LOCATION_STATE = "location_state",
 	LOCATION_CITY = "location_city", DESCRIPTION = "description", TOKEN = "token", FOLLOWING = "following",
-			FOLLOWERS = "followers", ACTIVITIES = "activities", CLUB = "clubs";
+			FOLLOWERS = "followers", ACTIVITIES = "activities", CLUB = "clubs", VERIFIED = "verified", VERIFICATION_TOKEN = "verification_token";
 
 	private boolean verifiedUser = false;
 	public int emailsSentToday = 0;
@@ -35,7 +35,7 @@ public class User implements DatabaseStructureObject
 	public User() {}
 
 	public User(String name, String email, String password, String location_country,
-		String location_state, String location_city, String description, String token)
+		String location_state, String location_city, String description, String token, String verification_token)
 	{
 		DBObject object = new BasicDBObject();
 
@@ -53,6 +53,7 @@ public class User implements DatabaseStructureObject
 		object.put("clubs",new BasicDBObject());
 		object.put("verified",verifiedUser);
 		object.put("sentEmails", 0);
+		object.put(VERIFICATION_TOKEN, verification_token);
 
 		this.object = object;
 	}

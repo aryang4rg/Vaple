@@ -25,12 +25,11 @@ public class verifyAccountHandler implements AjaxHandler
         {
             return 400;
         }
-        User u = (User) User.databaseConnectivity().getFromInfoInDataBase(User.TOKEN, token);
+        User u = (User) User.databaseConnectivity().getFromInfoInDataBase(User.VERIFICATION_TOKEN, token);
         if (u == null)
         {
             return 400;
         }
-
         u.setVerifiedUser(true);
         return 200;
     }
