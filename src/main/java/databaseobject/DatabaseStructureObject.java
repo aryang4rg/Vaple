@@ -14,6 +14,6 @@ public interface DatabaseStructureObject
     DBObject getDBForm();
     ObjectId getObjectID();
     Object get(String identifier);
-    void set(String identifier, Object object);
+    void set(String identifier, Object value);
 
 }

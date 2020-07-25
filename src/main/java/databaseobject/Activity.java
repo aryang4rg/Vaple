@@ -143,7 +143,6 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 	public DatabaseStructureObject getFromInfoInDataBase(String varName, Object data)
 	{
 		return findInDatabase(new BasicDBObject(varName,data));
-
 	}
 
 	/**
