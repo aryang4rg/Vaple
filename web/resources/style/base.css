@@ -1247,7 +1247,7 @@ textarea.new-activity-form-entry-input{
 .new-club-photo{
 	width: 180px;
 	height: 180px;
-	border-radius: 50%;
+	border-radius: 4px;
 	background-position: center;
 	background-size: cover;
 	margin-right: 16px;
@@ -1265,4 +1265,32 @@ textarea.new-activity-form-entry-input{
 
 .new-club-set-photo-button:hover{
 	text-decoration: underline;
+}
+
+.club-photo-container{
+	transform: translateY(-50%);
+	width: 190px;
+	height: 190px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+}
+
+.club-photo{
+	width: 180px;
+	height: 180px;
+	border-radius: 4px;
+	background-position: center;
+	background-size: cover;
+}
+
+.club-description-container{
+	display: flex;
+	flex-direction: column;
+}
+
+.club-members-count{
+	margin-left: 8px;
+	font-size: 14px;
 }

@@ -312,6 +312,16 @@ class NotFoundPage extends Page{
 	}
 }
 
+class UnverifiedPage extends Page{
+	constructor(){
+		super();
+
+		this.element.appendChild(createElement('div', {className: 'center'}, [
+			createElement('span', {className: 'text', innerText: "Please check your email for a verification link"})
+		]));
+	}
+}
+
 class LoginPage extends Page{
 	constructor(){
 		super();
@@ -1370,8 +1380,8 @@ class ActivityCreationPage extends Page{
 
 		window.waitForMap(() => {
 			this.gmap = new google.maps.Map(this.map, {
-				zoom: 18,
-				center: {lat: 0, lng: 0},
+				zoom: 11,
+				center: {lat: 37.330794, lng: -121.9324748},
 			});
 
 			google.maps.event.addListener(this.gmap, 'click', (e) => {
@@ -2210,15 +2220,10 @@ class ClubPage extends Page{
 	constructor(){
 		super();
 
-		this.self = false;
-		this.submittingToast = new LoadingToast('Changing');
-		this.followFailed = new LoadingToast('Failed to (un)follow the user, try again');
+		this.joinFailed = new LoadingToast('Failed to join/leave the club, try again');
 
-		toastManager.addToast(this.submittingToast);
-		toastManager.addToast(this.followFailed);
+		toastManager.addToast(this.joinFailed);
 
-		this.submitpfp = null;
-		this.submittedpfp = null;
 		this.id = null;
 
 		this.table = createElement('div', {className: 'profile-table'});
@@ -2235,104 +2240,56 @@ class ClubPage extends Page{
 		this.table.appendChild(this.right);
 		this.element.appendChild(this.table);
 
-		this.profileAboutContainer = createElement('div', {className: 'profile-about-container shadow-light'});
-		this.profileImage = createElement('div', {className: 'profile-photo shadow-heavy'});
-		this.profilePhotoContainer = createElement('div', {className: 'profile-photo-container'});
-		this.profilePhotoContainer.appendChild(this.profileImage);
-		this.fileChooser = createElement('input', {attributes: {type: 'file', name: 'name', accept: 'image/*'}});
-		this.photoEditButton = createElement('div', {className: 'profile-edit-button text metro', innerText: 'Change avatar'});
-		this.profilePhotoContainer.appendChild(this.photoEditButton);
-		this.profileAboutContainer.appendChild(this.profilePhotoContainer);
+		this.clubAboutContainer = createElement('div', {className: 'profile-about-container shadow-light'});
+		this.clubImage = createElement('div', {className: 'club-photo shadow-heavy'});
+		this.clubPhotoContainer = createElement('div', {className: 'club-photo-container'});
+		this.clubPhotoContainer.appendChild(this.clubImage);
+		this.clubAboutContainer.appendChild(this.clubPhotoContainer);
 		this.details = createElement('div', {className: 'profile-details'});
-		this.profileAboutContainer.appendChild(this.details);
-		this.name = this.createEditableString('profile-name text');
-		this.details.appendChild(this.name.element);
-		this.followcount = createElement('div', {className: 'number text'});
-		this.followercount = createElement('div', {className: 'number text'});
-		this.details.appendChild(createElement('div', {className: 'profile-follow-count'}, [
-			createElement('div', {className: 'profile-follow-counter'}, [
-				createElement('div', {className: 'title text', innerText: 'Followers'}),
-				this.followercount
-			]),
-			createElement('div', {className: 'divider'}),
-			createElement('div', {className: 'profile-follow-counter'}, [
-				createElement('div', {className: 'title text', innerText: 'Following'}),
-				this.followcount
-			]),
-		]));
-
-		this.photoEditButton.on('click', () => {
-			this.fileChooser.click();
-		});
-
-		this.fileChooser.on('change', (file) => {
-			var input = file.target;
-			var reader = new FileReader();
-
-			reader.onload = () => {
-				this.submitpfp = reader.result;
-				this.edited();
-
-				setBackgroundImage(this.profileImage, reader.result);
-			};
-
-			reader.readAsDataURL(input.files[0]);
-		});
+		this.clubAboutContainer.appendChild(this.details);
+		this.name = createElement('div', {className: 'profile-name text'});
+		this.details.appendChild(this.name);
 
 		this.details.appendChild(createElement('div', {className: 'divider'}));
-		this.bio = this.createEditableString('profile-bio text', 512, true);
-		this.details.appendChild(this.bio.element);
+		this.descContainer = createElement('div', {className: 'club-description-container'});
+		this.type = createElement('span', {className: 'text'});
+		this.descContainer.appendChild(this.type);
+		this.description = createElement('span', {className: 'profile-bio text', css: {marginTop: '8px'}});
+		this.descContainer.appendChild(this.description);
+		this.details.appendChild(this.descContainer);
 		this.details.appendChild(createElement('div', {className: 'divider'}));
 		this.location = createElement('div', {className: 'profile-location'});
 		this.details.appendChild(this.location);
-		this.country = this.createEditableString('text metro');
-		this.location.appendChild(this.country.element);
-		this.state = this.createEditableString('text metro');
-		this.location.appendChild(this.state.element);
-		this.city = this.createEditableString('text metro');
-		this.location.appendChild(this.city.element);
-		this.submit = createElement('div', {className: 'profile-submit text metro', innerText: 'save', css: {display: 'none'}});
-		this.details.appendChild(this.submit);
-		this.follow = createElement('div', {className: 'profile-follow text metro', innerText: 'follow', css: {display: 'none'}});
-		this.details.appendChild(this.follow);
-		this.error = createElement('span', {className: 'profile-submit-error text metro'});
-		this.details.appendChild(this.error);
-		this.left.appendChild(this.profileAboutContainer);
+		this.country = createElement('span', {className: 'text metro'});
+		this.location.appendChild(this.country);
+		this.state = createElement('span', {className: 'text metro'});
+		this.location.appendChild(this.state);
+		this.city = createElement('span', {className: 'text metro'});
+		this.location.appendChild(this.city);
+		this.join = createElement('div', {className: 'profile-follow text metro', innerText: 'follow', css: {display: 'none'}});
+		this.details.appendChild(this.join);
+		this.left.appendChild(this.clubAboutContainer);
 
-		this.submit.on('click', () => {
-			if(accountManager.submitting)
-				return;
-			this.error.setText('');
-			this.submit.classList.add('disabled');
-			this.submittingToast.text.setText('Changing');
-			this.submittingToast.show();
-			this.submittingToast.indeterminate();
-			this.submittedpfp = this.submitpfp;
-
-			accountManager.changeAccount(this.name.input.value, this.bio.input.value, this.country.input.value, this.state.input.value, this.city.input.value, this.submitpfp);
-
-			this.submitpfp = null;
-		});
-
-		this.isFollowing = false;
-		this.follow.on('click', () => {
-			if(this.followRequest)
-				this.followRequest.abort();
+		this.isJoined = false;
+		this.joinRequest = null;
+		this.join.on('click', () => {
+			if(this.joinRequest)
+				this.joinRequest.abort();
 			const change = {};
 
-			if(this.isFollowing){
-				change.unfollowing = [this.id];
+			if(this.isJoined){
+				// change.unfollowing = [this.id];
 
-				this.follow.setText('Follow');
-				this.isFollowing = false;
+				this.join.setText('Join');
+				this.isJoined = false;
 			}else{
-				change.following = [this.id];
+				// change.isJoined = [this.id];
 
-				this.follow.setText('Unfollow');
-				this.isFollowing = true;
+				this.join.setText('Leave');
+				this.isJoined = true;
 			}
 
-			const x = this.followRequest = accountManager.sendRequest('/follow_change', change, (status, error, resp) => {
+			const x = this.joinRequest = accountManager.sendRequest('/join_leave_club', change, (status, error, resp) => {
 				var err = false;
 
 				if(error || status != 200){
@@ -2342,29 +2299,28 @@ class ClubPage extends Page{
 					err = true;
 				}
 
-				if(this.followRequest == x){
-					this.followRequest = null;
+				if(this.joinRequest == x){
+					this.joinRequest = null;
 
 					if(!err)
 						return;
-					if(this.isFollowing){
-						this.follow.setText('Follow');
-						this.isFollowing = false;
+					if(this.isJoined){
+						this.join.setText('Join');
+						this.isJoined = false;
 					}else{
-						this.follow.setText('Unfollow');
-						this.isFollowing = true;
+						this.join.setText('Leave');
+						this.isJoined = true;
 					}
 				}
 			});
 		});
 
-		this.clubs = createElement('div', {className: 'profile-clubs shadow-light'});
-		this.clubs.appendChild(createElement('span', {className: 'profile-clubs-title text metro', innerText: 'Clubs'}));
-		this.noneText = createElement('span', {className: 'text metro', css: {display: 'none'}});
-		this.clubs.appendChild(this.noneText);
-		this.clubsList = createElement('div', {className: 'profile-clubs-list'});
-		this.clubs.appendChild(this.clubsList);
-		this.right.appendChild(this.clubs);
+		this.members = createElement('div', {className: 'profile-clubs shadow-light'});
+		this.membersTitle = createElement('span', {className: 'profile-clubs-title text metro', innerText: 'Members'});
+		this.members.appendChild(this.membersTitle);
+		this.membersList = createElement('div', {className: 'profile-clubs-list'});
+		this.members.appendChild(this.membersList);
+		this.right.appendChild(this.members);
 
 		this.fetch_activities = null;
 		this.activity_last = null;
@@ -2393,11 +2349,11 @@ class ClubPage extends Page{
 		this.element.on('scroll', (e) => {
 			const min = Math.max(0, this.element.offsetHeight - 250);
 			const pscroll = Math.max(0, this.element.scrollTop - Math.max(0,
-				this.profileAboutContainer.offsetHeight - min));
+				this.clubAboutContainer.offsetHeight - min));
 			const cscroll = Math.max(0, this.element.scrollTop - Math.max(0,
-				this.clubs.offsetHeight - min));
-			this.profileAboutContainer.style.transform = 'translateY(' + pscroll + 'px)';
-			this.clubs.style.transform = 'translateY(' + cscroll + 'px)';
+				this.members.offsetHeight - min));
+			this.clubAboutContainer.style.transform = 'translateY(' + pscroll + 'px)';
+			this.members.style.transform = 'translateY(' + cscroll + 'px)';
 
 			if(this.activity_next && !this.fetch_activities)
 				if(this.element.offsetHeight + this.element.scrollTop + 800 >= this.middle.offsetHeight)
@@ -2405,175 +2361,60 @@ class ClubPage extends Page{
 		});
 	}
 
-	createEditableString(textClass, maxLength = 32, textarea = false){
-		const element = createElement('div', {className: 'profile-editable-string-container'});
-		const text = createElement('span', {className: textClass});
-		const input = createElement(textarea ? 'textarea' : 'input', {className: textClass, attributes: {spellcheck: false, maxlength: maxLength}});
-		const button = createElement('svg', {className: 'profile-editable-string-svg'}, [
-			createElement('path', {attributes: {fill: 'none', d: 'M0 0h24v24H0z'}}),
-			createElement('path', {attributes: {d: 'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'}})
-		]);
-
-		const data = {element, text, input, setText(text){
-			this.text.setText(text);
-			this.input.value = text;
-		}};
-
-		element.appendChild(text);
-		element.appendChild(input);
-		element.appendChild(button);
-		button.on('click', () => {
-			if(!this.self)
-				return;
-			element.classList.add('editing');
-			input.focus();
-
-			this.updateSize();
-		});
-
-		input.on('blur', () => {
-			element.classList.remove('editing');
-
-			this.updateSize();
-
-			if(text.textContent != input.value){
-				this.edited();
-
-				text.setText(input.value);
-			}
-		});
-
-		input.on('input', () => {
-			input.value = input.value.replace(/[\r\n]+/g, '');
-		});
-
-		return data;
-	}
-
-	edited(){
-		this.submit.style.display = '';
-		this.updateSize();
-	}
-
-	updateResult(data){
-		this.submit.classList.remove('disabled');
-		this.submittingToast.hideAfter(2000);
-		this.submittingToast.progress(0);
-
-		if(!data || data.error || !data.profile){
-			this.submittingToast.text.setText('Could not update profile');
-
-			if(!this.self)
-				return;
-			const error = (data && data.error) || 'There was an error updating your profile';
-
-			this.error.setText(error);
-			this.updateSize();
-
-			return;
-		}
-
-		if(data.profile.image){
-			if(!this.self)
-				return;
-			this.error.setText('Could not update image: ' + data.profile.image);
-		}else if(this.submittedpfp){
-			const url = cdnPath('profile', accountManager.id) + '?nocache=' + Date.now();
-
-			pageManager.topBar.showProfilePhoto(url);
-
-			if(!this.self)
-				return;
-			setBackgroundImage(this.profileImage, url);
-		}
-
-		this.submittingToast.text.setText('Profile updated');
-		this.name.setText(data.profile.name);
-		this.bio.setText(data.profile.description);
-		this.country.setText(data.profile.location_country);
-		this.state.setText(data.profile.location_state);
-		this.city.setText(data.profile.location_city);
-		this.submit.style.display = 'none';
-
-		this.updateSize();
-	}
-
 	updateSize(){
 		setTimeout(() => {
-			this.profileAboutContainer.style.height = 100 + this.details.offsetHeight + 'px';
+			this.clubAboutContainer.style.height = 120 + this.details.offsetHeight + 'px';
 		}, 0);
 	}
 
 	load(data){
 		if(!data)
 			return pageManager.showErrorPage();
-		document.title = data.name + "'s profile";
-		history.replaceState(null, document.title, '/profile/' + data.id);
+		document.title = data.name;
+		history.replaceState(null, document.title, '/club/' + data.id);
 
-		setBackgroundImage(this.profileImage, cdnPath('profile', data.id));
+		setBackgroundImage(this.clubImage, cdnPath('club', data.id));
 
 		this.followRequest = null;
 		this.name.setText(data.name);
-		this.followcount.setText(data.following_count);
-		this.followercount.setText(data.followers_count);
-		this.bio.setText(data.description);
-		this.country.setText(data.location_country);
-		this.state.setText(data.location_state);
-		this.city.setText(data.location_city);
-		this.self = data.self;
+		this.type.setText(data.type);
+		this.description.setText(data.description);
+		this.country.setText(data.country);
+		this.state.setText(data.state);
+		this.city.setText(data.city);
+		this.owner = data.owner;
 
-		if(this.self){
-			if(accountManager.updating)
-				this.submit.style.display = '';
-			else
-				this.submit.style.display = 'none';
-			this.profilePhotoContainer.classList.add('editable');
-			this.name.element.classList.add('editable');
-			this.bio.element.classList.add('editable');
-			this.country.element.classList.add('editable');
-			this.state.element.classList.add('editable');
-			this.city.element.classList.add('editable');
-			this.noneText.setText('You are not a part of any clubs');
-			this.follow.style.display = 'none';
-		}else{
-			this.error.setText('');
-			this.profilePhotoContainer.classList.remove('editable');
-			this.name.element.classList.remove('editable');
-			this.bio.element.classList.remove('editable');
-			this.country.element.classList.remove('editable');
-			this.state.element.classList.remove('editable');
-			this.city.element.classList.remove('editable');
-			this.noneText.setText('This user is not a part of any clubs');
-			this.follow.style.display = '';
-			this.isFollowing = data.following;
+		if(this.owner)
+			this.join.style.display = 'none';
+		else{
+			this.join.style.display = '';
+			this.isJoined = data.joined;
 
-			if(this.isFollowing)
-				this.follow.setText('Unfollow');
+			if(this.isJoined)
+				this.join.setText('Leave');
 			else
-				this.follow.setText('Follow');
+				this.join.setText('Join');
 		}
 
 		this.updateSize();
 
-		while(this.clubsList.childNodes.length)
-			this.clubsList.removeChild(this.clubsList.childNodes[0]);
-		var club_count = 0;
-		for(var i in data.clubs){
-			club_count++;
-
-			const club = data.clubs[i];
-			const container = createElement('a', {className: 'profile-clubs-photo-container', attributes: {href: '/club/' + club.id}});
+		while(this.membersList.childNodes.length)
+			this.membersList.removeChild(this.membersList.childNodes[0]);
+		for(var i = 0; i < data.members.length; i++){
+			const member = data.members[i];
+			const container = createElement('a', {className: 'profile-clubs-photo-container', attributes: {href: '/profile/' + member.id}});
 			const img = createElement('div', {className: 'profile-clubs-photo'});
 
-			setBackgroundImage(img, cdnPath('club', club.id));
+			setBackgroundImage(img, cdnPath('profile', member.id));
 			ajaxify(container);
 
 			container.appendChild(img);
 
-			this.clubsList.appendChild(container);
+			this.membersList.appendChild(container);
 		}
 
-		this.noneText.style.display = club_count ? 'none' : '';
+		this.membersTitle.setText('Members');
+		this.membersTitle.appendChild(createElement('span', {className: 'club-members-count text', innerText: data.members.length + ''}));
 
 		if(this.fetch_activities)
 			this.fetch_activities.abort();
@@ -2634,16 +2475,13 @@ class ClubPage extends Page{
 					this.middle.appendChild(this.loadingIndicator);
 					this.hasLoading = true;
 				}
-			}else if(!this.activity_last){
-				this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: this.self ?
-					'You don\'t have any activities': 'This user has no activities'
-				}));
-			}
+			}else if(!this.activity_last)
+				this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: 'This club has no activities'}));
 		}
 	}
 
 	fetchActivities(id, top = 50, last){
-		this.fetch_activities = accountManager.sendRequest('/activities?id=' + id + '&top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
+		this.fetch_activities = accountManager.sendRequest('/activities?clubId=' + id + '&top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
 			this.activity_next = false;
 			this.fetch_activities = null;
 
@@ -2705,7 +2543,8 @@ const pageManager = new (class{
 			new_activity: new ActivityCreationPage(),
 			activity: new ActivityPage(),
 			new_club: new ClubCreationPage(),
-			club: new ClubPage()
+			club: new ClubPage(),
+			unverified: new UnverifiedPage()
 		};
 
 		this.showingPage = null;
@@ -2945,14 +2784,14 @@ const pageLoader = new (class{
 		const l = accountManager.sendRequest(url, null, (status, error, resp) => {
 			this.loadingToast.hideAfter(200);
 
+			if(resp)
+				pageManager.load(resp);
 			if(status == 404)
 				pageManager.showNotFoundPage();
 			else if(error)
 				pageManager.showErrorPage();
 			else if(status != 200)
 				pageManager.showErrorPage();
-			else
-				pageManager.load(resp);
 		});
 
 		this.loading = l;
@@ -3120,8 +2959,9 @@ const accountManager = new (class{
 				return callback(x.status, new Error("invalid json response"), null);
 			}
 
-			if(accountManager.needAccount && !accountManager.load(data.account))
-				return callback(x.status, new Error("expected an account"), null);
+			if(accountManager.needAccount)
+				if((x.status == 200 || data.account) && !accountManager.load(data.account))
+					return callback(x.status, new Error("expected an account"), null);
 			callback(x.status, null, data);
 		});
 
