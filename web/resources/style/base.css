@@ -1005,6 +1005,10 @@ textarea.new-activity-form-entry-input{
 	margin-right: 4px;
 }
 
+.new-activity-form-entry-dropdown.long{
+	width: 256px;
+}
+
 .new-activity-form-entry-dropdown.short{
 	width: 93px;
 }
@@ -1030,7 +1034,7 @@ textarea.new-activity-form-entry-input{
 }
 
 .new-activity-form-entry-dropdown-values{
-	width: 128px;
+	width: 100%;
 	padding: 16px 0;
 	max-height: 200px;
 	overflow: auto;

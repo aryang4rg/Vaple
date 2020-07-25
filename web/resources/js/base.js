@@ -1185,7 +1185,7 @@ const activityManager = new (class{
 				}
 			}
 
-			time.appendChild(createElement('div', {className: 'profile-activity-time text metro', innerText: text}));
+			time.appendChild(createElement('div', {className: 'profile-activity-time text metro', innerText: data.type + ' \u2022 ' + text}));
 			body.appendChild(time);
 
 			const description = this.createOffsetContainer();
@@ -1258,7 +1258,7 @@ class NewActivityPage extends Page{
 		this.entries = createElement('div', {className: 'new-activity-form-entries'});
 		this.title = this.createEntry('Title', 'text');
 		this.entries.appendChild(this.title.entry);
-		this.type = this.createEntry('Type', 'text');
+		this.type = this.createTypeEntry();
 		this.entries.appendChild(this.type.entry);
 		this.description = this.createEntry('Description', 'text', true);
 		this.entries.appendChild(this.description.entry);
@@ -1314,6 +1314,39 @@ class NewActivityPage extends Page{
 		});
 	}
 
+	createTypeEntry(){
+		const types = [
+			"Fundraising", "Garbage Cleanup", "Charity Work", "Environmental Care",
+			"Environmental Cleanup", "Hospital Volunteering", "Animal Care", "Awareness Work",
+			"Religious Work", "Religious Volunteering", "Mentorship Volunteering", "Elderly Care",
+			"Disabled Care", "Special Needs Care", "Homeless Volunteer Work", "Social Issue Awareness",
+			"Protest", "Educational Workshops"
+		];
+
+		const entry = createElement('div', {className: 'new-activity-form-entry'});
+		const cont = createElement('div', {className: 'new-activity-form-entry-input-container row'});
+		const error = createElement('span', {className: 'new-activity-form-entry-error text metro'});
+		const input = this.createDropdown(types, null, 'Select an activity type', 'long');
+		const field = {get value(){
+			if(input.selectedIndex == -1)
+				return '';
+			return types[input.selectedIndex];
+		}, set value(v){
+			input.updateValues([]);
+			input.updateValues(types);
+		}};
+
+		entry.appendChild(createElement('span', {className: 'text metro', innerText: 'Type'}));
+		cont.appendChild(input.entry);
+		entry.appendChild(cont);
+		entry.appendChild(error);
+		input.entry.style.border = 'none';
+		input.entry.style.borderBottom = '1px #ccc solid';
+		input.entry.style.height = '41px';
+
+		return {entry, field, error};
+	}
+
 	createEntry(name, type, large = false){
 		const entry = createElement('div', {className: 'new-activity-form-entry' + (large ? ' large' : '')});
 		const cont = createElement('div', {className: 'new-activity-form-entry-input-container'});
@@ -1333,11 +1366,11 @@ class NewActivityPage extends Page{
 		return {entry, field, error};
 	}
 
-	createDropdown(valuesList, defaultv, placeholder, short){
+	createDropdown(valuesList, defaultv, placeholder, attr){
 		var selectedIndex = -1;
 		if(defaultv !== undefined && defaultv !== null)
 			selectedIndex = defaultv;
-		const entry = createElement('div', {className: 'new-activity-form-entry-dropdown' + (short ? ' short' : ''), attributes: {tabindex: 0}});
+		const entry = createElement('div', {className: 'new-activity-form-entry-dropdown' + (attr ? ' ' + attr : ''), attributes: {tabindex: 0}});
 		const text = createElement('div', {className: 'new-activity-form-entry-dropdown-text text metro placeholder', innerText: selectedIndex != -1 ? valuesList[defaultv] : placeholder});
 		const svg = createElement('svg', {className: 'new-activity-form-entry-dropdown-svg'}, [
 			createElement('path', {attributes: {fill: 'none', d: 'M0 0h24v24H0z'}}),
@@ -1414,8 +1447,8 @@ class NewActivityPage extends Page{
 		const cont = createElement('div', {className: 'new-activity-form-entry-input-container row'});
 		const error = createElement('span', {className: 'new-activity-form-entry-error text metro'});
 		const month = this.createDropdown(numberToMonth, now.getMonth());
-		const day = this.createDropdown(days.slice(0, monthdays), now.getDate() - 1, 'Select a day', true);
-		const year = this.createDropdown([now.getFullYear(), now.getFullYear() + 1], 0, '', true);
+		const day = this.createDropdown(days.slice(0, monthdays), now.getDate() - 1, 'Select a day', 'short');
+		const year = this.createDropdown([now.getFullYear(), now.getFullYear() + 1], 0, '', 'short');
 
 		entry.appendChild(createElement('span', {className: 'text metro', innerText: name}));
 		cont.appendChild(month.entry);
@@ -1443,9 +1476,9 @@ class NewActivityPage extends Page{
 
 		if(hourz == 0)
 			hourz = 12;
-		const hour = this.createDropdown(hours, hourz - 1, '', true);
-		const minute = this.createDropdown(minutes, Math.floor(now.getMinutes() / 5), '', true);
-		const ampm = this.createDropdown(['AM', 'PM'], now.getHours() >= 12 ? 1 : 0, '', true);
+		const hour = this.createDropdown(hours, hourz - 1, '', 'short');
+		const minute = this.createDropdown(minutes, Math.floor(now.getMinutes() / 5), '', 'short');
+		const ampm = this.createDropdown(['AM', 'PM'], now.getHours() >= 12 ? 1 : 0, '', 'short');
 
 		cont.appendChild(hour.entry);
 		cont.appendChild(minute.entry);
