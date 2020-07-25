@@ -47,15 +47,20 @@ public class FollowPersonHandler implements AjaxHandler
 					User.databaseConnectivity().updateInDatabase(other);
 					String recipient = other.getEmail();
 					String subject = "New Follower";
-					String messageText = "<h3>You have a new Follower!<br>Your new follower is: " + user.getName() + "</h3>" +
+					String messageText = "<h3>You have a new follower!<br>Your new follower is: " + user.getName() + "</h3>" +
                             "<h4> Their <a href=\"" + IP_ADDRESS + "/profile/" + user.getObjectID() + "\">profile</a><br></h4><img src=\"" +
-                            IP_ADDRESS + "/cdn/profile/" + user.getObjectID() + ".png\" width = \"50\">";
-					try
+                            IP_ADDRESS + "/cdn/profile/" + user.getObjectID() + ".png\" width = \"150\">";
+					if (user.getEmailsSentToday() <= 7)
                     {
-                        JavaMail.sendMessage(recipient, subject, messageText);
-                    } catch (Exception e)
-                    {
-                        e.printStackTrace();
+                        try
+                        {
+                            JavaMail.sendMessage(recipient, subject, messageText);
+                        } catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                        user.setEmailsSentToday(user.getEmailsSentToday() + 1);
+                        User.databaseConnectivity().updateInDatabase(user);
                     }
 				}
             }

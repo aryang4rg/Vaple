@@ -111,7 +111,7 @@ public class SignUpServlet implements AjaxHandler
 				String verificationLink = "";
 				
 				try {
-					JavaMail.sendMessage(user.getEmail(),"Verify Email",verificationLink);
+					JavaMail.sendMessage(user.getEmail(),"Verify Email to access Vaple",verificationLink);
 				} catch (Exception e)
 				{
 					e.printStackTrace();
