@@ -5,7 +5,6 @@ import com.mongodb.DBObject;
 import main.DatabaseConnectivity;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
 
 public class Challenge implements DatabaseStructureObject
 {
@@ -42,25 +41,25 @@ public class Challenge implements DatabaseStructureObject
     @Override
     public DatabaseStructureObject getFromInfoInDataBase(String varName, Object data)
     {
-        return null;
+        return findInDatabase(new BasicDBObject(varName,data));
     }
 
     @Override
     public boolean infoExistsInDatabase(String varName, Object data)
     {
-        return false;
+        return getFromInfoInDataBase(varName, data) != null;
     }
 
     @Override
     public void updateInDatabase(DatabaseStructureObject object)
     {
-
+        DatabaseConnectivity.updateObject(object.getDBForm(), DatabaseConnectivity.CHALLENGECOLLECTION);
     }
 
     @Override
     public void addInDatabase(DatabaseStructureObject object)
     {
-
+        DatabaseConnectivity.addObject(object.getDBForm(), DatabaseConnectivity.CHALLENGECOLLECTION);
     }
 
     @Override
@@ -72,18 +71,18 @@ public class Challenge implements DatabaseStructureObject
     @Override
     public ObjectId getObjectID()
     {
-        return null;
+        return (ObjectId)object.get("_id");
     }
 
     @Override
     public Object get(String identifier)
     {
-        return null;
+        return object.get(identifier);
     }
 
     @Override
-    public void set(String identifier, Object object)
+    public void set(String identifier, Object value)
     {
-
+        object.put(identifier,value);
     }
 }
