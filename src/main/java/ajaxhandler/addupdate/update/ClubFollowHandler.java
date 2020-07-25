@@ -31,6 +31,10 @@ public class ClubFollowHandler implements AjaxHandler
         {
             return 400;
         }
+        if (toJoin == null)
+        {
+            return 400;
+        }
 
         Club c = (Club) Club.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(club_id));
         if (c == null)

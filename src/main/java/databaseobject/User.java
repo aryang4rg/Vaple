@@ -106,6 +106,16 @@ public class User implements DatabaseStructureObject
 		this.object = object;
 	}
 
+	@Override
+	public Object get(String string) {
+		return object.get(string);
+	}
+
+	public void set(String identifier, Object value)
+	{
+		object.put(identifier,value);
+	}
+
 	/**
 	 *
 	 * @return A DBObject version of the databasestructureobjects.databaseobject.User.

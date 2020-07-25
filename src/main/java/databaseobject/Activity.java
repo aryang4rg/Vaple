@@ -1,6 +1,5 @@
 package databaseobject;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import main.*;
@@ -23,23 +22,30 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 			ATTENDING = "attending", TIME_START = "time_start", TIME_END = "time_end", FORM = "form", OBJECTID = "objectID",
 			ASSOCIATED_CLUB = "associated_club", CREATOR = "creator", TYPE = "type";
 
-	String name, description;
-	double latitude, longitude;
-	ArrayList<ObjectId> attending;
-	long time_start, time_end;
-	BasicDBObject form;
-	ObjectId objectID;
-	ObjectId associated_club;
-	ObjectId creator;
-	String type;
+	DBObject object = new BasicDBObject();
+	public Activity(String name, String description, String type, ObjectId creator, ArrayList<ObjectId> attending, long time_start, long time_end, double latitude, double longitude, Club club)
+	{
+		object.put("name",name);
+		object.put("type",type);
+		object.put("description",description);
+		object.put("attending",attending);
+		object.put("creator",creator);
+		object.put("time_start",time_start);
+		object.put("time_end",time_end);
+		object.put("latitude",latitude);
+		object.put("longitude",longitude);
+		if (club != null) {
+			object.put("club", club);
+		}
+	}
 
 	@Override
 	public int compareTo(Activity o) {
-		if (time_start - o.time_start > 0)
+		if ((long)get(TIME_START) - (long)o.get(TIME_START) > 0)
 		{
 			return -1;
 		}
-		else if (time_start == o.time_start)
+		else if ((long)get(TIME_START) == (long)o.get(TIME_START))
 		{
 			return 0;
 		}
@@ -54,58 +60,44 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 
 	public Activity() {}
 
-	public Activity(String name, String description, String type, ObjectId creator, ArrayList<ObjectId> attending, long time_start, long time_end, double latitude, double longitude, Club associated_club)
-	{
-		this.name = name;
-		this.type = type;
-		this.description = description;
-		this.attending = attending;
-		this.creator = creator;
-		this.time_start = time_start;
-		this.time_end = time_end;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		if (associated_club != null) {
-			this.associated_club = associated_club.getObjectID();
-		}
 
-		ObjectNode node = JsonNodeFactory.instance.objectNode();
+
+	@Override
+	public Object get(String string) {
+		return object.get(string);
+	}
+
+	public void set(String identifier, Object value)
+	{
+		object.put(identifier,value);
 	}
 
 
 	public ObjectNode toFeedNode(){
 
 		ObjectNode node = JsonNodeFactory.instance.objectNode();
-		node.put("name", getName());
+		node.put("name", (String)get(NAME));
 		node.put("id", getObjectID().toHexString());
-		node.put("description", getDescription());
-		node.put("type", getType());
-		node.put("attending", Json.objectIdListToJsonNode(getAttending()));
-		node.put("creator", getCreator().toHexString());
-		node.put("time_start", getTime_start());
-		node.put("time_end", getTime_end());
-		node.put(LATITUDE, getLatitude());
-		node.put(LONGITUDE, getLongitude());
+		node.put("description", (String)get(DESCRIPTION));
+		node.put("type", (String)get(TYPE));
+		node.put("attending", Json.objectIdListToJsonNode((ArrayList<ObjectId>)get(ATTENDING)));
+		node.put("creator", ((ObjectId)(get(CREATOR))) .toHexString());
+		node.put("time_start", (long)get(TIME_START));
+		node.put("time_end", (long)get(TIME_END));
+		node.put(LATITUDE, (double)get(LATITUDE));
+		node.put(LONGITUDE, (double)get(LONGITUDE));
 
 		return node;
 	}
 
-
+	@Override
+	public ObjectId getObjectID() {
+		return (ObjectId)object.get("_id");
+	}
 
 	public Activity(DBObject object)
 	{
-		name = (String)object.get("name");
-		type = (String)object.get("type");
-		description = (String)object.get("description");
-		objectID = (ObjectId)object.get("_id");
-		attending = (ArrayList<ObjectId>)object.get("attending");
-		time_start = (Long)object.get("time_start");
-		time_end = (Long)object.get("time_end");
-		latitude = (Double)object.get("latitude");
-		longitude = (Double)object.get("longitude");
-		creator = (ObjectId)object.get("creator");
-		associated_club = (ObjectId)object.get("associated_club");
-
+		this.object = object;
 	}
 
 	/**
@@ -167,200 +159,9 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 		DatabaseConnectivity.addObject(object.getDBForm(), DatabaseConnectivity.ACTIVITYCOLLECTION);
 	}
 
-	public double getLatitude()
+	public DBObject getDBForm()
 	{
-		return latitude;
+		return object;
 	}
 
-	public void setLatitude(double latitude)
-	{
-		this.latitude = latitude;
-	}
-
-	public double getLongitude()
-	{
-		return longitude;
-	}
-
-	public void setLongitude(double longitude)
-	{
-		this.longitude = longitude;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public BasicDBObject getDBForm()
-	{
-		form = new BasicDBObject();
-		form.append("name",getName());
-		form.append("description",getDescription());
-		form.append("attending",getAttending());
-		form.append("creator", getCreator());
-		form.append("time_start",getTime_start());
-		form.append("time_end",getTime_end());
-		form.append("type", getType());
-		form.append("latitude",getLatitude());
-		form.append("longitude",getLongitude());
-
-		form.append("associated_club", getAssociated_club());
-		return form;
-	}
-
-	/**
-	 *
-	 * @return Gets the name of the activity
-	 */
-	public String getName()
-	{
-		return name;
-	}
-
-	/**
-	 *
-	 * @param name Sets the name of the activity
-	 */
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	/**
-	 *
-	 * @return Gets the country the activity takes place in
-	 */
-
-	/**
-	 *
-	 * @return Returns the ObjectId of the activity
-	 */
-	public ObjectId getObjectID()
-	{
-		return objectID;
-	}
-
-	/**
-	 *
-	 * @param objectID Sets the ObjectId of an Object
-	 */
-	public void setObjectID(ObjectId objectID)
-	{
-		this.objectID = objectID;
-	}
-
-	/**
-	 *
-	 * @param location_state Sets the state(location) of the activity
-	 */
-
-	/**
-	 *
-	 * @return Returns the description of the activity
-	 */
-	public String getDescription()
-	{
-		return description;
-	}
-
-	/**
-	 *
-	 * @param description Sets the description of the activity
-	 */
-	public void setDescription(String description)
-	{
-		this.description = description;
-	}
-
-	/**
-	 *
-	 * @return Returns a list of ObjectId of attendees for the activity
-	 */
-	public ArrayList<ObjectId> getAttending()
-	{
-		return attending;
-	}
-
-	/**
-	 *
-	 * @param attending Sets the list of attendees for an activity
-	 */
-	public void setAttending(ArrayList<ObjectId> attending)
-	{
-		this.attending = attending;
-	}
-
-	/**
-	 *
-	 * @param id Adds an attendee to the list of attendees
-	 */
-	public void addAttending(ObjectId id) { attending.add(id);}
-
-	/**
-	 *
-	 * @param id Removes an attendee from the list of attendees
-	 */
-	public void removeAttending(ObjectId id) { attending.remove(id); }
-
-	/**
-	 *
-	 * @return Returns the time the activity takes place
-	 */
-	public long getStartTime()
-	{
-		return time_start;
-	}
-
-	/**
-	 *
-	 * @param time Sets the time the activity takes place
-	 */
-	public void setTime(long time)
-	{
-		this.time_start = time;
-	}
-
-	public long getTime_start() {
-		return time_start;
-	}
-
-	public void setTime_start(long time_start) {
-		this.time_start = time_start;
-	}
-
-	public long getTime_end() {
-		return time_end;
-	}
-
-	public void setTime_end(long time_end) {
-		this.time_end = time_end;
-	}
-
-	public BasicDBObject getForm() {
-		return form;
-	}
-
-	public void setForm(BasicDBObject form) {
-		this.form = form;
-	}
-
-	public ObjectId getAssociated_club() {
-		return associated_club;
-	}
-
-	public void setAssociated_club(ObjectId associated_club) {
-		this.associated_club = associated_club;
-	}
-
-	public ObjectId getCreator() {
-		return creator;
-	}
-
-	public void setCreator(ObjectId creator) {
-		this.creator = creator;
-	}
 }

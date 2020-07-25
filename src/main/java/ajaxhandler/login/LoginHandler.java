@@ -25,7 +25,7 @@ public class LoginHandler implements AjaxHandler
 		return instance;
 	}
 
-	private ActivityFeedHandler handler = new ActivityFeedHandler();
+	private ActivityFeedHandler handler = new ActivityFeedHandler(true);
 	public boolean isPage(){
 		return true;
 	}

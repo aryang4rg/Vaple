@@ -20,10 +20,11 @@ import java.util.Comparator;
 
 public class ActivityFeedHandler implements AjaxHandler
 {
-    private static ActivityFeedHandler instance = new ActivityFeedHandler();
+    boolean isAPage;
 
-    public static ActivityFeedHandler getInstance() {
-        return instance;
+    public ActivityFeedHandler(boolean isAPage)
+    {
+        this.isAPage = isAPage;
     }
 
     @Override
@@ -50,7 +51,7 @@ public class ActivityFeedHandler implements AjaxHandler
 
         if (specificUserId != null)
         {
-            User u =(User) User.databaseConnectivity().getFromInfoInDataBase(ID,specificUserId);
+            User u =(User) User.databaseConnectivity().getFromInfoInDataBase(ID,new ObjectId(specificUserId));
             if (u == null)
             {
                 return 400;

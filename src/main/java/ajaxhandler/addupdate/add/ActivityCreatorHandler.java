@@ -42,12 +42,12 @@ public class ActivityCreatorHandler implements AjaxHandler
         String longitude = Util.asText(request.get("longitude"));
         String time_start = Util.asText(request.get("time_start"));
         String time_end = Util.asText(request.get("time_end"));
-        String associated_club = Util.asText(request.get("associated_club"));
+        String associated_club = Util.asText(request.get("club"));
         String picture = Util.asText(request.get("image"));
 
 
 
-        if (!Util.checkIfStringsAreValid(title,description,type,time_end,time_start, longitude, latitude, picture))
+        if (!Util.checkIfStringsAreValid(title,description,type,time_end,time_start))
         {
             return 400;
         }
@@ -68,6 +68,11 @@ public class ActivityCreatorHandler implements AjaxHandler
             Activity activity = new Activity(title, description, type, user.getObjectID(), new ArrayList<ObjectId>(), Long.parseLong(time_start),
                     Long.parseLong(time_end), Double.parseDouble(latitude), Double.parseDouble(longitude), club);
             Activity.databaseConnectivity().addInDatabase(activity);
+            if (club != null)
+            {
+                club.setActivity(activity.getObjectID(), true);
+                Club.databaseConnectivity().addInDatabase(club);
+            }
 
             user.setActivities(activity.getObjectID(), true);
             User.databaseConnectivity().addInDatabase(user);

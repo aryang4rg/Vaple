@@ -1,5 +1,8 @@
 package databaseobject;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import main.*;
 
 import com.mongodb.BasicDBObject;
@@ -12,7 +15,7 @@ public class Club implements DatabaseStructureObject
 {
     private DBObject object;
     public static final String NAME = "name", DESCRIPTION = "description", LOCATION_COUNTRY = "location_country", LOCATION_STATE = "location_state",
-    LOCATION_CITY = "location_city", CLUB_TYPE = "club_type";
+    LOCATION_CITY = "location_city", CLUB_TYPE = "club_type", ACTIVITY = "activity";
 
     private static Club databaseConnectivityObject = new Club();
     public static Club databaseConnectivity()
@@ -33,8 +36,36 @@ public class Club implements DatabaseStructureObject
         object.put("club_type",club_type);
         object.put("members",new BasicDBObject());
         object.put("owner",owner);
+        object.put("activity", new BasicDBObject());
 
         this.object = object;
+        setMember(owner, true);
+    }
+
+    public Object getConciseDataNode()
+    {
+        ObjectNode node = new ObjectNode(JsonNodeFactory.instance);
+        //getDBForm().get(NAME)
+        return null;
+    }
+
+
+    @Override
+    public Object get(String string) {
+        return object.get(string);
+    }
+
+    public void set(String identifier, Object value)
+    {
+        object.put(identifier,value);
+    }
+
+    public void setActivity(ObjectId act, boolean isAdding)
+    {
+        if(isAdding)
+            ((DBObject)object.get("clubs")).put(act.toHexString(), true);
+        else
+            ((DBObject)object.get("clubs")).removeField(act.toHexString());
     }
 
     public void setMember(ObjectId userId, boolean isAdding){
@@ -113,33 +144,5 @@ public class Club implements DatabaseStructureObject
         return (ObjectId)object.get("_id");
     }
 
-    public static String getNAME()
-    {
-        return NAME;
-    }
 
-    public static String getDESCRIPTION()
-    {
-        return DESCRIPTION;
-    }
-
-    public static String getLocationCountry()
-    {
-        return LOCATION_COUNTRY;
-    }
-
-    public static String getLocationState()
-    {
-        return LOCATION_STATE;
-    }
-
-    public static String getLocationCity()
-    {
-        return LOCATION_CITY;
-    }
-
-    public static String getClubType()
-    {
-        return CLUB_TYPE;
-    }
 }

@@ -12,5 +12,7 @@ public interface DatabaseStructureObject
     void addInDatabase(DatabaseStructureObject object);
     DBObject getDBForm();
     ObjectId getObjectID();
+    Object get(String identifier);
+    void set(String identifier, Object object);
 
 }
