@@ -51,7 +51,7 @@ public class User implements DatabaseStructureObject
 		object.put("activities", new BasicDBObject());
 		object.put("clubs",new BasicDBObject());
 		object.put("verified",verifiedUser);
-		object.put("sentEmails", System.currentTimeMillis());
+		object.put("sentEmails", 0);
 
 		this.object = object;
 	}
@@ -421,7 +421,7 @@ public class User implements DatabaseStructureObject
 
 	public long getLastEmailTime()
 	{
-		return (long)object.get("sentEmails");
+		return (Long) object.get("sentEmails");
 	}
 
 	public void setLastEmailTime()
