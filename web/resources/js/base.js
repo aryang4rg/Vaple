@@ -699,8 +699,6 @@ class ProfilePage extends Page{
 
 		this.isFollowing = false;
 		this.follow.on('click', () => {
-			if(this.followRequest)
-				this.followRequest.abort();
 			const change = {};
 
 			if(this.isFollowing){
@@ -713,6 +711,13 @@ class ProfilePage extends Page{
 
 				this.follow.setText('Unfollow');
 				this.isFollowing = true;
+			}
+
+			if(this.followRequest){
+				this.followRequest.abort();
+				this.followRequest = null;
+
+				return;
 			}
 
 			const x = this.followRequest = accountManager.sendRequest('/follow_change', change, (status, error, resp) => {
@@ -2273,28 +2278,33 @@ class ClubPage extends Page{
 		this.isJoined = false;
 		this.joinRequest = null;
 		this.join.on('click', () => {
-			if(this.joinRequest)
-				this.joinRequest.abort();
-			const change = {};
+			const change = {club_id: this.id};
 
 			if(this.isJoined){
-				// change.unfollowing = [this.id];
+				change.toJoin = false;
 
 				this.join.setText('Join');
 				this.isJoined = false;
 			}else{
-				// change.isJoined = [this.id];
+				change.toJoin = true;
 
 				this.join.setText('Leave');
 				this.isJoined = true;
+			}
+
+			if(this.joinRequest){
+				this.joinRequest.abort();
+				this.joinRequest = null;
+
+				return;
 			}
 
 			const x = this.joinRequest = accountManager.sendRequest('/join_leave_club', change, (status, error, resp) => {
 				var err = false;
 
 				if(error || status != 200){
-					this.followFailed.show();
-					this.followFailed.hideAfter(2000);
+					this.joinFailed.show();
+					this.joinFailed.hideAfter(2000);
 
 					err = true;
 				}
@@ -2316,8 +2326,12 @@ class ClubPage extends Page{
 		});
 
 		this.members = createElement('div', {className: 'profile-clubs shadow-light'});
+		this.membersTitleContainer = createElement('div', {className: 'profile-clubs-title-container', css: {'flex-direction': 'row', 'justify-content': 'center'}});
 		this.membersTitle = createElement('span', {className: 'profile-clubs-title text metro', innerText: 'Members'});
-		this.members.appendChild(this.membersTitle);
+		this.membersTitleContainer.appendChild(this.membersTitle);
+		this.membersCount = createElement('span', {className: 'club-members-count text'});
+		this.membersTitleContainer.appendChild(this.membersCount);
+		this.members.appendChild(this.membersTitleContainer);
 		this.membersList = createElement('div', {className: 'profile-clubs-list'});
 		this.members.appendChild(this.membersList);
 		this.right.appendChild(this.members);
@@ -2375,7 +2389,7 @@ class ClubPage extends Page{
 
 		setBackgroundImage(this.clubImage, cdnPath('club', data.id));
 
-		this.followRequest = null;
+		this.joinRequest = null;
 		this.name.setText(data.name);
 		this.type.setText(data.type);
 		this.description.setText(data.description);
@@ -2413,8 +2427,7 @@ class ClubPage extends Page{
 			this.membersList.appendChild(container);
 		}
 
-		this.membersTitle.setText('Members');
-		this.membersTitle.appendChild(createElement('span', {className: 'club-members-count text', innerText: data.members.length + ''}));
+		this.membersCount.setText(data.members.length + '');
 
 		if(this.fetch_activities)
 			this.fetch_activities.abort();
