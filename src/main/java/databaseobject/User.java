@@ -23,6 +23,7 @@ public class User implements DatabaseStructureObject
 	LOCATION_CITY = "location_city", DESCRIPTION = "description", TOKEN = "token", FOLLOWING = "following", FOLLOWERS = "followers", ACTIVITIES = "activities";
 
 	private boolean verifiedUser = false;
+	public int emailsSentToday = 0;
 
 	private static User databaseConnectivityObject = new User();
 	public static User databaseConnectivity()
@@ -49,6 +50,7 @@ public class User implements DatabaseStructureObject
 		object.put("activities", new BasicDBObject());
 		object.put("clubs",new BasicDBObject());
 		object.put("verified",verifiedUser);
+		object.put("sentEmails", new BasicDBObject());
 
 		this.object = object;
 	}
@@ -99,6 +101,12 @@ public class User implements DatabaseStructureObject
 	public void addActivityToUser(Activity activity)
 	{
 		((DBObject)object.get("activities")).put(activity.getObjectID().toHexString(),true);
+	}
+
+	public void clearEmailsSent()
+	{
+		emailsSentToday = 0;
+		((DBObject)object.get("sentEmails")).put("day",emailsSentToday);
 	}
 
 	public User(DBObject object)
@@ -377,7 +385,7 @@ public class User implements DatabaseStructureObject
 	 */
 	public void updateInDatabase(DatabaseStructureObject user)
 	{
-		DatabaseConnectivity.updateObject( user.getDBForm(), DatabaseConnectivity.ACCOUNTCOLLECTION);
+		DatabaseConnectivity.updateObject(user.getDBForm(), DatabaseConnectivity.ACCOUNTCOLLECTION);
 	}
 
 
@@ -403,4 +411,16 @@ public class User implements DatabaseStructureObject
 	{
 		this.verifiedUser = verifiedUser;
 	}
+
+	public int getEmailsSentToday()
+	{
+		return (int)((DBObject)object.get("sentEmails")).get("day");
+	}
+
+	public void setEmailsSentToday(int n)
+	{
+		emailsSentToday+= n;
+		((DBObject)object.get("sentEmails")).put("day",emailsSentToday);
+	}
+
 }

@@ -1,6 +1,7 @@
 package main;
 
 import com.mongodb.*;
+import databaseobject.User;
 import org.bson.types.ObjectId;
 
 import java.net.UnknownHostException;
@@ -29,7 +30,6 @@ public class DatabaseConnectivity
 	public static final DBCollection ACCOUNTCOLLECTION = database.getCollection("account");
 	public static final DBCollection ACTIVITYCOLLECTION = database.getCollection("activity");
 	public static final DBCollection CLUBCOLLECTION = database.getCollection("club");
-
 
 	/**
 	 * Adds an object to the database
