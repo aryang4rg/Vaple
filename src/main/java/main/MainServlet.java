@@ -199,8 +199,9 @@ public class MainServlet extends HttpServlet
 			}
 		}
 
-		String page = "<!DOCTYPE html><html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"/style/base.css\">"
-			+ "</head><body><script src=\"/js/base.js\"></script><script src=\"/js/loader.js\"></script></body></html>";
+		String page = "<!DOCTYPE html><html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"/style/base.css\">" +
+			"</head><body><script src=\"/js/base.js\"></script><script src=\"/js/loader.js\"></script>" +
+			"<script src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyBdBgeXjW2cX_Q_sOZvliYy-8eDQq319ss&callback=initMap\"></body></html>";
 		/* send a minimized version of page.html since it never changes anyway */
 		resp.setHeader("Content-Type", "text/html");
 		resp.setHeader("Content-Length", "" + page.length());
