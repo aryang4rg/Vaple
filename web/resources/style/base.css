@@ -22,15 +22,41 @@ a{
 	user-select: none;
 }
 
+*::-webkit-scrollbar{
+	width: 10px;
+	height: 10px;
+	background-color: #fff;
+}
+
+*::-webkit-scrollbar-track{
+	width: 10px;
+	background-color: transparent;
+}
+
+*::-webkit-scrollbar-thumb{
+	width: 10px;
+	background-color: #ccc;
+}
+
+*::-webkit-scrollbar-thumb:hover{
+	background-color: #aaa;
+}
+
+*::-webkit-scrollbar-thumb:active{
+	background-color: #888;
+}
+
 .text{
 	font-family: roboto;
 	font-size: 1rem;
 	line-height: 1rem;
 	display: inline-block;
+	font-weight: 300;
 }
 
 .text.metro{
 	font-family: 'Metropolis Regular';
+	font-weight: 400;
 }
 
 @keyframes waiting{
@@ -509,7 +535,7 @@ a{
 	font-size: 16px;
 	line-height: 20px;
 	width: 100%;
-	font-weight: 500;
+	font-weight: 400;
 	text-align: left !important;
 	word-break: break-word;
 }
@@ -592,10 +618,33 @@ a{
 	padding: 20px;
 }
 
+.profile-clubs-title-container{
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 16px;
+	position: relative;
+}
+
+.profile-clubs-title-new-container{
+	width: 24px;
+	height: 24px;
+	position: absolute;
+	right: 0;
+}
+
+.profile-clubs-title-new{
+	fill: none;
+	stroke: none;
+	stroke-linecap: round;
+	width: 24px;
+	height: 24px;
+}
+
 .profile-clubs-title{
 	font-size: 24px;
 	line-height: normal;
-	margin-bottom: 16px;
 }
 
 .profile-clubs-list{
@@ -706,6 +755,30 @@ a{
 	background-position: center;
 	background-size: cover;
 	margin: 8px 4px 0 0;
+}
+
+.profile-activity-attend-button{
+	border-radius: 1000px;
+	width: 180px;
+	text-transform: uppercase;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	color: #000;
+	height: 32px;
+	cursor: pointer;
+	user-select: none;
+	border: #000 1px solid;
+}
+
+.profile-activity-attend-button.animation{
+	background-image: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
+	background-size: 1800% 1800%;
+	animation: cycle 4s linear infinite;
+	color: #fff;
+	border: #fff 1px solid;
 }
 
 .activities-loader-center{
@@ -891,7 +964,8 @@ a{
 	border-radius: 8px;
 	background-color: #fff;
 	padding: 40px;
-	display: column;
+	display: flex;
+	justify-content: center;
 	align-items: center;
 	flex-direction: row;
 }
@@ -899,13 +973,14 @@ a{
 .new-activity-form-container{
 	display: flex;
 	flex-direction: row;
-	width: 640px;
+	width: 100%;
 }
 
 .new-activity-form-container.column{
 	flex-direction: column;
 	align-items: center;
 	margin-right: 24px;
+	width: 640px;
 }
 
 .new-activity-form-title{
@@ -1064,6 +1139,65 @@ textarea.new-activity-form-entry-input{
 	background-color: #0001;
 }
 
+.new-activity-form-entry-club-container{
+	height: 40px;
+	padding: 0 20px;
+	width: 280px;
+	border-radius: 4px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	cursor: pointer;
+}
+
+.new-activity-form-entry-club-container:hover{
+	background-color: #0001;
+}
+
+.new-activity-form-entry-dropdown-values.clublist .new-activity-form-entry-dropdown-value{
+	user-select: none;
+	word-break: break-word;
+}
+
+.new-activity-form-entry-dropdown-values.clublist .new-activity-form-entry-dropdown-value .text{
+	width: calc(100% - 72px);
+}
+
+.new-activity-form-entry-club-photo{
+	width: 32px;
+	height: 32px;
+	background-position: center;
+	background-size: cover;
+	border-radius: 2px;
+	margin-right: 8px;
+}
+
+.new-activity-form-entry-club-close{
+	width: 24px;
+	height: 24px;
+	margin-left: 8px;
+	display: none;
+	fill: #888;
+	cursor: pointer;
+}
+
+.new-activity-form-entry-club-close:hover{
+	fill: #000;
+}
+
+.new-activity-form-entry-club-container.chosen{
+	padding: 8px 0;
+	cursor: default;
+}
+
+.new-activity-form-entry-club-container.chosen:hover{
+	background-color: transparent;
+}
+
+.new-activity-form-entry-club-container.chosen .new-activity-form-entry-club-close{
+	display: inline-block;
+}
+
 .new-activity-form-entry-error{
 	color: #a00;
 	font-size: 13px;
@@ -1100,4 +1234,35 @@ textarea.new-activity-form-entry-input{
 	margin: 20px 0;
 	height: 100%;
 	width: 640px;
+}
+
+.new-club-photo-container{
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.new-club-photo{
+	width: 180px;
+	height: 180px;
+	border-radius: 50%;
+	background-position: center;
+	background-size: cover;
+	margin-right: 16px;
+}
+
+.new-club-set-photo-container{
+	display: flex;
+	flex-direction: column;
+}
+
+.new-club-set-photo-button{
+	color: #888;
+	cursor: pointer;
+}
+
+.new-club-set-photo-button:hover{
+	text-decoration: underline;
 }
