@@ -1317,7 +1317,7 @@ const types = [
 	"Protest", "Educational Workshops"
 ];
 
-class NewActivityPage extends Page{
+class ActivityCreationPage extends Page{
 	constructor(){
 		super();
 
@@ -1468,7 +1468,7 @@ class NewActivityPage extends Page{
 	}
 
 	createClubDropdown(){
-		const entry = createElement('div', {className: 'new-activity-form-entry'});
+		const entry = createElement('div', {className: 'new-activity-form-entry', css: {height: '80px'}});
 		const cont = createElement('div', {className: 'new-activity-form-entry-input-container'});
 		const field = createElement('input', {className: 'new-activity-form-entry-input text metro', attributes: {placeholder: 'Enter the club (optional)', spellcheck: false}});
 
@@ -2702,7 +2702,7 @@ const pageManager = new (class{
 			explore: new ExplorePage(),
 			dashboard: new DashboardPage(),
 			notfound: new NotFoundPage(),
-			new_activity: new NewActivityPage(),
+			new_activity: new ActivityCreationPage(),
 			activity: new ActivityPage(),
 			new_club: new ClubCreationPage(),
 			club: new ClubPage()
