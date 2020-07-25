@@ -144,7 +144,7 @@ public class ActivityFeedHandler implements AjaxHandler
 			response.put("type", "feed");
 			response.put("data", data);
 		}else{
-			response.put("activites", data.get("activities"));
+			response.put("activities", data.get("activities"));
 		}
         return 200;
     }
