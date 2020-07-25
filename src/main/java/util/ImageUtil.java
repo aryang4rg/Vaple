@@ -23,8 +23,8 @@ public class ImageUtil{
 			return "Image must be atleast 32x32";
 		if(img.getWidth() > 512 || img.getHeight() > 512)
 			return "Image must be atmost 512x512";
-		if(imageBytes.length > 256 * 1024)
-			return "Image must be atmost 256KB";
+		if(imageBytes.length > 512 * 1024)
+			return "Image must be atmost 512KB";
 		if (!file.exists()) {
 			file.createNewFile();
 		}

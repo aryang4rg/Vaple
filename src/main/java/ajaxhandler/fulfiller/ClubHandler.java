@@ -16,6 +16,13 @@ import java.io.IOException;
 
 public class ClubHandler implements AjaxHandler
 {
+    private static ClubHandler instance = new ClubHandler();
+    private ClubHandler(){}
+
+    public static ClubHandler getInstance() {
+        return instance;
+    }
+
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException {
 
@@ -32,6 +39,20 @@ public class ClubHandler implements AjaxHandler
         response.put("data", node);
         response.put("type", "club");
         response.put("data", c.getConciseDataNode());
+
+        if (user == null)
+        {
+            response.put("owner", false);
+            response.put("joined", false);
+        }
+        else
+        {
+           if(c.get("owner").equals(user.getObjectID().toHexString()))
+           {
+
+           }
+
+        }
         return 200;
 
     }

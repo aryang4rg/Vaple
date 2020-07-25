@@ -21,7 +21,7 @@ public class Club implements DatabaseStructureObject
 {
     private DBObject object;
     public static final String NAME = "name", DESCRIPTION = "description", LOCATION_COUNTRY = "location_country", LOCATION_STATE = "location_state",
-    LOCATION_CITY = "location_city", CLUB_TYPE = "club_type", ACTIVITY = "activity", OWNER = "owner", MEMBER = "members";
+    LOCATION_CITY = "location_city", CLUB_TYPE = "type", ACTIVITY = "activity", OWNER = "owner", MEMBER = "members";
     List<String> tags;
 
     private static Club databaseConnectivityObject = new Club();
@@ -41,7 +41,7 @@ public class Club implements DatabaseStructureObject
         node.put("city", (String)get(LOCATION_CITY));
         node.put("state", (String)get(LOCATION_STATE));
         node.put("country", (String)get(LOCATION_COUNTRY));
-        node.put("club_type", (String)get(CLUB_TYPE));
+        node.put(CLUB_TYPE, (String)get(CLUB_TYPE));
         node.put("owner", ((ObjectId)get(OWNER)).toHexString());
 
         ObjectNode actNode = Util.createObjectNode();
@@ -72,7 +72,7 @@ public class Club implements DatabaseStructureObject
         object.put("location_country",location_country);
         object.put("location_state",location_state);
         object.put("location_city",location_city);
-        object.put("club_type",club_type);
+        object.put(CLUB_TYPE,club_type);
         object.put("members",new BasicDBObject());
         object.put("owner",owner);
         object.put("activity", new BasicDBObject());

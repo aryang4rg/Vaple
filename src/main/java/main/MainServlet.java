@@ -11,15 +11,17 @@ import java.util.Hashtable;
 
 import ajaxhandler.*;
 import ajaxhandler.addupdate.add.ActivityCreatorHandler;
+import ajaxhandler.addupdate.add.ClubCreateHandler;
 import ajaxhandler.addupdate.add.SignUpServlet;
 import ajaxhandler.addupdate.update.AccountChangeHandler;
+import ajaxhandler.addupdate.update.AddUserToActivity;
 import ajaxhandler.addupdate.update.ClubFollowHandler;
 import ajaxhandler.addupdate.update.FollowPersonHandler;
-import ajaxhandler.fulfiller.ActivityFeedHandler;
-import ajaxhandler.fulfiller.NewActivityHandler;
-import ajaxhandler.fulfiller.ProfileHandler;
+import ajaxhandler.fulfiller.*;
 import ajaxhandler.login.LoginHandler;
 import ajaxhandler.login.LoginServlet;
+import ajaxhandler.login.UnverifiedHandler;
+import ajaxhandler.login.VerifyAccountHandler;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import databaseobject.*;
 import util.*;
@@ -36,7 +38,7 @@ public class MainServlet extends HttpServlet
 		return new File(getServletContext().getRealPath("/resources" + path));
 	}
 
-	private static void sendFile(OutputStream out, File file) throws FileNotFoundException, IOException {
+	private static void sendFile(OutputStream out, File file) throws IOException {
 		FileInputStream in = new FileInputStream(file);
 		byte[] buffer = new byte[16384];
 		int length;
@@ -53,7 +55,7 @@ public class MainServlet extends HttpServlet
 
 	private Hashtable<String, AjaxHandler> ajaxRequestToHandler()
 	{
-		Hashtable<String, AjaxHandler> hashtable = new Hashtable<String, AjaxHandler>();
+		Hashtable<String, AjaxHandler> hashtable = new Hashtable<>();
 		hashtable.put("account_login", LoginServlet.getInstance());
 		hashtable.put("account_create", SignUpServlet.getInstance());
 		hashtable.put("login", LoginHandler.getInstance());
@@ -66,12 +68,18 @@ public class MainServlet extends HttpServlet
 		hashtable.put("activities", new ActivityFeedHandler(false));
 		hashtable.put("home", new ActivityFeedHandler(true));
 		hashtable.put("new_activity", NewActivityHandler.getInstance());
-
+		hashtable.put("verify_account", VerifyAccountHandler.getInstance());
+		hashtable.put("club_create", ClubCreateHandler.getInstance(this));
+		hashtable.put("add_to_activity", AddUserToActivity.getInstance());
+		hashtable.put("activity", ActivityHandler.getInstance());
+		hashtable.put("club", ClubHandler.getInstance());
+		hashtable.put("new_club",  NewClubHandler.getInstance());
+		hashtable.put("unverified_user", UnverifiedHandler.getInstance());
 		return hashtable;
 	}
 
 	private Hashtable<String, String> extensionToMimeHM(){
-		Hashtable<String, String> map = new Hashtable<String, String>();
+		Hashtable<String, String> map = new Hashtable<>();
 
 		map.put("js", "application/javascript");
 		map.put("css", "text/css");
@@ -84,10 +92,16 @@ public class MainServlet extends HttpServlet
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String[] uriSplit = req.getRequestURI().split("[/]+");
+		User user = null;
+		AjaxHandler handler = null;
+		String token = req.getHeader("Authentication");
+
+		if(token != null)
+			user = (User) User.databaseConnectivity().getFromInfoInDataBase(User.TOKEN, token);
+
 
 		if("POST".equalsIgnoreCase(req.getMethod()))
 		{
-			AjaxHandler handler = null;
 
 			if(uriSplit.length == 0)
 			{
@@ -101,6 +115,23 @@ public class MainServlet extends HttpServlet
 
 			if (handler != null)
 			{
+				boolean isUnverified = false;
+				if (!handler.equals(VerifyAccountHandler.getInstance()) && user != null && !(Boolean)user.get(User.VERIFIED))
+				{
+					if (handler.isPage()) {
+						handler = pathToHandler.get("unverified_user");
+						uriSplit = new String[]{};
+					}
+					else
+					{
+						isUnverified = true;
+						resp.setStatus(403);
+					}
+				}
+				if (isUnverified)
+				{
+					return;
+				}
 				JsonNode request = null;
 				try {
 					request = Json.parse(req.getInputStream());
@@ -112,11 +143,7 @@ public class MainServlet extends HttpServlet
 
 					ObjectNode response = Util.createObjectNode();
 
-				User user = null;
-				String token = req.getHeader("Authentication");
 
-				if(token != null)
-					user = (User) User.databaseConnectivity().getFromInfoInDataBase(User.TOKEN, token);
 				/* maybe remove later */
 
 				if(user == null && handler.isPage()){
@@ -124,10 +151,7 @@ public class MainServlet extends HttpServlet
 					uriSplit = new String[]{};
 				}
 
-				if (user != null && !(Boolean)user.get(User.VERIFIED))
-				{
 
-				}
 				/* maybe remove later ^*/
 				int statusCode = handler.service(req, resp, request, response, uriSplit, user);
 

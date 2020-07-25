@@ -22,7 +22,7 @@ public class VerifyAccountHandler implements AjaxHandler
 
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException {
-        if (uriSplit.length != 1 ) // 0: / 1: verify_account 2: == token
+        if (uriSplit.length != 3 ) // 0: / 1: verify_account 2: == token
         {
             return 400;
         }

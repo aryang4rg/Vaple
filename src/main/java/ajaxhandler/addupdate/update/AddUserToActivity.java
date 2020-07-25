@@ -14,6 +14,14 @@ import java.io.IOException;
 
 public class AddUserToActivity implements AjaxHandler {
 
+    private static AddUserToActivity instance = new AddUserToActivity();
+
+    public static AddUserToActivity getInstance() {
+        return instance;
+    }
+
+    private AddUserToActivity(){}
+
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException {
         String id = Util.asText(request.get("activity"));
