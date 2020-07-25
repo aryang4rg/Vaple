@@ -140,8 +140,12 @@ public class ActivityFeedHandler implements AjaxHandler
         {
             data.put("activities", Json.toJson(new ArrayList<Activity>()));
         }
-        response.put("type", "feed");
-        response.put("data", data);
+        if(isAPage){
+			response.put("type", "feed");
+			response.put("data", data);
+		}else{
+			response.put("activites", data.get("activities"));
+		}
         return 200;
     }
 
