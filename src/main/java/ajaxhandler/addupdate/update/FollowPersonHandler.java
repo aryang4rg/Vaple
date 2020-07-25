@@ -50,8 +50,12 @@ public class FollowPersonHandler implements AjaxHandler
 					String messageText = "<h3>You have a new follower!<br>Your new follower is: " + user.getName() + "</h3>" +
                             "<h4> Their <a href=\"" + IP_ADDRESS + "/profile/" + user.getObjectID() + "\">profile</a><br></h4><img src=\"" +
                             IP_ADDRESS + "/cdn/profile/" + user.getObjectID() + ".png\" width = \"150\">";
-					if (user.getEmailsSentToday() <= 7)
+					long lastTime = user.getLastEmailTime();
+					long now = System.currentTimeMillis();
+
+					if (now - lastTime > 3600 * 1000)
                     {
+                        user.setLastEmailTime();
                         try
                         {
                             JavaMail.sendMessage(recipient, subject, messageText);
@@ -59,8 +63,7 @@ public class FollowPersonHandler implements AjaxHandler
                         {
                             e.printStackTrace();
                         }
-                        user.setEmailsSentToday(user.getEmailsSentToday() + 1);
-                        User.databaseConnectivity().updateInDatabase(user);
+
                     }
 				}
             }

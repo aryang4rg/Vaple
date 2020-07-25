@@ -10,6 +10,7 @@ import org.bson.types.ObjectId;
 import util.Json;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * <PRE>The user class describes a user object, which stores the user's name, location, description, password, email, a list of followers and
@@ -50,7 +51,7 @@ public class User implements DatabaseStructureObject
 		object.put("activities", new BasicDBObject());
 		object.put("clubs",new BasicDBObject());
 		object.put("verified",verifiedUser);
-		object.put("sentEmails", new BasicDBObject());
+		object.put("sentEmails", 0);
 
 		this.object = object;
 	}
@@ -367,10 +368,6 @@ public class User implements DatabaseStructureObject
 		return node;
 	}
 
-
-
-
-
 	public DatabaseStructureObject findInDatabase(DBObject obj){
 		DBObject object = DatabaseConnectivity.findOneObject(obj, DatabaseConnectivity.ACCOUNTCOLLECTION);
 		if(object != null)
@@ -422,15 +419,15 @@ public class User implements DatabaseStructureObject
 		this.verifiedUser = verifiedUser;
 	}
 
-	public int getEmailsSentToday()
+	public long getLastEmailTime()
 	{
-		return (int)((DBObject)object.get("sentEmails")).get("day");
+		return (Long) object.get("sentEmails");
 	}
 
-	public void setEmailsSentToday(int n)
+	public void setLastEmailTime()
 	{
-		emailsSentToday+= n;
-		((DBObject)object.get("sentEmails")).put("day",emailsSentToday);
+		set("sentEmails",System.currentTimeMillis());
+		updateInDatabase(this);
 	}
 
 }
