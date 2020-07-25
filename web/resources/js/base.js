@@ -1493,11 +1493,12 @@ class NewActivityPage extends Page{
 		this.creatingToast.text.setText('Creating activity');
 		this.creatingToast.show();
 
-		this.submitting = accountManager.sendRequest('/activity_create', {title: this.title.field.value, type: this.type.field.value,
+		this.submitting = accountManager.sendRequest('/activity_create', {title: this.title.field.value, type: this.type.field.value, description: this.description.type.value,
 			latitude: this.selectedLocation.lat, longitude: this.selectedLocation.lng, time_start, time_end, club: null}, (status, error, data) => {
 				this.submitting = null;
 				this.button.classList.remove('disabled');
 				this.creatingToast.hideAfter(2000);
+				this.creatingToast.progress();
 
 				if(error || status != 200 || (data && (data.error || !data.activity))){
 					this.actionError.setText((data && data.error) || 'There was an error creating this activity, try again later');
