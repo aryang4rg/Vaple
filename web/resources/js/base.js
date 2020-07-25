@@ -53,7 +53,16 @@ function cdnPath(subdir, name){
 }
 
 function setBackgroundImage(element, url){
-	element.style['background-image'] = 'url(' + url + ')';
+	element.style.backgroundImage = 'url(' + url + ')';
+}
+
+function ajaxify(el){
+	el.on('click', function(e){
+		e.preventDefault();
+		pageLoader.load(this.getAttribute('href'));
+
+		return false;
+	});
 }
 
 const ripplingManager = new (class{
@@ -883,14 +892,9 @@ class ProfilePage extends Page{
 			const img = createElement('div', {className: 'profile-clubs-photo'});
 
 			setBackgroundImage(img, cdnPath('club', club.id));
+			ajaxify(container);
 
 			container.appendChild(img);
-			container.on('click', (e) => {
-				e.preventDefault();
-				pageLoader.load(container.getAttribute('href'));
-
-				return false;
-			})
 
 			this.clubsList.appendChild(container);
 		}
@@ -938,13 +942,7 @@ class ProfilePage extends Page{
 			const creatorPhoto = createElement('a', {className: 'profile-activity-creator-photo', attributes: {href: '/profile/' + data.creator.id}});
 
 			setBackgroundImage(creatorPhoto, cdnPath('profile', data.creator.id));
-
-			creatorPhoto.on('click', function(e){
-				e.preventDefault();
-				pageLoader.load(this.getAttribute('href'));
-
-				return false;
-			});
+			ajaxify(creatorPhoto);
 
 			left.appendChild(creatorPhoto);
 			left.appendChild(createElement('span', {className: 'text metro', innerText: data.creator.name}));
@@ -953,13 +951,7 @@ class ProfilePage extends Page{
 				const clubPhoto = createElement('a', {className: 'profile-activity-club-photo', attributes: {href: '/club/' + data.club.id}});
 
 				setBackgroundImage(clubPhoto, cdnPath('club', data.club.id));
-
-				clubPhoto.on('click', function(e){
-					e.preventDefault();
-					pageLoader.load(this.getAttribute('href'));
-
-					return false;
-				});
+				ajaxify(clubPhoto);
 
 				right.appendChild(clubPhoto);
 				right.appendChild(createElement('span', {className: 'text metro', innerText: data.club.name}));
@@ -976,12 +968,7 @@ class ProfilePage extends Page{
 			title.appendChild(createElement('a', {className: 'profile-activity-title text metro', innerText: data.name, href: '/activity/' + data.id}));
 			body.appendChild(title);
 
-			title.on('click', function(e){
-				e.preventDefault();
-				pageLoader.load(this.getAttribute('href'));
-
-				return false;
-			});
+			ajaxify(title);
 
 			const time = this.createOffsetContainer();
 			var now = Date.now();
@@ -1086,13 +1073,7 @@ class ProfilePage extends Page{
 			for(var i = 0; i < data.attending.length; i++){
 				const el = createElement('a', {className: 'profile-activity-attending-photo', attributes: {href: '/profile/' + data.attending[i].id}});
 
-				el.on('click', function(e){
-					e.preventDefault();
-					pageLoader.load(this.getAttribute('href'));
-
-					return false;
-				});
-
+				ajaxify(el);
 				setBackgroundImage(el, cdnPath('profile', data.attending[i].id));
 
 				attending.appendChild(el);
@@ -1144,14 +1125,14 @@ class ProfilePage extends Page{
 	}
 
 	fetchActivities(id, top = 50, last){
-		this.fetch_activities = accountManager.sendRequest('/activities?id=' + id + '&top=' + top + '&last=' + last, null, (status, error, resp) => {
+		this.fetch_activities = accountManager.sendRequest('/activities?id=' + id + '&top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
 			this.activity_next = false;
 			this.fetch_activities = null;
 
 			if(error || status != 200)
 				this.showActivities(null);
 			else
-				this.showActivities(resp);
+				this.showActivities(resp.activities);
 		});
 	}
 
@@ -1160,6 +1141,81 @@ class ProfilePage extends Page{
 			this.fetch_activities.abort();
 			this.fetch_activities = null;
 		}
+	}
+}
+
+class NewActivityPage extends Page{
+	constructor(){
+		super();
+
+		this.form = createElement('div', {className: 'new-activity-form shadow-heavy'});
+		this.title = createElement('span', {className: 'new-activity-form-title text metro', innerText: 'Create an Activity'});
+		this.form.appendChild(this.title);
+		this.formContainer = createElement('div', {className: 'new-activity-form-container'});
+		this.entries = createElement('div', {className: 'new-activity-form-entries'});
+		this.title = this.createEntry('Title', 'text');
+		this.entries.appendChild(this.title.entry);
+		this.type = this.createEntry('Type', 'text');
+		this.entries.appendChild(this.type.entry);
+		this.description = this.createEntry('Description', 'text', true);
+		this.entries.appendChild(this.description.entry);
+		this.time = this.createTimeEntry('Start time');
+		this.entries.appendChild(this.time.entry);
+		this.formContainer.appendChild(this.entries);
+		this.button = createElement('div', {className: 'new-activity-button text metro', innerText: 'Create'});
+		this.formContainer.appendChild(this.button);
+		this.actionError = createElement('span', {className: 'new-activity-form-entry-error text metro'});
+		this.formContainer.appendChild(this.actionError);
+		this.successText = createElement('span', {className: 'text metro', css: {'font-size': '12px', 'margin-top': '40px'}});
+
+		this.form.appendChild(this.formContainer);
+		this.element.appendChild(createElement('div', {className: 'center'}, [this.form]));
+		this.element.classList.add('login-background');
+	}
+
+	createEntry(name, type, large = false){
+		const entry = createElement('div', {className: 'new-activity-form-entry' + (large ? ' large' : '')});
+		const cont = createElement('div', {className: 'new-activity-form-entry-input-container'});
+		const field = createElement(large ? 'textarea' : 'input', {className: 'new-activity-form-entry-input text metro', attributes: {placeholder: 'Enter the activity ' + name.toLowerCase(), type, spellcheck: false}});
+		const error = createElement('span', {className: 'new-activity-form-entry-error text metro'});
+
+		entry.appendChild(createElement('span', {className: 'text metro', innerText: name}));
+		cont.appendChild(field);
+		cont.appendChild(createElement('div', {className: 'new-activity-form-entry-input-focus-visualizer login-background'}));
+		entry.appendChild(cont);
+		entry.appendChild(error);
+		field.on('keyup', (e) => {
+			if(e.keyCode == 13)
+				this.trySubmit();
+		});
+
+		return {entry, field, error};
+	}
+
+	createDropdown(values, placeholder){
+		const container = createElement('div', {className: 'new-activity-form-entry-dropdown'});
+		const text = createElement('div', {className: 'new-activity-form-entry-dropdown-text placeholder', innerText: placeholder});
+		const svg = createElement('svg', {className: 'new-activity-form-entry-dropdown-svg'});
+
+		return container;
+	}
+
+	createTimeEntry(name){
+		const entry = createElement('div', {className: 'new-activity-form-entry'});
+		const cont = createElement('div', {className: 'new-activity-form-entry-input-container row'});
+		const error = createElement('span', {className: 'new-activity-form-entry-error text metro'});
+		const month = this.createDropdown();
+
+		entry.appendChild(createElement('span', {className: 'text metro', innerText: name}));
+		cont.appendChild(month);
+		entry.appendChild(cont);
+		entry.appendChild(error);
+
+		return {entry, fields: {month}, error};
+	}
+
+	trySubmit(){
+
 	}
 }
 
@@ -1211,7 +1267,8 @@ const pageManager = new (class{
 			feed: new FeedPage(),
 			explore: new ExplorePage(),
 			dashboard: new DashboardPage(),
-			notfound: new NotFoundPage()
+			notfound: new NotFoundPage(),
+			new_activity: new NewActivityPage()
 		};
 
 		this.showingPage = null;
@@ -1290,17 +1347,33 @@ const pageManager = new (class{
 				this.accountOptions.on('click', (e) => {
 					this.accountOptions.blur();
 				});
+
+				this.newActivityButton = createElement('a', {className: 'top-bar-new-activity-container', attributes: {href: '/new_activity'}});
+				this.svg = createElement('svg', {className: 'top-bar-new-activity', attributes: {viewBox: '0 0 48 48'}});
+
+				ajaxify(this.newActivityButton);
+				generateGradient(this.svg, {gradient: 'activity-add-gradient', mask: 'activity-add-mask'}, [
+					{
+						offset: "0%",
+						color: "#f00"
+					},
+					{
+						offset: "100%",
+						color: "#00f"
+					}
+				], [
+					createElement('path', {attributes: {d: 'M23.5,23.5 m -19.5 0 a 19.5,19.5 0 1,0 39,0 a 19.5,19.5 0 1,0 -39,0 z', stroke: '#fff', 'stroke-width': '3px'}}),
+					createElement('path', {attributes: {d: 'M14,22 22,22 22,14 25,14 25,22 33,22 33,25 25,25 25,33 22,33 22,25 25,25 14,25z', fill: '#fff'}})
+				]);
+
+				this.newActivityButton.appendChild(this.svg);
+				this.right.appendChild(this.newActivityButton);
 			}
 
 			createItem(text, path){
 				const el = createElement('a', {className: 'quick-nav text metro', innerText: text, attributes: {href: path}});
 
-				el.on('click', (e) => {
-					e.preventDefault();
-					pageLoader.load(el.getAttribute('href'));
-
-					return false;
-				});
+				ajaxify(el);
 
 				return el;
 			}
@@ -1435,10 +1508,10 @@ const pageLoader = new (class{
 		const l = accountManager.sendRequest(url, null, (status, error, resp) => {
 			this.loadingToast.hideAfter(200);
 
-			if(error)
-				return pageManager.showErrorPage();
 			if(status == 404)
 				pageManager.showNotFoundPage();
+			else if(error)
+				pageManager.showErrorPage();
 			else if(status != 200)
 				pageManager.showErrorPage();
 			else
