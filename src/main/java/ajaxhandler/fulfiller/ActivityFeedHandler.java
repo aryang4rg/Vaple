@@ -100,7 +100,7 @@ public class ActivityFeedHandler implements AjaxHandler
                 }
             }
         }
-        
+
         numToFetch = Math.abs(numToFetch);
         Collections.sort(activities);
         if (afterKeyword != null) {
