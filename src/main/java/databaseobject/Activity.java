@@ -67,8 +67,6 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 
 	public Activity() {}
 
-
-
 	@Override
 	public Object get(String string) {
 		return object.get(string);
