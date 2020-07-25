@@ -65,6 +65,35 @@ function ajaxify(el){
 	});
 }
 
+window.mapCallbacks = [];
+window.initMap = function(){
+	for(var i = 0; i < this.mapCallbacks.length; i++)
+		this.mapCallbacks[i]();
+	this.mapCallbacks = null;
+};
+
+window.waitForMap = function(callback){
+	if(this.mapCallbacks)
+		this.mapCallbacks.push(callback);
+	else
+		callback();
+}
+
+const numberToMonth = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December'
+];
+
 const ripplingManager = new (class{
 	constructor(){
 		this.currentRippling = [];
@@ -903,18 +932,18 @@ class ProfilePage extends Page{
 
 		if(this.fetch_activities)
 			this.fetch_activities.abort();
+		if(this.hasLoading){
+			this.loadingIndicator.removeChild(this.svg);
+			this.middle.removeChild(this.loadingIndicator);
+			this.hasLoading = false;
+		}
+
 		while(this.middle.childNodes.length)
 			this.middle.removeChild(this.middle.childNodes[0]);
 		this.activity_last = null;
 		this.activity_next = false;
 		this.id = data.id;
 		this.fetchActivities(data.id);
-
-		if(this.hasLoading){
-			this.loadingIndicator.removeChild(this.svg);
-			this.middle.removeChild(this.loadingIndicator);
-			this.hasLoading = false;
-		}
 
 		if(!this.hasCenterLoading){
 			this.centerLoadingIndicator.appendChild(this.svg);
@@ -976,7 +1005,6 @@ class ProfilePage extends Page{
 
 			if(now < data.time_start){
 				const date = new Date(data.time_start);
-				const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 				var hours = date.getHours();
 				var am = hours < 12;
 
@@ -984,7 +1012,7 @@ class ProfilePage extends Page{
 					hours -= 12;
 				else if(hours == 0)
 					hours = 12;
-				text = month[date.getMonth()] + ' ' + date.getDate() + ' at ' + hours + ':';
+				text = numberToMonth[date.getMonth()] + ' ' + date.getDate() + ' at ' + hours + ':';
 
 				if(date.getMinutes() < 10)
 					text += '0' + date.getMinutes();
@@ -1054,18 +1082,29 @@ class ProfilePage extends Page{
 
 		do{
 			const container = this.createOffsetContainer();
+			const map = createElement('div', {className: 'profile-activity-location shadow-light'});
 
-			container.appendChild(createElement('iframe', {className: 'profile-activity-location shadow-light', attributes:
-				{src: 'https://maps.google.com/maps?q=' + data.latitude + ',' + data.longitude + '&z=18&output=embed'}
-			}));
-
+			container.appendChild(map);
 			body.appendChild(container);
+
+			window.waitForMap(() => {
+				var gmap = new google.maps.Map(map, {
+					center: {lat: data.latitude, lng: data.longitude},
+					zoom: 18
+				});
+
+				new google.maps.Marker({
+					position: {lat: data.latitude, lng: data.longitude},
+					map: gmap,
+					title: data.title
+				});
+			});
 		}while(false);
 
 		do{
 			const text = this.createOffsetContainer();
 
-			text.appendChild(createElement('span', {className: 'text metro', innerText: 'People Attending'}));
+			text.appendChild(createElement('span', {className: 'text metro', innerText: data.attending.length ? 'People Attending' : 'No one is attending yet. Be the first!'}));
 			body.appendChild(text);
 
 			const attending = this.createOffsetContainer();
@@ -1148,10 +1187,16 @@ class NewActivityPage extends Page{
 	constructor(){
 		super();
 
+		this.creatingToast = new LoadingToast('Creating activity');
+
+		toastManager.addToast(this.creatingToast);
+
 		this.form = createElement('div', {className: 'new-activity-form shadow-heavy'});
-		this.title = createElement('span', {className: 'new-activity-form-title text metro', innerText: 'Create an Activity'});
-		this.form.appendChild(this.title);
 		this.formContainer = createElement('div', {className: 'new-activity-form-container'});
+		this.leftFormContainer = createElement('div', {className: 'new-activity-form-container column'});
+		this.rightFormContainer = createElement('div', {className: 'new-activity-form-container column'});
+		this.title = createElement('span', {className: 'new-activity-form-title text metro', innerText: 'Create an Activity'});
+		this.leftFormContainer.appendChild(this.title);
 		this.entries = createElement('div', {className: 'new-activity-form-entries'});
 		this.title = this.createEntry('Title', 'text');
 		this.entries.appendChild(this.title.entry);
@@ -1161,16 +1206,54 @@ class NewActivityPage extends Page{
 		this.entries.appendChild(this.description.entry);
 		this.time = this.createTimeEntry('Start time');
 		this.entries.appendChild(this.time.entry);
-		this.formContainer.appendChild(this.entries);
+		this.endtime = this.createTimeEntry('End time');
+		this.entries.appendChild(this.endtime.entry);
+		this.club = this.createEntry('Club', 'text');
+		this.entries.appendChild(this.club.entry);
+		this.leftFormContainer.appendChild(this.entries);
 		this.button = createElement('div', {className: 'new-activity-button text metro', innerText: 'Create'});
-		this.formContainer.appendChild(this.button);
+		this.leftFormContainer.appendChild(this.button);
 		this.actionError = createElement('span', {className: 'new-activity-form-entry-error text metro'});
-		this.formContainer.appendChild(this.actionError);
+		this.leftFormContainer.appendChild(this.actionError);
 		this.successText = createElement('span', {className: 'text metro', css: {'font-size': '12px', 'margin-top': '40px'}});
 
+		this.formContainer.appendChild(this.leftFormContainer);
+		this.formContainer.appendChild(this.rightFormContainer);
 		this.form.appendChild(this.formContainer);
 		this.element.appendChild(createElement('div', {className: 'center'}, [this.form]));
 		this.element.classList.add('login-background');
+
+		this.showingsuccess = false;
+		this.gmapmarker = null;
+		this.gmap = null;
+		this.selectedLocation = null;
+		this.map = createElement('div', {className: 'new-activity-location shadow-light'});
+		this.rightFormContainer.appendChild(this.map);
+		this.mapError = createElement('span', {className: 'new-activity-form-entry-error text metro'});
+		this.rightFormContainer.appendChild(this.mapError);
+		this.submitting = null;
+
+		window.waitForMap(() => {
+			this.gmap = new google.maps.Map(this.map, {
+				zoom: 18,
+				center: {lat: 0, lng: 0},
+			});
+
+			google.maps.event.addListener(this.gmap, 'click', (e) => {
+				if(this.gmapmarker)
+					this.gmapmarker.setMap(null);
+				this.selectedLocation = {lat: e.latLng.lat(), lng: e.latLng.lng()};
+				this.gmapmarker = new google.maps.Marker({
+					position: this.selectedLocation,
+					map: this.gmap,
+					title: 'Activity Location'
+				});
+			});
+		});
+
+		this.button.on('click', () => {
+			this.trySubmit();
+		});
 	}
 
 	createEntry(name, type, large = false){
@@ -1192,30 +1275,243 @@ class NewActivityPage extends Page{
 		return {entry, field, error};
 	}
 
-	createDropdown(values, placeholder){
-		const container = createElement('div', {className: 'new-activity-form-entry-dropdown'});
-		const text = createElement('div', {className: 'new-activity-form-entry-dropdown-text placeholder', innerText: placeholder});
-		const svg = createElement('svg', {className: 'new-activity-form-entry-dropdown-svg'});
+	createDropdown(valuesList, defaultv, placeholder, short){
+		var selectedIndex = -1;
+		if(defaultv !== undefined && defaultv !== null)
+			selectedIndex = defaultv;
+		const entry = createElement('div', {className: 'new-activity-form-entry-dropdown' + (short ? ' short' : ''), attributes: {tabindex: 0}});
+		const text = createElement('div', {className: 'new-activity-form-entry-dropdown-text text metro placeholder', innerText: selectedIndex != -1 ? valuesList[defaultv] : placeholder});
+		const svg = createElement('svg', {className: 'new-activity-form-entry-dropdown-svg'}, [
+			createElement('path', {attributes: {fill: 'none', d: 'M0 0h24v24H0z'}}),
+			createElement('path', {attributes: {d: 'M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z'}})
+		]);
 
-		return container;
+		const values = createElement('div', {className: 'new-activity-form-entry-dropdown-values shadow-light'});
+
+		var hasFocus = false;
+
+		entry.appendChild(svg);
+		entry.appendChild(text);
+		entry.appendChild(values);
+
+		entry.on('click', () => {
+			hasFocus = !hasFocus;
+
+			if(hasFocus){
+				entry.classList.add('choosing');
+				entry.focus();
+			}else{
+				entry.classList.remove('choosing');
+				entry.blur();
+			}
+		});
+
+		entry.on('blur', () => {
+			entry.classList.remove('choosing');
+			hasFocus = false;
+		});
+
+		const data = {entry, selectedIndex, updateValues: (valuesList) => {
+			while(values.childNodes.length)
+				values.removeChild(values.childNodes[0]);
+			for(let i = 0; i < valuesList.length; i++){
+				const el = createElement('div', {className: 'new-activity-form-entry-dropdown-value text metro', innerText: valuesList[i]});
+
+				values.appendChild(el);
+				el.on('click', () => {
+					data.selectedIndex = i;
+					text.classList.remove('placeholder');
+					text.setText(valuesList[i]);
+
+					if(data.chosen)
+						data.chosen();
+				});
+			}
+
+			if(selectedIndex > valuesList.length){
+				selectedIndex = -1;
+				text.classList.add('placeholder');
+				text.setText(placeholder);
+			}
+		}};
+
+		data.updateValues(valuesList);
+
+		return data;
 	}
 
 	createTimeEntry(name){
-		const entry = createElement('div', {className: 'new-activity-form-entry'});
+		const days = [];
+
+		for(var i = 0; i < 31; i++)
+			days.push(i + 1);
+		const now = new Date();
+		var monthdays = new Date();
+
+		monthdays.setMonth(monthdays.getMonth() + 1);
+		monthdays.setDate(0);
+		monthdays = monthdays.getDate();
+
+		const entry = createElement('div', {className: 'new-activity-form-entry large'});
 		const cont = createElement('div', {className: 'new-activity-form-entry-input-container row'});
 		const error = createElement('span', {className: 'new-activity-form-entry-error text metro'});
-		const month = this.createDropdown();
+		const month = this.createDropdown(numberToMonth, now.getMonth());
+		const day = this.createDropdown(days.slice(0, monthdays), now.getDate() - 1, 'Select a day', true);
+		const year = this.createDropdown([now.getFullYear(), now.getFullYear() + 1], 0, '', true);
 
 		entry.appendChild(createElement('span', {className: 'text metro', innerText: name}));
-		cont.appendChild(month);
+		cont.appendChild(month.entry);
+		cont.appendChild(day.entry);
+		cont.appendChild(year.entry);
 		entry.appendChild(cont);
 		entry.appendChild(error);
 
-		return {entry, fields: {month}, error};
+		month.chosen = () => {
+			monthdays = new Date(now.getYear() + year.selectedIndex, month.selectedIndex + 1, 0).getDate();
+
+			day.updateValues(days.slice(0, monthdays));
+		};
+
+		year.chosen = month.chosen;
+
+		const hours = [];
+		const minutes = [];
+
+		for(var i = 0; i < 12; i++)
+			hours.push(i + 1);
+		for(var i = 0; i < 12; i++)
+			minutes.push((i * 5) + '');
+		var hourz = now.getHours() % 12;
+
+		if(hourz == 0)
+			hourz = 12;
+		const hour = this.createDropdown(hours, hourz - 1, '', true);
+		const minute = this.createDropdown(minutes, Math.floor(now.getMinutes() / 5), '', true);
+		const ampm = this.createDropdown(['AM', 'PM'], now.getHours() >= 12 ? 1 : 0, '', true);
+
+		cont.appendChild(hour.entry);
+		cont.appendChild(minute.entry);
+		cont.appendChild(ampm.entry);
+
+		return {entry, fields: {month, day, year}, error, calculateTime(){
+			if(day.selectedIndex == -1)
+				return null;
+			var hours = hour.selectedIndex + 1;
+
+			if(ampm.selectedIndex == 0){
+				if(hours == 12)
+					hours = 0;
+			}else{
+				if(hours != 12)
+					hours += 12;
+			}
+
+			return new Date(now.getFullYear() + year.selectedIndex, month.selectedIndex, day.selectedIndex + 1, hours, minute.selectedIndex * 5);
+		}};
+	}
+
+	showing(){
+		this.title.field.value = '';
+		this.type.field.value = '';
+		this.description.field.value = '';
+
+		if(this.showingsuccess){
+			this.showingsuccess = false;
+			this.form.appendChild(this.formContainer);
+			this.form.removeChild(this.successText);
+		}
 	}
 
 	trySubmit(){
+		if(this.submitting)
+			return;
+		this.actionError.setText('');
+		this.actionError.style.display = 'none';
 
+		var error = false;
+
+		if(this.title.field.value)
+			this.title.error.setText('');
+		else{
+			this.title.error.setText('Enter the title');
+
+			error = true;
+		}
+
+		if(this.type.field.value)
+			this.type.error.setText('');
+		else{
+			this.type.error.setText('Enter the type');
+
+			error = true;
+		}
+
+		if(this.description.field.value)
+			this.description.error.setText('');
+		else{
+			this.description.error.setText('Enter a description');
+
+			error = true;
+		}
+
+		if(this.selectedLocation)
+			this.mapError.setText('');
+		else{
+			this.mapError.setText('Select a location');
+
+			error = true;
+		}
+
+		var time_start = this.time.calculateTime();
+		var time_end = this.endtime.calculateTime();
+
+		if(time_start == null){
+			this.time.error.setText('Select a valid time');
+
+			error = true;
+		}else
+			time_start = time_start.getTime();
+		if(time_end == null){
+			this.endtime.error.setText('Select a valid time');
+
+			error = true;
+		}else
+			time_end = time_end.getTime();
+		if(time_start && time_end && time_start >= time_end){
+			this.time.error.setText('Must be less than end time');
+			this.endtime.error.setText('Must be greater than start time');
+
+			error = true;
+		}else{
+			this.time.error.setText('');
+			this.endtime.error.setText('');
+		}
+
+		if(error)
+			return;
+		this.button.classList.add('disabled');
+		this.creatingToast.text.setText('Creating activity');
+		this.creatingToast.show();
+
+		this.submitting = accountManager.sendRequest('/activity_create', {title: this.title.field.value, type: this.type.field.value,
+			latitude: this.selectedLocation.lat, longitude: this.selectedLocation.lng, time_start, time_end, club: null}, (status, error, data) => {
+				this.button.classList.remove('disabled');
+				this.creatingToast.hideAfter(2000);
+
+				if(error || status != 200 || (data && data.error)){
+					this.actionError.setText((data && data.error) || 'There was an error creating this activity, try again later');
+					this.creatingToast.text.setText('Could not create the activity');
+				}else{
+					if(!this.showingsuccess){
+						this.showingsuccess = true;
+						this.form.removeChild(this.formContainer);
+						this.form.appendChild(this.successText);
+						this.successText.setText('Activity created, you will be shortly redirected to it');
+						this.pageLoader.load('/activity/' + data.id);
+						this.creatingToast.text.setText('Activity created');
+					}
+				}
+			});
 	}
 }
 
