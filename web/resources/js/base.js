@@ -2742,7 +2742,6 @@ const pageLoader = new (class{
 	constructor(){
 		this.loading = null;
 		this.loadingToast = new LoadingToast('Navigating page');
-		this.loadingToast.indeterminate();
 		this.waitforlogin = new Toast('Please wait for login/signup');
 
 		toastManager.addToast(this.loadingToast);
@@ -2808,6 +2807,7 @@ const pageLoader = new (class{
 
 		this.loading = l;
 		this.loadingToast.show();
+		this.loadingToast.indeterminate();
 	}
 
 	stopLoading(){
@@ -2815,6 +2815,7 @@ const pageLoader = new (class{
 			this.loading.abort();
 			this.loading = null;
 			this.loadingToast.hideAfter(200);
+			this.loadingToast.progress();
 		}
 	}
 });
