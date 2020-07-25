@@ -30,7 +30,7 @@ public class NewActivityHandler implements AjaxHandler
 
 	@Override
 	public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User u) throws ServletException, IOException {
-		if(uriSplit.length == 0)
+		if(uriSplit.length > 0)
 			return 404;
 		if(u == null)
 			return 400;
