@@ -62,7 +62,7 @@ public class MainServlet extends HttpServlet
 		hashtable.put("account_change", AccountChangeHandler.getInstance(this));
 		hashtable.put("join_leave_club", ClubFollowHandler.getInstance());
 		hashtable.put("follow_change", FollowPersonHandler.getInstance());
-		hashtable.put("activity_feed", new ActivityFeedHandler(true));
+		hashtable.put("activity_feed", new ActivityFeedHandler(false));
 		hashtable.put("activities", new ActivityFeedHandler(false));
 		hashtable.put("home", new ActivityFeedHandler(true));
 		hashtable.put("new_activity", NewActivityHandler.getInstance());
