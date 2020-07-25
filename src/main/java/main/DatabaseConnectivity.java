@@ -1,11 +1,7 @@
 package main;
 
 import com.mongodb.*;
-import databaseobject.User;
-import org.bson.types.ObjectId;
-
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -84,6 +80,5 @@ public class DatabaseConnectivity
 	{
 		return findOneObject(object, collection) != null;
 	}
-
 
 }

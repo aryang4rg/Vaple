@@ -10,6 +10,7 @@ import org.bson.types.ObjectId;
 import util.Json;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <PRE> The activity class describes an activity object, which stores data about the activity's name, location, time, description and
@@ -23,8 +24,10 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 			ASSOCIATED_CLUB = "associated_club", CREATOR = "creator", TYPE = "type";
 
 	DBObject object = new BasicDBObject();
+	List<String> tags;
 	public Activity(String name, String description, String type, ObjectId creator, ArrayList<ObjectId> attending, long time_start, long time_end, double latitude, double longitude, Club club)
 	{
+		tags = new ArrayList<String>();
 		object.put("name",name);
 		object.put("type",type);
 		object.put("description",description);
@@ -34,6 +37,7 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 		object.put("time_end",time_end);
 		object.put("latitude",latitude);
 		object.put("longitude",longitude);
+		object.put("tags",tags);
 		if (club != null) {
 			object.put("club", club);
 		}
@@ -163,5 +167,26 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 	{
 		return object;
 	}
+
+	public void addTag(String tag)
+	{
+		tags = (ArrayList<String>)object.get("tags");
+		tags.add(tag);
+		object.put("tags",tags);
+	}
+
+	public void removeTag(String tag)
+	{
+		tags = (ArrayList<String>)object.get("tags");
+		tags.remove(tag);
+		object.put("tags",tags);
+	}
+
+	public ArrayList<String> getTags()
+	{
+		return (ArrayList<String>)object.get("tags");
+	}
+
+
 
 }
