@@ -6,6 +6,7 @@ import databaseobject.Activity;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <PRE> This class implements methods to allow for modification of the database</PRE>
@@ -82,6 +83,55 @@ public class DatabaseConnectivity
 	public static boolean doesObjectExist(DBObject object, DBCollection collection)
 	{
 		return findOneObject(object, collection) != null;
+	}
+
+	public static List<DBObject> getAllObjectsByProperty(String data)
+	{
+		List<DBObject> finalList = new ArrayList<DBObject>();
+
+		ArrayList<DBObject> accountObjects = (ArrayList<DBObject>)ACCOUNTCOLLECTION.find().toArray();
+		for (int i = 0; i < accountObjects.size(); i++)
+		{
+				ArrayList<String> stringys = new ArrayList<String>(accountObjects.get(i).keySet());
+				for (int j = 0; j < stringys.size(); j++)
+				{
+					if (accountObjects.get(i).get(stringys.get(j)).equals(data))
+					{
+						finalList.add(accountObjects.get(i));
+						break;
+					}
+				}
+		}
+
+		ArrayList<DBObject> activityObjects = (ArrayList<DBObject>)ACTIVITYCOLLECTION.find().toArray();
+		for (int i = 0; i < activityObjects.size(); i++)
+		{
+			ArrayList<String> stringys = new ArrayList<String>(activityObjects.get(i).keySet());
+			for (int j = 0; j < stringys.size(); j++)
+			{
+				if (activityObjects.get(i).get(stringys.get(j)).equals(data))
+				{
+					finalList.add(activityObjects.get(i));
+					break;
+				}
+			}
+		}
+
+		ArrayList<DBObject> clubObjects = (ArrayList<DBObject>)CLUBCOLLECTION.find().toArray();
+		for (int i = 0; i < clubObjects.size(); i++)
+		{
+			ArrayList<String> stringys = new ArrayList<String>(clubObjects.get(i).keySet());
+			for (int j = 0; j < stringys.size(); j++)
+			{
+				if (clubObjects.get(i).get(stringys.get(j)).equals(data))
+				{
+					finalList.add(clubObjects.get(i));
+					break;
+				}
+			}
+		}
+
+		return finalList;
 	}
 
 }
