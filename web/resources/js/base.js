@@ -931,6 +931,7 @@ class ProfilePage extends Page{
 		this.country.setText(data.location_country);
 		this.state.setText(data.location_state);
 		this.city.setText(data.location_city);
+		this.fileChooser.value = '';
 		this.self = data.self;
 
 		if(this.self){
@@ -1989,18 +1990,15 @@ class ActivityPage extends Page{
 	}
 
 	load(data){
+		if(!data)
+			return pageManager.showErrorPage();
 		while(this.middle.childNodes.length)
 			this.middle.removeChild(this.middle.childNodes[0]);
 		this.middle.appendChild(createElement('div', {className: 'profile-container top-padding'}));
+		this.middle.appendChild(activityManager.createActivity(data.activity));
 
-		if(!data || !data.activity)
-			this.middle.appendChild(createElement('span', {className: 'profile-activity-error text', innerText: 'Could not load the activity at this moment'}));
-		else{
-			this.middle.appendChild(activityManager.createActivity(data.activity));
-
-			document.title = data.activity.name;
-			history.replaceState(null, document.title, '/activity/' + data.activity.id);
-		}
+		document.title = data.activity.name;
+		history.replaceState(null, document.title, '/activity/' + data.activity.id);
 	}
 }
 
@@ -2118,6 +2116,7 @@ class ClubCreationPage extends Page{
 		this.city.error.setText('');
 		this.setPhotoError.setText('');
 		this.submitPicture = null;
+		this.fileChooser.value = '';
 
 		if(this.showingsuccess){
 			this.showingsuccess = false;
