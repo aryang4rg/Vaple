@@ -114,32 +114,36 @@ public class ActivityFeedHandler implements AjaxHandler
             }
         }
 
+		BasicDBObject obj = new BasicDBObject();
+		ArrayList<JsonNode> jsonNodeHolderForActivities = new ArrayList<>();
         ObjectNode data = Util.createObjectNode();
         if (index < activities.size())
         {
             if (index+numToFetch < activities.size())
             {
-                ArrayList<JsonNode> jsonNodeHolderForActivities = new ArrayList<>();
+
                 for (int i = index; i < index+numToFetch; i++)
                 {
-                    jsonNodeHolderForActivities.add(activities.get(i).toFeedNode());
+					Activity activity = activities.get(i);
+
+					obj.put(activity.getObjectID().toHexString(), activity.toFeedNode());
                 }
-                data.put("activities", Json.toJson(jsonNodeHolderForActivities));
             }
             else
             {
-                ArrayList<JsonNode> jsonNodeHolderForActivities = new ArrayList<>();
                 for (int i = index; i < activities.size(); i++)
                 {
-                    jsonNodeHolderForActivities.add(activities.get(i).toFeedNode());
+					Activity activity = activities.get(i);
+
+					obj.put(activity.getObjectID().toHexString(), activity.toFeedNode());
                 }
-                data.put("activities", Json.toJson(jsonNodeHolderForActivities));
             }
-        }
-        else
-        {
-            data.put("activities", Json.toJson(new ArrayList<Activity>()));
-        }
+		}
+
+		for(String str : obj.keySet())
+			jsonNodeHolderForActivities.add(obj.get(str));
+		data.put("activities", Json.toJson(jsonNodeHolderForActivities));
+
         if(isAPage){
 			response.put("type", "feed");
 			response.put("data", data);
