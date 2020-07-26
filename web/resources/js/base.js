@@ -1271,18 +1271,21 @@ const activityManager = new (class{
 		do{
 			const textContainer = this.createOffsetContainer();
 			const text = this.createOffsetContainer();
+			const attendingText = createElement('span', {className: 'text metro'});
 
-			text.appendChild(createElement('span', {className: 'text metro', innerText: data.time_start > ctime ? (data.attending.length ? 'People Attending' : 'No one is attending yet. Be the first!') :
-																												(data.attending.length ? 'People Attended' : '')}));
+			text.appendChild(attendingText);
 			body.appendChild(textContainer);
 			textContainer.appendChild(text);
 
 			const attending = this.createOffsetContainer();
 			var userIsAttending = false;
+			var attending_count = 0;
 
-			for(var i = 0; i < data.attending.length; i++){
+			for(var i in data.attending){
 				if(data.attending[i].id == accountManager.id)
 					userIsAttending = true;
+				attending_count++;
+
 				const el = createElement('a', {className: 'profile-activity-attending-photo', attributes: {href: '/profile/' + data.attending[i].id}});
 
 				ajaxify(el);
@@ -1290,6 +1293,9 @@ const activityManager = new (class{
 
 				attending.appendChild(el);
 			}
+
+			attendingText.setText(data.time_start > ctime ? (attending_count ? 'People Attending' : 'No one is attending yet. Be the first!') :
+									(attending_count ? 'People Attended' : ''));
 
 			this.attending[data.id] = userIsAttending;
 
