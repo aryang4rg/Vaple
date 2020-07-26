@@ -933,6 +933,8 @@ class ProfilePage extends Page{
 		this.city.setText(data.location_city);
 		this.fileChooser.value = '';
 		this.self = data.self;
+		this.profileAboutContainer.style.transform = '';
+		this.clubs.style.transform = '';
 
 		if(this.self){
 			if(accountManager.updating)
@@ -2402,6 +2404,8 @@ class ClubPage extends Page{
 		this.state.setText(data.state);
 		this.city.setText(data.city);
 		this.owner = data.owner;
+		this.clubAboutContainer.style.transform = '';
+		this.members.style.transform = '';
 
 		if(this.owner)
 			this.join.style.display = 'none';
