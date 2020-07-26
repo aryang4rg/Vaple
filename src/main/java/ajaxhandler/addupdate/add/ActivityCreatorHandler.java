@@ -1,6 +1,7 @@
 package ajaxhandler.addupdate.add;
 
 import ajaxhandler.AjaxHandler;
+import com.mongodb.BasicDBObject;
 import databaseobject.*;
 import main.MainServlet;
 import util.*;
@@ -56,7 +57,7 @@ public class ActivityCreatorHandler implements AjaxHandler
 
         Club club = null;
         if (associated_club != null) {
-            club = (Club) Club.databaseConnectivity().getFromInfoInDataBase(ID, associated_club);
+            club = (Club) Club.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(associated_club));
         }
 
         if (user == null)
@@ -69,12 +70,12 @@ public class ActivityCreatorHandler implements AjaxHandler
             {
                 return 400;
             }
-            Activity activity = new Activity(title, description, type, user.getObjectID(), new ArrayList<ObjectId>(), Long.parseLong(time_start),
+            Activity activity = new Activity(title, description, type, user.getObjectID(), new BasicDBObject(), Long.parseLong(time_start),
                     Long.parseLong(time_end), Double.parseDouble(latitude), Double.parseDouble(longitude), club);
             Activity.databaseConnectivity().addInDatabase(activity);
             if (club != null)
             {
-                club.setActivity(activity.getObjectID(), true);
+                club.set(activity.getObjectID().toHexString(), true);
                 Club.databaseConnectivity().updateInDatabase(club);
             }
 

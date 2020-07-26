@@ -118,15 +118,9 @@ public class MainServlet extends HttpServlet
 				boolean isUnverified = false;
 				if (!handler.equals(VerifyAccountHandler.getInstance()) && user != null && !(Boolean)user.get(User.VERIFIED))
 				{
-					if (handler.isPage()) {
-						handler = pathToHandler.get("unverified_user");
-						uriSplit = new String[]{};
-					}
-					else
-					{
-						isUnverified = true;
-						resp.setStatus(403);
-					}
+					handler = pathToHandler.get("unverified_user");
+					uriSplit = new String[]{};
+
 				}
 				if (isUnverified)
 				{

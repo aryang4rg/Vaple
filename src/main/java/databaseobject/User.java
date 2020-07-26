@@ -8,6 +8,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import util.Json;
+import util.Util;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -80,7 +81,22 @@ public class User implements DatabaseStructureObject
 		node.put("description", getDescription());
 		node.put("followers_count", countFollowers());
 		node.put("following_count", countFollowing());
-		node.put("clubs", Json.toJson(dbObjectClubListToArrayList(getClubs())));
+
+		ArrayList<String> clubList = new ArrayList<>(getClubs().keySet());
+		ObjectNode clubNode = Util.createObjectNode();
+		for (String i : clubList)
+		{
+			Club c = (Club) Club.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(i));
+			if (c != null)
+			{
+				ObjectNode myClub = Util.createObjectNode();
+				myClub.put("id", c.getObjectID().toHexString());
+				myClub.put("name", (String)c.get(Club.NAME));
+				clubNode.put(c.getObjectID().toHexString(), myClub);
+			}
+		}
+		node.put("clubs", clubNode);
+
 		return node;
 	}
 	public static ArrayList<String> dbObjectClubListToArrayList(DBObject clubs)

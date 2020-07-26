@@ -26,11 +26,11 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 
 	public static final String NAME = "name", DESCRIPTION = "description", LATITUDE = "latitude", LONGITUDE = "longitude",
 			ATTENDING = "attending", TIME_START = "time_start", TIME_END = "time_end", FORM = "form", OBJECTID = "objectID",
-			ASSOCIATED_CLUB = "associated_club", CREATOR = "creator", TYPE = "type";
+			ASSOCIATED_CLUB = "club", CREATOR = "creator", TYPE = "type";
 
 	DBObject object = new BasicDBObject();
 	List<String> tags;
-	public Activity(String name, String description, String type, ObjectId creator, ArrayList<ObjectId> attending, long time_start, long time_end, double latitude, double longitude, Club club)
+	public Activity(String name, String description, String type, ObjectId creator, BasicDBObject attending, long time_start, long time_end, double latitude, double longitude, Club club)
 	{
 		tags = new ArrayList<String>();
 		object.put("name",name);
@@ -44,7 +44,7 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 		object.put("longitude",longitude);
 		object.put("tags",tags);
 		if (club != null) {
-			object.put("club", club);
+			object.put("club", club.getObjectID().toHexString());
 		}
 	}
 
@@ -86,6 +86,10 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 		object.put(identifier,value);
 	}
 
+	public ArrayList<String> allAttending()
+	{
+		return new ArrayList<String>( ((DBObject)get(ATTENDING)).keySet());
+	}
 
 	public ObjectNode toFeedNode(){
 
@@ -94,7 +98,21 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 		node.put("id", getObjectID().toHexString());
 		node.put("description", (String)get(DESCRIPTION));
 		node.put("type", (String)get(TYPE));
-		node.put("attending", Json.objectIdListToJsonNode((ArrayList<ObjectId>)get(ATTENDING)));
+		ObjectNode attendingNode = Util.createObjectNode();
+		ArrayList<String> attend = allAttending();
+		for (String userId : attend)
+		{
+			User user = (User) User.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(userId));
+			if (user != null)
+			{
+				ObjectNode myUserNode = Util.createObjectNode();
+				myUserNode.put("id", user.getObjectID().toHexString());
+				myUserNode.put("name", (String)user.get(User.NAME));
+				attendingNode.put(user.getObjectID().toHexString(), myUserNode);
+			}
+		}
+		node.put("attending", attendingNode);
+
 		node.put("creator", ((ObjectId)(get(CREATOR))) .toHexString());
 		node.put("time_start", (long)get(TIME_START));
 		node.put("time_end", (long)get(TIME_END));
@@ -104,7 +122,33 @@ public class Activity implements DatabaseStructureObject, Comparable<Activity>
 		creator.put("id", ((ObjectId)get(CREATOR)).toHexString());
 		creator.put("name", (String)((User)User.databaseConnectivity().getFromInfoInDataBase(ID, get(CREATOR))).get(NAME));
 		node.put("creator", creator);
-
+		ObjectNode club = Util.createObjectNode();
+		boolean clubExists = true;
+		if (get(ASSOCIATED_CLUB) != null)
+		{
+			Club assClub =  (Club)Club.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId((String)get(ASSOCIATED_CLUB)));
+			if (assClub != null)
+			{
+				club.put("id", (String)get(ASSOCIATED_CLUB));
+				club.put("name", (String)assClub.get(Club.NAME));
+			}
+			else
+			{
+				clubExists = false;
+			}
+		}
+		else
+		{
+			clubExists = false;
+		}
+		if (clubExists)
+		{
+			node.put("club", club);
+		}
+		else
+		{
+			node.put("club", "null");
+		}
 
 		return node;
 	}

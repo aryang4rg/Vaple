@@ -191,6 +191,7 @@ public class AccountChangeHandler implements AjaxHandler
 				error = ImageUtil.writeToFile(mainServlet.getFile("/cdn/profile/" + u.getObjectID().toHexString() + ".png"), picture);
 			}catch(IOException e){
 				node.put("image", "Error creating image");
+				e.printStackTrace();
 			}
 
 			if(error != null)

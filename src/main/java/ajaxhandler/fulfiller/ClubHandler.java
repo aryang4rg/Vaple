@@ -26,9 +26,9 @@ public class ClubHandler implements AjaxHandler
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException {
 
-        if(uriSplit.length != 3) // 0: / 1: club 2: id
+        if(uriSplit.length != 1) // 0: / 1: club 2: id
             return 404;
-        String id = uriSplit[2];
+        String id = uriSplit[0];
         Club c = (Club)Club.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(id));
         if (c == null)
         {
@@ -49,7 +49,7 @@ public class ClubHandler implements AjaxHandler
         {
            if(c.get("owner").equals(user.getObjectID().toHexString()))
            {
-
+                response.put("","");
            }
 
         }
