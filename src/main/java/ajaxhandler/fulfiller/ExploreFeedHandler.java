@@ -37,11 +37,7 @@ public class ExploreFeedHandler implements AjaxHandler
         response.put("type", "explore");
         ObjectNode data = Util.createObjectNode();
         tag = Util.trimAndnullIfSpecialCharacters(tag);
-
-        if (tag == null)
-        {
-            return 400;
-        }
+        
         data.put("tag", tag);
 
         ObjectNode activityNode = Util.createObjectNode();

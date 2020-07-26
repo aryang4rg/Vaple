@@ -103,10 +103,15 @@ public class DatabaseConnectivity
 				ArrayList<String> stringys = new ArrayList<String>(objects.get(i).keySet());
 				for (int j = 0; j < stringys.size(); j++)
 				{
-					if (objects.get(i).get(stringys.get(j)).equals(data))
+					try {
+						if (objects.get(i).get(stringys.get(j)).equals(data)) {
+							finalList.add(objects.get(i));
+							break;
+						}
+					}
+					catch (NullPointerException e)
 					{
-						finalList.add(objects.get(i));
-						break;
+						e.printStackTrace();
 					}
 				}
 		}
