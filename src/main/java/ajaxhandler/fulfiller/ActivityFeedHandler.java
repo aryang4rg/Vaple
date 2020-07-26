@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.bson.types.ObjectId;
-import org.bson.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +38,8 @@ public class ActivityFeedHandler implements AjaxHandler
         afterKeyword = Util.trimAndnullIfSpecialCharacters(afterKeyword);
         ArrayList<Activity> activities = new ArrayList<>();
 
+        String clubParameterId = req.getParameter("clubId");
+
         try {
             numToFetch = Integer.parseInt(req.getParameter("top"));
         }
@@ -52,7 +53,7 @@ public class ActivityFeedHandler implements AjaxHandler
             User u =(User) User.databaseConnectivity().getFromInfoInDataBase(ID,new ObjectId(specificUserId));
             if (u == null)
             {
-                return 400;
+                return 404;
             }
 
 
@@ -64,6 +65,24 @@ public class ActivityFeedHandler implements AjaxHandler
                 }
             }
 
+
+        }
+        else if (clubParameterId != null)
+        {
+            if (!ObjectId.isValid(clubParameterId))
+                return 400;
+            Club c = (Club)Club.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(clubParameterId));
+            if (c == null) {
+                return 404;
+            }
+            ArrayList<String> activitiesInClub = c.getActivities();
+
+            for (String ActivityID : activitiesInClub) {
+                Activity activity = (Activity) Activity.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(ActivityID));
+                if (activity != null) {
+                    activities.add(activity);
+                }
+            }
 
         }
         else {
@@ -137,7 +156,6 @@ public class ActivityFeedHandler implements AjaxHandler
                 for (int i = index; i < activities.size(); i++)
                 {
 					Activity activity = activities.get(i);
-
 					obj.put(activity.getObjectID().toHexString(), activity.toFeedNode());
                 }
             }

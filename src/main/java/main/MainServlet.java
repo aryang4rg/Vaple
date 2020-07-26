@@ -75,6 +75,9 @@ public class MainServlet extends HttpServlet
 		hashtable.put("club", ClubHandler.getInstance());
 		hashtable.put("new_club",  NewClubHandler.getInstance());
 		hashtable.put("unverified_user", UnverifiedHandler.getInstance());
+		hashtable.put("explore", ExploreFeedHandler.getInstance());
+		hashtable.put("challenges", ChallengesHandler.getInstance());
+
 		return hashtable;
 	}
 

@@ -50,7 +50,7 @@ public class ClubCreateHandler implements AjaxHandler
         if(picture != null){
             try{
                 String str =  ImageUtil.writeToFile(mainServlet.getFile("/cdn/club/" + club.getObjectID().toHexString() + ".png"), picture);
-                if (str == null)
+                if (str != null)
                 {
                     response.put("image", "Error creating image");
                     DatabaseConnectivity.removeObject(club.getDBForm(), DatabaseConnectivity.CLUBCOLLECTION);
@@ -61,7 +61,12 @@ public class ClubCreateHandler implements AjaxHandler
                 DatabaseConnectivity.removeObject(club.getDBForm(), DatabaseConnectivity.CLUBCOLLECTION);
                 return 400;
             }
-
+        }
+        else
+        {
+            response.put("image", "Error creating image");
+            DatabaseConnectivity.removeObject(club.getDBForm(), DatabaseConnectivity.CLUBCOLLECTION);
+            return 400;
         }
 
 

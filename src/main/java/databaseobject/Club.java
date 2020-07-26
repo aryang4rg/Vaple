@@ -107,6 +107,13 @@ public class Club implements DatabaseStructureObject
             ((DBObject)object.get(MEMBER)).removeField(userId.toHexString());
     }
 
+    public void setActivity(ObjectId activityID, boolean isAdding){
+        if(isAdding)
+            ((DBObject)object.get(ACTIVITY)).put(activityID.toHexString(), true);
+        else
+            ((DBObject)object.get(ACTIVITY)).removeField(activityID.toHexString());
+    }
+
     public Club(String name, String description, String location_country, String location_state, String location_city, String club_type, ObjectId owner)
     {
         DBObject object = new BasicDBObject();

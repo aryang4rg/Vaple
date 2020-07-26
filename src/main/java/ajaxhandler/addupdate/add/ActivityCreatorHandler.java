@@ -75,7 +75,7 @@ public class ActivityCreatorHandler implements AjaxHandler
             Activity.databaseConnectivity().addInDatabase(activity);
             if (club != null)
             {
-                club.set(activity.getObjectID().toHexString(), true);
+                club.setActivity(activity.getObjectID(), true);
                 Club.databaseConnectivity().updateInDatabase(club);
             }
 
