@@ -350,6 +350,7 @@ a{
 
 .profile-container.middle{
 	flex-grow: 1;
+	width: calc(100% - 824px);
 }
 
 .profile-container.expander{
