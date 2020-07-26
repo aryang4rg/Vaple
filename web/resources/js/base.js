@@ -2531,15 +2531,6 @@ class ExplorePage extends Page{
 	}
 }
 
-class DashboardPage extends Page{
-	load(data){
-		/* todo */
-
-		document.title = 'Account';
-		history.replaceState(null, document.title, '/dashboard');
-	}
-}
-
 function generateGradient(svg, ids, stops, maskch = []){
 	const gradient = createElement('linearGradient', {id: ids.gradient, attributes: {'x1': '0%', 'y1': '0%', 'x2': '100%', 'y2': '100%'}});
 
@@ -2560,7 +2551,6 @@ const pageManager = new (class{
 			profile: new ProfilePage(),
 			feed: new FeedPage(),
 			explore: new ExplorePage(),
-			dashboard: new DashboardPage(),
 			notfound: new NotFoundPage(),
 			new_activity: new ActivityCreationPage(),
 			activity: new ActivityPage(),
@@ -2584,7 +2574,6 @@ const pageManager = new (class{
 					return false;
 				});
 
-				this.element.appendChild(this.createItem('Dashboard', '/dashboard'));
 				this.element.appendChild(this.createItem('Explore', '/explore'));
 				this.element.appendChild(this.createItem('Challenges', '/challenges'));
 
