@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public interface AjaxHandler
 {
 	String ID = "_id";
-	String IP_ADDRESS = "24.5.125.206"; //Change with whatever goes before /profiles in website
+	String IP_ADDRESS = "vaple.net"; //Change with whatever goes before /profiles in website
 	int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException;
 	boolean isPage();
 }
