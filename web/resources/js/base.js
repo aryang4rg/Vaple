@@ -372,7 +372,7 @@ class LoginPage extends Page{
 		this.textcontainer.appendChild(this.text);
 		this.textcontainer.appendChild(this.textbutton);
 		this.formContainer.appendChild(this.textcontainer);
-		this.successText = createElement('span', {className: 'text metro'});
+		this.successText = createElement('span', {className: 'text metro', css: {marginTop: '40px'}});
 		this.form.appendChild(this.formContainer);
 		this.element.appendChild(createElement('div', {className: 'center'}, [this.form]));
 		this.element.classList.add('login-background');
@@ -812,7 +812,7 @@ class ProfilePage extends Page{
 
 			if(this.activity_next && !this.fetch_activities)
 				if(this.element.offsetHeight + this.element.scrollTop + 800 >= this.middle.offsetHeight)
-					this.fetchActivities(this.id, 0, this.activity_last);
+					this.fetchActivities(this.id, this.activity_last);
 		});
 	}
 
@@ -1058,8 +1058,8 @@ class ProfilePage extends Page{
 		}
 	}
 
-	fetchActivities(id, top = 10, last){
-		this.fetch_activities = accountManager.sendRequest('/activities?id=' + id + '&top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
+	fetchActivities(id, last){
+		this.fetch_activities = accountManager.sendRequest('/activities?id=' + id + '&top=10' + (last ? '&last=' + last : ''), null, (status, error, resp) => {
 			this.activity_next = false;
 			this.fetch_activities = null;
 
@@ -1887,7 +1887,7 @@ class FeedPage extends Page{
 		this.element.on('scroll', (e) => {
 			if(this.activity_next && !this.fetch_activities)
 				if(this.element.offsetHeight + this.element.scrollTop + 800 >= this.middle.offsetHeight)
-					this.fetchActivities(0, this.activity_last);
+					this.fetchActivities(this.activity_last);
 		});
 	}
 
@@ -1960,8 +1960,8 @@ class FeedPage extends Page{
 		}
 	}
 
-	fetchActivities(top = 10, last){
-		this.fetch_activities = accountManager.sendRequest('/activity_feed?top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
+	fetchActivities(last){
+		this.fetch_activities = accountManager.sendRequest('/activity_feed?top=10' + (last ? '&last=' + last : ''), null, (status, error, resp) => {
 			this.activity_next = false;
 			this.fetch_activities = null;
 
@@ -2378,7 +2378,7 @@ class ClubPage extends Page{
 
 			if(this.activity_next && !this.fetch_activities)
 				if(this.element.offsetHeight + this.element.scrollTop + 800 >= this.middle.offsetHeight)
-					this.fetchActivities(this.id, 0, this.activity_last);
+					this.fetchActivities(this.id, this.activity_last);
 		});
 	}
 
@@ -2502,8 +2502,8 @@ class ClubPage extends Page{
 		}
 	}
 
-	fetchActivities(id, top = 10, last){
-		this.fetch_activities = accountManager.sendRequest('/activities?clubId=' + id + '&top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
+	fetchActivities(id, last){
+		this.fetch_activities = accountManager.sendRequest('/activities?clubId=' + id + '&top=10' + (last ? '&last=' + last : ''), null, (status, error, resp) => {
 			this.activity_next = false;
 			this.fetch_activities = null;
 
@@ -2523,11 +2523,159 @@ class ClubPage extends Page{
 }
 
 class ExplorePage extends Page{
-	load(data){
-		/* todo */
+	constructor(){
+		super();
 
+		this.table = createElement('div', {className: 'explore-table'});
+		this.left = createElement('div', {className: 'explore-content'});
+		this.middle = createElement('div', {className: 'explore-content'});
+		this.right = createElement('div', {className: 'explore-content'});
+		this.table.appendChild(createElement('div', {className: 'explore-container'}, [this.left]));
+		this.table.appendChild(createElement('div', {className: 'explore-container expander'}));
+		this.table.appendChild(createElement('div', {className: 'explore-container'}, [this.middle]));
+		this.table.appendChild(createElement('div', {className: 'explore-container expander'}));
+		this.table.appendChild(createElement('div', {className: 'explore-container'}, [this.right]));
+		this.input = createElement('input', {className: 'explore-search-bar', attributes: {placeholder: 'Search', name: 'query', autocomplete: 'off', spellcheck: 'false'}});
+		this.search = createElement('form', {className: 'explore-search-container', attributes: {action: 'javascript:void(0)', method: 'GET'}});
+		this.search.appendChild(createElement('svg', {className: 'explore-search-icon'}, [
+			createElement('path', {attributes: {d: 'M0 0h24v24H0z', fill: 'none'}}),
+			createElement('path', {attributes: {d: 'M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'}})
+		]));
+
+		this.search.appendChild(this.input);
+		this.element.appendChild(this.table);
+		this.search.on('submit', () => {
+			this.input.blur();
+
+			pageLoader.load('/explore?tag=' + this.input.value);
+		});
+
+		this.searchAppended = false;
+	}
+
+	createPictureEntry(subdir, id, name, desc){
+		const entry = {};
+
+		entry.shadow = createElement('div', {className: 'explore-picture-photo-shadow shadow-heavy'});
+		entry.container = createElement('div', {className: 'explore-picture-container shadow-heavy'});
+		entry.photo = createElement('div', {className: 'explore-picture-photo'});
+		entry.details = createElement('div', {className: 'explore-picture-details'});
+		entry.name = createElement('a', {className: 'explore-picture-name text metro', innerText: name, attributes: {href: '/' + subdir + '/' + id}});
+		entry.description = createElement('div', {className: 'explore-picture-description text metro', innerText: desc});
+		entry.shadow.appendChild(entry.container);
+		entry.container.appendChild(entry.photo);
+		entry.container.appendChild(entry.details);
+		entry.details.appendChild(entry.name);
+		entry.details.appendChild(entry.description);
+
+		setBackgroundImage(entry.photo, cdnPath(subdir, id));
+		ajaxify(entry.name);
+
+		return entry;
+	}
+
+	createActivityEntry(id, name, type, desc, attending, past){
+		const entry = {};
+
+		entry.container = createElement('div', {className: 'explore-activity shadow-heavy'});
+		entry.name = createElement('a', {className: 'explore-activity-name text metro', innerText: type + ' \u2022 ' + name, attributes: {href: '/activity/' + id}});
+		entry.description = createElement('span', {className: 'explore-activity-description text', innerText: desc});
+		entry.attendingContainer = createElement('div', {className: 'explore-activity-attending-container'});
+		entry.attendingContainer.appendChild(createElement('span', {className: 'text metro', innerText: past ? 'Attended' : 'Attending'}));
+		entry.attendingContainer.appendChild(createElement('span', {className: 'explore-activity-attending-count text metro', innerText: attending}));
+		entry.container.appendChild(entry.name);
+		entry.container.appendChild(entry.description);
+		entry.container.appendChild(entry.attendingContainer);
+
+		ajaxify(entry.name);
+
+		return entry;
+	}
+
+	showing(){
+		this.search.style.display = '';
+
+		if(!this.searchAppended){
+			pageManager.topBar.element.appendChild(this.search);
+			pageManager.topBar.element.appendChild(pageManager.topBar.right);
+
+			this.searchAppended = true;
+		}
+	}
+
+	hidden(){
+		this.search.style.display = 'none';
+	}
+
+	load(data){
+		if(!data)
+			return pageManager.showErrorPage();
 		document.title = 'Explore';
-		history.replaceState(null, document.title, '/explore');
+
+		if(data.tag)
+			history.replaceState(null, document.title, '/explore?tag=' + data.tag);
+		else
+			history.replaceState(null, document.title, '/explore');
+
+		while(this.left.childNodes.length)
+			this.left.removeChild(this.left.childNodes[0]);
+		while(this.middle.childNodes.length)
+			this.middle.removeChild(this.middle.childNodes[0]);
+		while(this.right.childNodes.length)
+			this.right.removeChild(this.right.childNodes[0]);
+		this.left.appendChild(createElement('div', {className: 'explore-container-title text metro', innerText: 'Users'}));
+		this.middle.appendChild(createElement('div', {className: 'explore-container-title text metro', innerText: 'Activities'}));
+		this.right.appendChild(createElement('div', {className: 'explore-container-title text metro', innerText: 'Clubs'}));
+
+		for(var i in data.users){
+			const entry = this.createPictureEntry('profile', data.users[i].id, data.users[i].name, data.users[i].description);
+
+			this.left.appendChild(entry.shadow);
+		}
+
+		for(var i in data.activities){
+			const entry = this.createActivityEntry(data.activities[i].id, data.activities[i].name, data.activities[i].type,
+				data.activities[i].description, data.activities[i].numAttending, data.activities[i].is_past);
+			this.middle.appendChild(entry.container);
+		}
+
+		for(var i in data.clubs){
+			const entry = this.createPictureEntry('club', data.clubs[i].id, data.clubs[i].name, data.clubs[i].description);
+
+			this.right.appendChild(entry.shadow);
+		}
+	}
+}
+
+class ChallengePage extends Page{
+	constructor(){
+		super();
+
+		this.table = createElement('div', {className: 'profile-table'});
+		this.left = createElement('div', {className: 'profile-container left'});
+		this.middle = createElement('div', {className: 'profile-container middle'});
+		this.right = createElement('div', {className: 'profile-container right'});
+
+		this.table.appendChild(this.left);
+		this.table.appendChild(createElement('div', {className: 'profile-container expander'}));
+		this.table.appendChild(this.middle);
+		this.table.appendChild(createElement('div', {className: 'profile-container expander'}));
+		this.table.appendChild(this.right);
+		this.element.appendChild(this.table);
+	}
+
+	load(data){
+		if(!data)
+			return pageManager.showErrorPage();
+		while(this.middle.childNodes.length)
+			this.middle.removeChild(this.middle.childNodes[0]);
+		this.middle.appendChild(createElement('div', {className: 'profile-container top-padding text metro', css: {display: 'flex', 'justify-content': 'center', 'align-items': 'center', 'font-size': '32px'}, innerText: 'Challenges'}));
+
+		document.title = 'Challenges';
+		history.replaceState(null, document.title, '/challenges');
+
+		for(var i in data.activities)
+			this.middle.appendChild(activityManager.createActivity(data.activities[i]));
 	}
 }
 
@@ -2556,7 +2704,8 @@ const pageManager = new (class{
 			activity: new ActivityPage(),
 			new_club: new ClubCreationPage(),
 			club: new ClubPage(),
-			unverified: new UnverifiedPage()
+			unverified: new UnverifiedPage(),
+			challenges: new ChallengePage()
 		};
 
 		this.showingPage = null;
