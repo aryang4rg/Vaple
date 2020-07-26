@@ -77,6 +77,11 @@ public class DatabaseConnectivity
 		collection.update(new BasicDBObject("_id", object.get("_id")), object);
 	}
 
+	public static void removeObject(DBObject object, DBCollection collection)
+	{
+		collection.remove(object);
+	}
+
 	/**
 	 *
 	 * @param object The object to be searched for

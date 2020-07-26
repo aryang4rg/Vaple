@@ -45,10 +45,17 @@ public class Club implements DatabaseStructureObject
         node.put("owner", (String)get(OWNER));
 
         ArrayNode memNode = new ArrayNode(JsonNodeFactory.instance);
-        ArrayList<DBObject> members = getMembers();
-        for (DBObject mem : members)
+        ArrayList<String> members = getMembers();
+        for (String mem : members)
         {
-            memNode.add( ((ObjectId) mem.get(ID)).toHexString());
+            ObjectNode memNodeInternal = Util.createObjectNode();
+            User user = (User) User.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(mem));
+            if (user != null) {
+                memNodeInternal.put("id", mem);
+                memNodeInternal.put("name", (String)user.get(User.NAME));
+                memNode.add(memNodeInternal);
+            }
+
         }
 
         node.put(MEMBER, memNode);
@@ -56,6 +63,50 @@ public class Club implements DatabaseStructureObject
 
         return node;
     }
+
+    public ObjectNode viewClubHandlerJson(){
+
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        node.put("name", (String)get(NAME));
+        node.put("id", getObjectID().toHexString());
+        node.put("description", (String)get(DESCRIPTION));
+        node.put("country", (String)get(LOCATION_COUNTRY));
+        node.put("city", (String)get(LOCATION_CITY));
+        node.put("state", (String)get(LOCATION_STATE));
+        node.put("country", (String)get(LOCATION_COUNTRY));
+        node.put(CLUB_TYPE, (String)get(CLUB_TYPE));
+
+        ArrayNode memNode = new ArrayNode(JsonNodeFactory.instance);
+        ObjectNode owner = Util.createObjectNode();
+        User ownerUser = (User)User.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId((String)get(OWNER)));
+        owner.put("id", (String)get(OWNER));
+        owner.put("name", (String)ownerUser.get(User.NAME));
+        ArrayList<String> members = getMembers();
+        for (String mem : members)
+        {
+            ObjectNode memNodeInternal = Util.createObjectNode();
+            User user = (User) User.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(mem));
+            if (user != null) {
+                memNodeInternal.put("id", mem);
+                memNodeInternal.put("name", (String)user.get(User.NAME));
+                memNode.add(memNodeInternal);
+            }
+
+        }
+
+        node.put(MEMBER, memNode);
+
+
+        return node;
+    }
+
+    public void setMember(ObjectId userId, boolean isAdding){
+        if(isAdding)
+            ((DBObject)object.get(MEMBER)).put(userId.toHexString(), true);
+        else
+            ((DBObject)object.get(MEMBER)).removeField(userId.toHexString());
+    }
+
     public Club(String name, String description, String location_country, String location_state, String location_city, String club_type, ObjectId owner)
     {
         DBObject object = new BasicDBObject();
@@ -70,7 +121,7 @@ public class Club implements DatabaseStructureObject
         DBObject membersObject = new BasicDBObject();
         membersObject.put(owner.toHexString(), true);
 
-        object.put("members",new BasicDBObject());
+        object.put("members", membersObject);
 
         object.put("owner",owner.toHexString());
         object.put("activity", new BasicDBObject());
@@ -98,12 +149,7 @@ public class Club implements DatabaseStructureObject
         object.put(identifier,value);
     }
 
-    public void setMember(ObjectId userId, boolean isAdding){
-        if(isAdding)
-            ((DBObject)object.get("clubs")).put(userId.toHexString(), true);
-        else
-            ((DBObject)object.get("clubs")).removeField(userId.toHexString());
-    }
+
 
     public int countObjectEntries(DBObject object){
         int size = object.keySet().size();
@@ -123,9 +169,9 @@ public class Club implements DatabaseStructureObject
         this.object = object;
     }
 
-    public ArrayList<DBObject> getMembers()
+    public ArrayList<String> getMembers()
     {
-        return (ArrayList<DBObject>) DatabaseConnectivity.CLUBCOLLECTION.find().sort(new BasicDBObject("name",1)).toArray();
+        return new ArrayList<>( ((DBObject)get(MEMBER)).keySet() );
     }
 
 

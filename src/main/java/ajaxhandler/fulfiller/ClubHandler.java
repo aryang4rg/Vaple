@@ -29,7 +29,20 @@ public class ClubHandler implements AjaxHandler
         if(uriSplit.length != 1) // 0: / 1: club 2: id
             return 404;
         String id = uriSplit[0];
-        Club c = (Club)Club.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(id));
+        if (id == null || id.equals("undefined") || id.equals("null"))
+        {
+            return 404;
+        }
+        Club c;
+
+        if(!ObjectId.isValid(id))
+        {
+            return 404;
+        }
+
+        c = (Club) Club.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(id));
+
+
         if (c == null)
         {
             return 404;
@@ -38,21 +51,33 @@ public class ClubHandler implements AjaxHandler
         ObjectNode node = Util.createObjectNode();
         response.put("data", node);
         response.put("type", "club");
-        response.put("data", c.getConciseDataNode());
+        ObjectNode data = c.viewClubHandlerJson();
 
         if (user == null)
         {
-            response.put("owner", false);
-            response.put("joined", false);
+            data.put("owner", false);
+            data.put("joined", false);
         }
         else
         {
            if(c.get("owner").equals(user.getObjectID().toHexString()))
            {
-                response.put("","");
+               data.put("owner",true);
+               data.put("joined", false);
            }
-
+           else if (user.getClubList().contains(c.getObjectID().toHexString()))
+           {
+               data.put("owner",false);
+               data.put("joined", true);
+           }
+           else
+           {
+               data.put("owner",false);
+               data.put("joined", false);
+           }
         }
+
+        response.put("data", data);
         return 200;
 
     }

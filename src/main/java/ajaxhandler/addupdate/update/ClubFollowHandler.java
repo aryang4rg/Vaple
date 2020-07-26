@@ -27,17 +27,18 @@ public class ClubFollowHandler implements AjaxHandler
         String club_id = Util.asText(request.get("club_id"));
         Boolean toJoin = request.get("toJoin").asBoolean();
 
-        if (Util.trimAndnullIfSpecialCharacters(club_id) == null)
-        {
+        if (Util.trimAndnullIfSpecialCharacters(club_id) == null) {
             return 400;
         }
-        if (toJoin == null)
-        {
+        if (toJoin == null) {
             return 400;
         }
 
         Club c = (Club) Club.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(club_id));
-        if (c == null)
+        if (c == null) {
+            return 400;
+        }
+        if (user == null)
         {
             return 400;
         }

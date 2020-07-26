@@ -28,6 +28,10 @@ public class ActivityHandler implements AjaxHandler
         if(uriSplit.length != 1) // 0: / 1: activity 2: id
             return 404;
         String id = uriSplit[0];
+        if (!ObjectId.isValid(id))
+        {
+            return 404;
+        }
         Activity activity = (Activity)Activity.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(id));
         if (activity == null)
         {
