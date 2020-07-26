@@ -2262,7 +2262,7 @@ class ClubPage extends Page{
 
 		this.details.appendChild(createElement('div', {className: 'divider'}));
 		this.descContainer = createElement('div', {className: 'club-description-container'});
-		this.type = createElement('span', {className: 'text'});
+		this.type = createElement('span', {className: 'text metro'});
 		this.descContainer.appendChild(this.type);
 		this.description = createElement('span', {className: 'profile-bio text', css: {marginTop: '8px'}});
 		this.descContainer.appendChild(this.description);
