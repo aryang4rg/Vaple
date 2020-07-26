@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static databaseobject.Activity.NAME;
 import static databaseobject.Activity.getActivitiesByTag;
 
 public class ExploreFeedHandler implements AjaxHandler
@@ -45,14 +46,45 @@ public class ExploreFeedHandler implements AjaxHandler
                 if (myActivity != null)
                 {
                     ObjectNode innerNode = Util.createObjectNode();
-                    innerNode.put("id", ((ObjectId)myActivity.get("id")).toHexString());
-                    //innerNode.put("name", ())
+                    innerNode.put("id", ((ObjectId)myActivity.get(ID)).toHexString());
+                    innerNode.put("name", (String)myActivity.get(NAME));
+                    activityNode.put( ((ObjectId)myActivity.get(ID)).toHexString(), innerNode);
+                }
+            }
 
-                    activityNode.put( ((ObjectId)myActivity.get("id")).toHexString(), innerNode);
+            for (DBObject obj: clubs)
+            {
+                ObjectId id = (ObjectId) obj.get(ID);
+                Club club = (Club)Club.databaseConnectivity().getFromInfoInDataBase(ID, id);
+                if (club != null)
+                {
+                    ObjectNode innerNode = Util.createObjectNode();
+                    innerNode.put("id", ((ObjectId)club.get(ID)).toHexString());
+                    innerNode.put("name", (String)club.get(NAME));
+                    clubNode.put( ((ObjectId)club.get(ID)).toHexString(), innerNode);
                 }
             }
 
 
+            for (DBObject obj: users)
+            {
+                ObjectId id = (ObjectId) obj.get(ID);
+                User myUser = (User)User.databaseConnectivity().getFromInfoInDataBase(ID, id);
+                if (myUser != null)
+                {
+                    ObjectNode innerNode = Util.createObjectNode();
+                    innerNode.put("id", ((ObjectId)myUser.get(ID)).toHexString());
+                    innerNode.put("name", (String)myUser.get(NAME));
+                    userNode.put( ((ObjectId)myUser.get(ID)).toHexString(), innerNode);
+                }
+            }
+            response.put("activities", activityNode);
+            response.put("clubs", clubNode);
+            response.put("users", userNode);
+        }
+        else
+        {
+            
         }
         return 0;
     }

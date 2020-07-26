@@ -44,6 +44,9 @@ public class AddUserToActivity implements AjaxHandler {
         {
             return 400;
         }
+
+
+
         user.setActivities(activity.getObjectID(), toAdd);
         activity.setAttending(user.getObjectID(), toAdd);
         Activity.databaseConnectivity().updateInDatabase(activity);

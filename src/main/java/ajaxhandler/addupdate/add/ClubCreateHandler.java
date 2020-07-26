@@ -49,7 +49,13 @@ public class ClubCreateHandler implements AjaxHandler
 
         if(picture != null){
             try{
-                ImageUtil.writeToFile(mainServlet.getFile("/cdn/club/" + club.getObjectID().toHexString() + ".png"), picture);
+                String str =  ImageUtil.writeToFile(mainServlet.getFile("/cdn/club/" + club.getObjectID().toHexString() + ".png"), picture);
+                if (str == null)
+                {
+                    response.put("image", "Error creating image");
+                    DatabaseConnectivity.removeObject(club.getDBForm(), DatabaseConnectivity.CLUBCOLLECTION);
+                    return 400;
+                }
             }catch(IOException e){
                 response.put("image", "Error creating image");
                 DatabaseConnectivity.removeObject(club.getDBForm(), DatabaseConnectivity.CLUBCOLLECTION);
