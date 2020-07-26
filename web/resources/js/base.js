@@ -1058,7 +1058,7 @@ class ProfilePage extends Page{
 		}
 	}
 
-	fetchActivities(id, top = 50, last){
+	fetchActivities(id, top = 10, last){
 		this.fetch_activities = accountManager.sendRequest('/activities?id=' + id + '&top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
 			this.activity_next = false;
 			this.fetch_activities = null;
@@ -1960,7 +1960,7 @@ class FeedPage extends Page{
 		}
 	}
 
-	fetchActivities(top = 50, last){
+	fetchActivities(top = 10, last){
 		this.fetch_activities = accountManager.sendRequest('/activity_feed?top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
 			this.activity_next = false;
 			this.fetch_activities = null;
@@ -2502,7 +2502,7 @@ class ClubPage extends Page{
 		}
 	}
 
-	fetchActivities(id, top = 50, last){
+	fetchActivities(id, top = 10, last){
 		this.fetch_activities = accountManager.sendRequest('/activities?clubId=' + id + '&top=' + top + (last ? '&last=' + last : ''), null, (status, error, resp) => {
 			this.activity_next = false;
 			this.fetch_activities = null;
