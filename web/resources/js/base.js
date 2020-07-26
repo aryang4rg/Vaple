@@ -1272,7 +1272,7 @@ const activityManager = new (class{
 			const textContainer = this.createOffsetContainer();
 			const text = this.createOffsetContainer();
 
-			text.appendChild(createElement('span', {className: 'text metro', innerText: data.time_end > ctime ? (data.attending.length ? 'People Attending' : 'No one is attending yet. Be the first!') :
+			text.appendChild(createElement('span', {className: 'text metro', innerText: data.time_start > ctime ? (data.attending.length ? 'People Attending' : 'No one is attending yet. Be the first!') :
 																												(data.attending.length ? 'People Attended' : '')}));
 			body.appendChild(textContainer);
 			textContainer.appendChild(text);
