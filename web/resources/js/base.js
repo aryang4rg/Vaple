@@ -2674,8 +2674,12 @@ class ChallengePage extends Page{
 		document.title = 'Challenges';
 		history.replaceState(null, document.title, '/challenges');
 
-		for(var i in data.activities)
+		for(var i in data.activities){
+			data.activities[i].club = null;
+			data.activities[i].creator = {id: '', name: ''};
+
 			this.middle.appendChild(activityManager.createActivity(data.activities[i]));
+		}
 	}
 }
 
