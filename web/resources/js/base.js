@@ -48,8 +48,8 @@ function createElement(tagName, args = {}, children = []){
 
 function cdnPath(subdir, name){
 	if(subdir)
-		return '/cdn/' + subdir + '/' + name + '.png';
-	return '/cdn/' + name + '.png';
+		return '/cdn/' + subdir + '/' + name + '.png' + '?nocache=' + Date.now();
+	return '/cdn/' + name + '.png' + '?nocache=' + Date.now();
 }
 
 function setBackgroundImage(element, url){
@@ -889,7 +889,7 @@ class ProfilePage extends Page{
 				return;
 			this.error.setText('Could not update image: ' + data.profile.image);
 		}else if(this.submittedpfp){
-			const url = cdnPath('profile', accountManager.id) + '?nocache=' + Date.now();
+			const url = cdnPath('profile', accountManager.id);
 
 			pageManager.topBar.showProfilePhoto(url);
 
