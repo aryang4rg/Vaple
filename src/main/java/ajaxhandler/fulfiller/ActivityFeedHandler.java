@@ -1,13 +1,16 @@
 package ajaxhandler.fulfiller;
 
 import ajaxhandler.AjaxHandler;
+import com.mongodb.BasicDBObject;
 import databaseobject.*;
 import util.*;
 
 import databaseobject.Activity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.bson.types.ObjectId;
+import org.bson.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -141,7 +144,7 @@ public class ActivityFeedHandler implements AjaxHandler
 		}
 
 		for(String str : obj.keySet())
-			jsonNodeHolderForActivities.add(obj.get(str));
+			jsonNodeHolderForActivities.add( (JsonNode)obj.get(str));
 		data.put("activities", Json.toJson(jsonNodeHolderForActivities));
 
         if(isAPage){

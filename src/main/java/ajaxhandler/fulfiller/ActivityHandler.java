@@ -25,7 +25,7 @@ public class ActivityHandler implements AjaxHandler
 
     @Override
     public int service(HttpServletRequest req, HttpServletResponse resp, JsonNode request, ObjectNode response, String[] uriSplit, User user) throws ServletException, IOException {
-        if(uriSplit.length != 1) // 0: / 1: activity 2: id
+        if(uriSplit.length != 1)
             return 404;
         String id = uriSplit[0];
         if (!ObjectId.isValid(id))
