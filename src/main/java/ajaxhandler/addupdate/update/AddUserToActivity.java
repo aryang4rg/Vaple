@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import databaseobject.Activity;
 import databaseobject.User;
+import org.bson.types.ObjectId;
 import util.Util;
 
 import javax.servlet.ServletException;
@@ -38,7 +39,7 @@ public class AddUserToActivity implements AjaxHandler {
         {
             return 400;
         }
-        Activity activity = (Activity) Activity.databaseConnectivity().getFromInfoInDataBase(ID, id);
+        Activity activity = (Activity) Activity.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId(id));
         if (activity == null)
         {
             return 400;

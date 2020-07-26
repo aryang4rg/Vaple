@@ -44,6 +44,10 @@ public class ClubCreateHandler implements AjaxHandler
         String picture = Util.asText(request.get("image"));
 
         Club club = new Club(name, description, country, state, city, type, user.getObjectID());
+        Club.databaseConnectivity().addInDatabase(club);
+
+        user.setClubs(club.getObjectID(), true);
+        User.databaseConnectivity().updateInDatabase(user);
 
         if (!Util.checkIfStringsAreValid(name,description,type,city,state,country))
         {
@@ -59,7 +63,7 @@ public class ClubCreateHandler implements AjaxHandler
 
         }
 
-        Club.databaseConnectivity().addInDatabase(club);
+        response.put("club", club.getConciseDataNode());
         return 200;
     }
 

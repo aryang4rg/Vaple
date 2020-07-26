@@ -1,6 +1,8 @@
 package ajaxhandler.login;
 
 import ajaxhandler.AjaxHandler;
+import ajaxhandler.fulfiller.ActivityHandler;
+import ajaxhandler.fulfiller.ProfileHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import databaseobject.User;
@@ -14,6 +16,7 @@ import java.io.IOException;
 public class VerifyAccountHandler implements AjaxHandler
 {
     private static VerifyAccountHandler instance = new VerifyAccountHandler();
+    private ProfileHandler profileHandler = ProfileHandler.getInstance();
     private VerifyAccountHandler(){}
 
     public static VerifyAccountHandler getInstance() {
@@ -26,7 +29,7 @@ public class VerifyAccountHandler implements AjaxHandler
         {
             return 400;
         }
-        String token = uriSplit[2];
+        String token = uriSplit[0];
         token = Util.trimAndnullIfSpecialCharacters(token);
         if (token== null)
         {
@@ -37,7 +40,9 @@ public class VerifyAccountHandler implements AjaxHandler
         {
             return 400;
         }
-        u.setVerifiedUser(true);
+        u.set (User.VERIFIED, true);
+        User.databaseConnectivity().updateInDatabase(u);
+        profileHandler.service(req,resp,request,response,new String[]{u.getObjectID().toHexString()},u);
         return 200;
     }
 

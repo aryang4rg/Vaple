@@ -42,6 +42,6 @@ public class ActivityHandler implements AjaxHandler
 
     @Override
     public boolean isPage() {
-        return false;
+        return true;
     }
 }

@@ -42,14 +42,7 @@ public class Club implements DatabaseStructureObject
         node.put("state", (String)get(LOCATION_STATE));
         node.put("country", (String)get(LOCATION_COUNTRY));
         node.put(CLUB_TYPE, (String)get(CLUB_TYPE));
-        node.put("owner", ((ObjectId)get(OWNER)).toHexString());
-
-        ObjectNode actNode = Util.createObjectNode();
-        ArrayList<String> activities = getActivities();
-        for (String str : activities)
-        {
-            actNode.put("str", true);
-        }
+        node.put("owner", (String)get(OWNER));
 
         ArrayNode memNode = new ArrayNode(JsonNodeFactory.instance);
         ArrayList<DBObject> members = getMembers();
@@ -73,8 +66,13 @@ public class Club implements DatabaseStructureObject
         object.put("location_state",location_state);
         object.put("location_city",location_city);
         object.put(CLUB_TYPE,club_type);
+
+        DBObject membersObject = new BasicDBObject();
+        membersObject.put(owner.toHexString(), true);
+
         object.put("members",new BasicDBObject());
-        object.put("owner",owner);
+
+        object.put("owner",owner.toHexString());
         object.put("activity", new BasicDBObject());
         object.put("tags",tags);
 
@@ -84,7 +82,7 @@ public class Club implements DatabaseStructureObject
 
     public ArrayList<String> getActivities()
     {
-        Set<String> activities = ((DBObject)(object.get("activities"))).keySet();
+        Set<String> activities = ((DBObject)(object.get(ACTIVITY))).keySet();
         ArrayList<String> actList = new ArrayList<>(activities);
         return actList;
     }
@@ -98,14 +96,6 @@ public class Club implements DatabaseStructureObject
     public void set(String identifier, Object value)
     {
         object.put(identifier,value);
-    }
-
-    public void setActivity(ObjectId act, boolean isAdding)
-    {
-        if(isAdding)
-            ((DBObject)object.get("clubs")).put(act.toHexString(), true);
-        else
-            ((DBObject)object.get("clubs")).removeField(act.toHexString());
     }
 
     public void setMember(ObjectId userId, boolean isAdding){
