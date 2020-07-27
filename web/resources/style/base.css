@@ -1450,4 +1450,6 @@ textarea.new-activity-form-entry-input{
 	border: 0;
 	outline: 0;
 	font-size: 1rem;
+	display: flex;
+	flex: 1;
 }
