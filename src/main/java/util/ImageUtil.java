@@ -21,10 +21,12 @@ public class ImageUtil{
 			return "Not a valid image";
 		if(img.getWidth() < 32 || img.getHeight() < 32)
 			return "Image must be atleast 32x32";
-		if(img.getWidth() > 512 || img.getHeight() > 512)
-			return "Image must be atmost 512x512";
-		if(imageBytes.length > 512 * 1024)
-			return "Image must be atmost 512KB";
+
+		if(img.getWidth() > 2048 || img.getHeight() > 2048)
+			return "Image must be atmost 2048x2048";
+		if(imageBytes.length > 1024 * 1024)
+			return "Image must be atmost 1024KB";
+
 		if (!file.exists()) {
 			file.createNewFile();
 		}

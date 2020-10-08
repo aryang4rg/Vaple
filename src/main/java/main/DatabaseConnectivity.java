@@ -104,12 +104,12 @@ public class DatabaseConnectivity
 				for (int j = 0; j < stringys.size(); j++)
 				{
 					try {
-						if (objects.get(i).get(stringys.get(j)).equals(data)) {
+						if ( (((String)(objects.get(i).get(stringys.get(j)))).toLowerCase()).contains(data.toLowerCase())) {
 							finalList.add(objects.get(i));
 							break;
 						}
 					}
-					catch (NullPointerException e)
+					catch (Exception e)
 					{
 						e.printStackTrace();
 					}

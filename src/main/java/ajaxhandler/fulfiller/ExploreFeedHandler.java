@@ -37,7 +37,7 @@ public class ExploreFeedHandler implements AjaxHandler
         response.put("type", "explore");
         ObjectNode data = Util.createObjectNode();
         tag = Util.trimAndnullIfSpecialCharacters(tag);
-        
+
         data.put("tag", tag);
 
         ObjectNode activityNode = Util.createObjectNode();
@@ -116,8 +116,8 @@ public class ExploreFeedHandler implements AjaxHandler
                 if (oneAct != null)
                 {
                     ObjectNode innerNode = Util.createObjectNode();
-                    innerNode.put("id", ((ObjectId)oneAct.get(ID)).toHexString());
                     innerNode.put("name", (String)oneAct.get(NAME));
+                    innerNode.put("id", ((ObjectId)oneAct.get(ID)).toHexString());
                     innerNode.put("description", (String)oneAct.get(DESCRIPTION));
                     innerNode.put("attending_number", oneAct.allAttending().size());
                     innerNode.put("type", (String)oneAct.get(TYPE));
@@ -130,7 +130,7 @@ public class ExploreFeedHandler implements AjaxHandler
                     ObjectNode innerNode = Util.createObjectNode();
                     innerNode.put("id", ((ObjectId)twoAct.get(ID)).toHexString());
                     innerNode.put("name", (String)twoAct.get(NAME));
-                    innerNode.put("description", (String)oneAct.get(DESCRIPTION));
+                    innerNode.put("description", (String)twoAct.get(DESCRIPTION));
                     innerNode.put("attending_number", twoAct.allAttending().size());
                     innerNode.put("type", (String)twoAct.get(TYPE));
                     innerNode.put("is_past", ( System.currentTimeMillis() > (Long)twoAct.get(TIME_START)  ));
@@ -176,7 +176,7 @@ public class ExploreFeedHandler implements AjaxHandler
                     ObjectNode innerNode = Util.createObjectNode();
                     innerNode.put("id", ((ObjectId)twoAct.get(ID)).toHexString());
                     innerNode.put("name", (String)twoAct.get(NAME));
-                    innerNode.put("description", (String)oneAct.get(DESCRIPTION));
+                    innerNode.put("description", (String)twoAct.get(DESCRIPTION));
 
                     userNode.put( ((ObjectId)twoAct.get(ID)).toHexString(), innerNode);
                 }
@@ -215,7 +215,7 @@ public class ExploreFeedHandler implements AjaxHandler
                     ObjectNode innerNode = Util.createObjectNode();
                     innerNode.put("id", ((ObjectId)twoAct.get(ID)).toHexString());
                     innerNode.put("name", (String)twoAct.get(NAME));
-                    innerNode.put("description", (String)oneAct.get(DESCRIPTION));
+                    innerNode.put("description", (String)twoAct.get(DESCRIPTION));
                     clubNode.put( ((ObjectId)twoAct.get(ID)).toHexString(), innerNode);
                 }
 

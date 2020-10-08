@@ -34,7 +34,7 @@ public class ActivityFeedHandler implements AjaxHandler
         String specificUserId = req.getParameter("id");
         int index = 0;
 
-        String afterKeyword = req.getParameter("after");
+        String afterKeyword = req.getParameter("last");
         afterKeyword = Util.trimAndnullIfSpecialCharacters(afterKeyword);
         ArrayList<Activity> activities = new ArrayList<>();
 

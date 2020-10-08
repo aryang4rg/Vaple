@@ -27,10 +27,10 @@ public class ChallengesHandler implements AjaxHandler
         ObjectNode data = Util.createObjectNode();
 
         Activity[] challenges = {
-                (Activity)Activity.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId("5f1d1db564b99c5008590e67")),
-                (Activity)Activity.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId("5f1d1db564b99c5008590e67")),
-                (Activity)  Activity.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId("5f1d1db564b99c5008590e67")),
-                (Activity)Activity.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId("5f1d1db564b99c5008590e67"))
+                (Activity)Activity.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId("5f1ddd7664b9d4288d7e6447")),
+                (Activity)Activity.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId("5f1ddc0564b9d4288d7e6444")),
+                (Activity)  Activity.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId("5f1ddc6664b9d4288d7e6445")),
+                (Activity)Activity.databaseConnectivity().getFromInfoInDataBase(ID, new ObjectId("5f1ddcd464b9d4288d7e6446"))
 
                                 };
 

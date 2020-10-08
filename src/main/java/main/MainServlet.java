@@ -53,6 +53,7 @@ public class MainServlet extends HttpServlet
 	private Hashtable<String, String> extensionToMime = extensionToMimeHM();
 
 
+
 	private Hashtable<String, AjaxHandler> ajaxRequestToHandler()
 	{
 		Hashtable<String, AjaxHandler> hashtable = new Hashtable<>();
