@@ -1,0 +1,5 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sat Oct 10 22:22:47 PDT 2020
+discord4j-common-3.1.1.jar>central=
+discord4j-common-3.1.1-sources.jar>central=
+discord4j-common-3.1.1.pom>central=

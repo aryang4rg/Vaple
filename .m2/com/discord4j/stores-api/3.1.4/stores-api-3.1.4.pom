@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- This module was also published with a richer model, Gradle metadata,  -->
+  <!-- which should be used instead. Do not delete the following line which  -->
+  <!-- is to indicate to Gradle or any Gradle module metadata file consumer  -->
+  <!-- that they should prefer consuming it instead. -->
+  <!-- do_not_remove: published-with-gradle-metadata -->
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.discord4j</groupId>
+  <artifactId>stores-api</artifactId>
+  <version>3.1.4</version>
+  <name>Stores</name>
+  <description>A set of pre-made store implementations for Discord4J</description>
+  <url>https://github.com/Discord4J/Stores</url>
+  <organization>
+    <name>Discord4J</name>
+    <url>https://discord4j.com</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>LGPL-3.0</name>
+      <url>https://github.com/Discord4J/Stores/LICENSE.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>The Discord4J Team</name>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git://github.com/Discord4J/Stores.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:Discord4J/Stores.git</developerConnection>
+    <url>https://github.com/Discord4J/Stores</url>
+  </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/Discord4J/Stores/issues</url>
+  </issueManagement>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.projectreactor</groupId>
+        <artifactId>reactor-bom</artifactId>
+        <version>Dysprosium-SR11</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>io.projectreactor</groupId>
+      <artifactId>reactor-core</artifactId>
+      <version>3.3.9.RELEASE</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.austinv11.servicer</groupId>
+      <artifactId>Servicer</artifactId>
+      <version>1.0.3</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.11.2</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- This module was also published with a richer model, Gradle metadata,  -->
+  <!-- which should be used instead. Do not delete the following line which  -->
+  <!-- is to indicate to Gradle or any Gradle module metadata file consumer  -->
+  <!-- that they should prefer consuming it instead. -->
+  <!-- do_not_remove: published-with-gradle-metadata -->
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.discord4j</groupId>
+  <artifactId>discord4j-voice</artifactId>
+  <version>3.1.1</version>
+  <name>Discord4J</name>
+  <description>A JVM-based REST/WS wrapper for the official Discord Bot API</description>
+  <url>https://github.com/Discord4J/Discord4J</url>
+  <organization>
+    <name>Discord4J</name>
+    <url>https://discord4j.com</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>LGPL-3.0</name>
+      <url>https://github.com/Discord4J/Discord4J/LICENSE.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>The Discord4J Team</name>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git://github.com/Discord4J/Discord4J.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:Discord4J/Discord4J.git</developerConnection>
+    <url>https://github.com/Discord4J/Discord4J</url>
+  </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/Discord4J/Discord4J/issues</url>
+  </issueManagement>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.projectreactor</groupId>
+        <artifactId>reactor-bom</artifactId>
+        <version>Dysprosium-SR12</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>com.discord4j</groupId>
+      <artifactId>discord-json</artifactId>
+      <version>1.5.4</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.discord4j</groupId>
+      <artifactId>discord4j-common</artifactId>
+      <version>3.1.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.discord4j</groupId>
+      <artifactId>simple-fsm</artifactId>
+      <version>1.0.1</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>

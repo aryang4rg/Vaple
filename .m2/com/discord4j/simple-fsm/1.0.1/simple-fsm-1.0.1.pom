@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.discord4j</groupId>
+  <artifactId>simple-fsm</artifactId>
+  <version>1.0.1</version>
+  <packaging>pom</packaging>
+  <description>A very simple finite state machine</description>
+  <name>simple-fsm</name>
+  <url>https://github.com/Discord4J/simple-fsm</url>
+  <organization>
+    <name>Discord4J</name>
+    <url>https://discord4j.com</url>
+  </organization>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/Discord4J/simple-fsm/issues</url>
+  </issueManagement>
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>https://github.com/Discord4J/simple-fsm/LICENSE.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://github.com/Discord4J/simple-fsm</url>
+    <connection>scm:git:git://github.com/Discord4J/simple-fsm.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:Discord4J/simple-fsm.git</developerConnection>
+  </scm>
+  <developers>
+    <developer>
+      <name>The Discord4J Team</name>
+    </developer>
+  </developers>
+</project>

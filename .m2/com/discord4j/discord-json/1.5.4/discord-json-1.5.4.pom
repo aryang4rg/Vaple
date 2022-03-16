@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- This module was also published with a richer model, Gradle metadata,  -->
+  <!-- which should be used instead. Do not delete the following line which  -->
+  <!-- is to indicate to Gradle or any Gradle module metadata file consumer  -->
+  <!-- that they should prefer consuming it instead. -->
+  <!-- do_not_remove: published-with-gradle-metadata -->
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.discord4j</groupId>
+  <artifactId>discord-json</artifactId>
+  <version>1.5.4</version>
+  <name>discord-json</name>
+  <description>Discord entity domain as immutable Jackson objects</description>
+  <url>https://github.com/Discord4J/discord-json</url>
+  <organization>
+    <name>Discord4J</name>
+    <url>https://discord4j.com</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>LGPL-3.0</name>
+      <url>https://github.com/Discord4J/discord-json/LICENSE.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>The Discord4J Team</name>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git://github.com/Discord4J/discord-json.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:Discord4J/discord-json.git</developerConnection>
+    <url>https://github.com/Discord4J/discord-json</url>
+  </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/Discord4J/discord-json/issues</url>
+  </issueManagement>
+  <dependencies>
+    <dependency>
+      <groupId>com.discord4j</groupId>
+      <artifactId>discord-json-api</artifactId>
+      <version>1.5.4</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.11.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jdk8</artifactId>
+      <version>2.11.2</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+</project>
